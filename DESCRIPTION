@@ -1,0 +1,21 @@
+Package: singcar
+Title: Functions for comparing single cases against a normative control group
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Jonathan",
+           family = "Rittmo",
+           role = c("aut", "cre"),
+           email = "j.rittmo@gmail.com",
+           comment = c(ORCID = "0000-0001-5075-0166"))
+Description: Contains functions for comparing single cases against a normative control group.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0
+Imports: 
+    stats
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 2.1.0)
+VignetteBuilder: knitr
