@@ -56,7 +56,7 @@
 #' @export
 #'
 #' @examples
-#' ch.ttest(-2, rnorm(15), alternative = "l", estimate.p = TRUEuse)
+#' ch.ttest(-2, rnorm(15), alternative = "l", estimate.p = TRUE)
 
 
 ch.ttest <- function (case, controls, alternative = c("less", "greater", "two.sided"), estimate.p = FALSE,
