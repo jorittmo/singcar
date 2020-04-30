@@ -7,6 +7,8 @@
 ch.ttest(
   case,
   controls,
+  controls.sd = NULL,
+  controls.n = NULL,
   alternative = c("less", "greater", "two.sided"),
   estimate.p = FALSE,
   conf.int = TRUE,
@@ -18,7 +20,14 @@ ch.ttest(
 \arguments{
 \item{case}{Case observation, can only be a single value.}
 
-\item{controls}{Numeric vector of observations from the control sample.}
+\item{controls}{Numeric vector of observations from the control sample.
+If single value, treated as mean.}
+
+\item{controls.sd}{If input of controls is single value, the standard deviation
+of the sample must be gven as well.}
+
+\item{controls.n}{If input of controls is single value, the size
+of the sample must be gven as well.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"less"} (default), \code{"greater"} or
@@ -45,9 +54,10 @@ A list with class \code{"htest"} containing the following components:
 \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
 the p-value for the test.\cr\cr \code{estimate}    \tab estimated standardised
-difference or proporiton as well as mean and sd of controls.\cr\cr
+difference or proportion as well as mean and sd of controls.\cr\cr
 \code{null.value}   \tab the value of the difference under the null
-hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for the
+hypothesis.\cr\cr \code{sample.size}   \tab the size of the control sample\cr\cr
+\code{conf.int}     \tab a confidence interval for the
 specified estimate and alternative hypothesis.\cr\cr \code{interval}     \tab
 string indicating the type of interval (proportion or difference). \cr\cr
 \code{stderr}     \tab the standard error of the mean (difference), used as

@@ -21,6 +21,11 @@
 #'
 #' @param case Case observation, can only be a single value.
 #' @param controls Numeric vector of observations from the control sample.
+#' If single value, treated as mean.
+#' @param controls.sd If input of controls is single value, the standard deviation
+#' of the sample must be gven as well.
+#' @param controls.n If input of controls is single value, the size
+#' of the sample must be gven as well.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
@@ -40,9 +45,10 @@
 #' \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 #' \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
 #' the p-value for the test.\cr\cr \code{estimate}    \tab estimated standardised
-#' difference or proporiton as well as mean and sd of controls.\cr\cr
+#' difference or proportion as well as mean and sd of controls.\cr\cr
 #' \code{null.value}   \tab the value of the difference under the null
-#' hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for the
+#' hypothesis.\cr\cr \code{sample.size}   \tab the size of the control sample\cr\cr
+#' \code{conf.int}     \tab a confidence interval for the
 #' specified estimate and alternative hypothesis.\cr\cr \code{interval}     \tab
 #' string indicating the type of interval (proportion or difference). \cr\cr
 #' \code{stderr}     \tab the standard error of the mean (difference), used as
@@ -59,26 +65,37 @@
 #' ch.ttest(-2, rnorm(15), alternative = "l", estimate.p = TRUE)
 
 
-ch.ttest <- function (case, controls, alternative = c("less", "greater", "two.sided"), estimate.p = FALSE,
-                      conf.int = TRUE, conf.level = 0.95, conf.int.spec = 0.01, na.rm = FALSE) {
+ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
+                      alternative = c("less", "greater", "two.sided"),
+                      estimate.p = FALSE, conf.int = TRUE, conf.level = 0.95,
+                      conf.int.spec = 0.01, na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
-  if (length(controls)<2) stop("Controls do not have enough observations")
+  if (length(controls)<2 & is.null(controls.sd) == TRUE) {
+    stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
+  }
+
+  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == TRUE) stop("Input sample size")
   if (is.na(case)==TRUE) stop("Case is NA")
 
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
-  if (sum(is.na(controls)) > 0) stop("controls contains NA, set na.rm = TRUE to proceed")
+  if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
   alternative <- match.arg(alternative)
 
   con_m <- mean(controls) # Mean of the control sample
+
   con_sd <- stats::sd(controls) # Standard deviation of the control sample
+  if (length(controls)<2 & is.null(controls.sd) == FALSE) con_sd <- controls.sd
+
   n <- length(controls)
+  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == FALSE) n <- controls.n
+
   stderr <- con_sd * sqrt((n + 1)/n) # Standard error by C&H (1998) method
 
-  std_fx <- (case-con_m)/con_sd
+  std_fx <- (case - con_m)/con_sd
   tstat <- (case - con_m)/stderr # C&H's modified t
-  df <- length(controls) - 1 # The degrees of freedom
+  df <- n - 1 # The degrees of freedom
 
   # Get p-value depending on alternative hypothesis
 
@@ -225,6 +242,7 @@ ch.ttest <- function (case, controls, alternative = c("less", "greater", "two.si
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat, parameter = df, p.value = pval,
                  estimate = estimate, null.value = null.value,
+                 sample.size = n,
                  conf.int = cint,
                  interval = interval,
                  stderr = stderr,
@@ -232,7 +250,8 @@ ch.ttest <- function (case, controls, alternative = c("less", "greater", "two.si
                  method = paste("Crawford-Howell (1998) t-test"),
                  data.name = paste0("case = ", format(round(case, 2), nsmall = 2),
                                     " and controls (M = ", format(round(con_m, 2), nsmall = 2),
-                                    ", SD = ", format(round(con_sd, 2), nsmall = 2), ")"))
+                                    ", SD = ", format(round(con_sd, 2), nsmall = 2),
+                                    ", N = ", n, ")"))
 
   class(output) <- "htest"
   output
