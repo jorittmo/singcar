@@ -85,7 +85,7 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
 
   con_m <- mean(controls) # Mean of the control sample
 
-  con_sd <- stats::sd(controls) # Standard deviation of the control sample
+  con_sd <- stats::sd(controls) # Standard deviation of the control sample (returns NA if summary stats used)
   if (length(controls)<2 & is.null(controls.sd) == FALSE) con_sd <- controls.sd
 
   n <- length(controls)
