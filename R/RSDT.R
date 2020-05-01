@@ -127,7 +127,7 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
     )
     names(tstat) <- "t"
 
-    pval <- 2 * pt(abs(tstat), df = df, lower.tail = F)
+    pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = F)
 
   } else {
 
@@ -152,7 +152,7 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
     names(tstat) <- "approx. t"
 
-    pval <- 2 * pt(abs(psi), df = df, lower.tail = F)
+    pval <- 2 * stats::pt(abs(psi), df = df, lower.tail = F)
 
   }
 

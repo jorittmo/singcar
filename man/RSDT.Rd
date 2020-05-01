@@ -23,11 +23,11 @@ RSDT(
 \item{case.y}{Case's score on task Y.}
 
 \item{controls.x}{Controls' scores on task X. Takes either a vector of
-observations or a single value interpreted as mean. *Note*: you can supply
+observations or a single value interpreted as mean. \emph{Note}: you can supply
 a vector as input for task X while mean and SD for task Y.}
 
 \item{controls.y}{Controls' scores on task Y. Takes either a vector of
-observations or a single value interpreted as mean. *Note*: you can supply
+observations or a single value interpreted as mean. \emph{Note}: you can supply
 a vector as input for task Y while mean and SD for task X.}
 
 \item{controls.x.sd}{If single value for task X is given as input you must
@@ -64,12 +64,12 @@ A list with class \code{"htest"} containing the following components:
   \code{data.name}     \tab a character string giving the name(s) of the data}
 }
 \description{
-A test used for assessing dissociation between two tasks.Takes two single
-values from a case (from two tasks) and compares them to two a distribution
-of scores for both tasks estimated by a control sample. Calculates a
-standardised effects size of task difference as well as a point estimate of
-the proportion of the control population that would be expected to show a
-more extreme task difference.
+A test used to determine dissociation between two functions as assessed by
+two tasks.Takes two single values from a case (from two tasks) and compares
+them to two a distribution of scores for both tasks estimated by a control
+sample. Calculates a standardised effects size of task difference as well as
+a point estimate of the proportion of the control population that would be
+expected to show a more extreme task difference.
 }
 \examples{
 RSDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,
