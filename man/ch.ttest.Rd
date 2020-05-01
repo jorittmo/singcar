@@ -10,7 +10,7 @@ ch.ttest(
   controls.sd = NULL,
   controls.n = NULL,
   alternative = c("less", "greater", "two.sided"),
-  estimate.p = FALSE,
+  print.p.int = FALSE,
   conf.int = TRUE,
   conf.level = 0.95,
   conf.int.spec = 0.01,
@@ -20,21 +20,21 @@ ch.ttest(
 \arguments{
 \item{case}{Case observation, can only be a single value.}
 
-\item{controls}{Numeric vector of observations from the control sample.
-If single value, treated as mean.}
+\item{controls}{Numeric vector of observations from the control sample. If
+single value, treated as mean.}
 
-\item{controls.sd}{If input of controls is single value, the standard deviation
-of the sample must be gven as well.}
+\item{controls.sd}{If input of controls is single value, the standard
+deviation of the sample must be gven as well.}
 
-\item{controls.n}{If input of controls is single value, the size
-of the sample must be gven as well.}
+\item{controls.n}{If input of controls is single value, the size of the
+sample must be gven as well.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"less"} (default), \code{"greater"} or
 \code{"two.sided"}. You can specify just the initial letter.}
 
-\item{estimate.p}{Set to \code{TRUE} to estimate the proportion of population
-falling above or below case score instead of standardised difference.}
+\item{print.p.int}{Set to \code{TRUE} to print the confidence interval for
+the point estimate of the p-value.}
 
 \item{conf.int}{Calculate confidence intervals for desired estimate. Uses
 iterative method, set to \code{FALSE} for faster calculation (e.g. for
@@ -53,19 +53,19 @@ A list with class \code{"htest"} containing the following components:
 \tabular{llll}{
 \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
-the p-value for the test.\cr\cr \code{estimate}    \tab estimated standardised
-difference or proportion as well as mean and sd of controls.\cr\cr
+the p-value for the test.\cr\cr \code{estimate}    \tab estimated
+standardised difference (zcc) and point estimate of p-value. \cr\cr
 \code{null.value}   \tab the value of the difference under the null
-hypothesis.\cr\cr \code{sample.size}   \tab the size of the control sample\cr\cr
-\code{conf.int}     \tab a confidence interval for the
-specified estimate and alternative hypothesis.\cr\cr \code{interval}     \tab
-string indicating the type of interval (proportion or difference). \cr\cr
-\code{stderr}     \tab the standard error of the mean (difference), used as
-denominator in the t-statistic formula.\cr\cr \code{alternative}     \tab a
-character string describing the alternative hypothesis.\cr\cr \code{method}
-\tab a character string indicating what type of t-test was performed.\cr\cr
-\code{data.name}     \tab a character string giving the name(s) of the data
-as well as sum summaries.
+hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for zcc if
+not print.p.int set to TRUE \cr\cr \code{interval}     \tab named numerical
+vector containing confidence intervals for both zcc and p-value. \cr\cr
+\code{desc}     \tab named numerical containing descriptive statistics: mean
+and standard deviations of controls as well as sample size and standard error
+used in the t-formula. \cr\cr \code{alternative}     \tab a character string
+describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+string indicating what type of t-test was performed.\cr\cr \code{data.name}
+\tab a character string giving the name(s) of the data as well as sum
+summaries.
 }
 }
 \description{
@@ -92,5 +92,5 @@ See \url{https://stat.ethz.ch/pipermail/r-help/2008-June/164843.html}.
 }
 
 \examples{
-ch.ttest(-2, rnorm(15), alternative = "l", estimate.p = TRUE)
+ch.ttest(-2, rnorm(15), alternative = "l")
 }

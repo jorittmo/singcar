@@ -20,17 +20,17 @@
 #' See \url{https://stat.ethz.ch/pipermail/r-help/2008-June/164843.html}.
 #'
 #' @param case Case observation, can only be a single value.
-#' @param controls Numeric vector of observations from the control sample.
-#' If single value, treated as mean.
-#' @param controls.sd If input of controls is single value, the standard deviation
-#' of the sample must be gven as well.
-#' @param controls.n If input of controls is single value, the size
-#' of the sample must be gven as well.
+#' @param controls Numeric vector of observations from the control sample. If
+#'   single value, treated as mean.
+#' @param controls.sd If input of controls is single value, the standard
+#'   deviation of the sample must be gven as well.
+#' @param controls.n If input of controls is single value, the size of the
+#'   sample must be gven as well.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
-#' @param estimate.p Set to \code{TRUE} to estimate the proportion of population
-#'   falling above or below case score instead of standardised difference.
+#' @param print.p.int Set to \code{TRUE} to print the confidence interval for
+#'   the point estimate of the p-value.
 #' @param conf.int Calculate confidence intervals for desired estimate. Uses
 #'   iterative method, set to \code{FALSE} for faster calculation (e.g. for
 #'   simulations).
@@ -44,31 +44,31 @@
 #' \tabular{llll}{
 #' \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 #' \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
-#' the p-value for the test.\cr\cr \code{estimate}    \tab estimated standardised
-#' difference or proportion as well as mean and sd of controls.\cr\cr
+#' the p-value for the test.\cr\cr \code{estimate}    \tab estimated
+#' standardised difference (zcc) and point estimate of p-value. \cr\cr
 #' \code{null.value}   \tab the value of the difference under the null
-#' hypothesis.\cr\cr \code{sample.size}   \tab the size of the control sample\cr\cr
-#' \code{conf.int}     \tab a confidence interval for the
-#' specified estimate and alternative hypothesis.\cr\cr \code{interval}     \tab
-#' string indicating the type of interval (proportion or difference). \cr\cr
-#' \code{stderr}     \tab the standard error of the mean (difference), used as
-#' denominator in the t-statistic formula.\cr\cr \code{alternative}     \tab a
-#' character string describing the alternative hypothesis.\cr\cr \code{method}
-#' \tab a character string indicating what type of t-test was performed.\cr\cr
-#' \code{data.name}     \tab a character string giving the name(s) of the data
-#' as well as sum summaries.
+#' hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for zcc if
+#' not print.p.int set to TRUE \cr\cr \code{interval}     \tab named numerical
+#' vector containing confidence intervals for both zcc and p-value. \cr\cr
+#' \code{desc}     \tab named numerical containing descriptive statistics: mean
+#' and standard deviations of controls as well as sample size and standard error
+#' used in the t-formula. \cr\cr \code{alternative}     \tab a character string
+#' describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+#' string indicating what type of t-test was performed.\cr\cr \code{data.name}
+#' \tab a character string giving the name(s) of the data as well as sum
+#' summaries.
 #' }
 #'
 #' @export
 #'
 #' @examples
-#' ch.ttest(-2, rnorm(15), alternative = "l", estimate.p = TRUE)
+#' ch.ttest(-2, rnorm(15), alternative = "l")
 
 
 ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
                       alternative = c("less", "greater", "two.sided"),
-                      estimate.p = FALSE, conf.int = TRUE, conf.level = 0.95,
-                      conf.int.spec = 0.01, na.rm = FALSE) {
+                      print.p.int = FALSE, conf.int = TRUE, conf.level = 0.95,
+                      conf.int.spec = 0.01,  na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(controls.sd) == TRUE) {
@@ -80,6 +80,8 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
 
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
+
+  if (conf.int == FALSE & print.p.int == TRUE) warning("print.p.int will be ignored")
 
   alternative <- match.arg(alternative)
 
@@ -93,7 +95,7 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
 
   stderr <- con_sd * sqrt((n + 1)/n) # Standard error by C&H (1998) method
 
-  std_fx <- (case - con_m)/con_sd
+  zcc <- (case - con_m)/con_sd
   tstat <- (case - con_m)/stderr # C&H's modified t
   df <- n - 1 # The degrees of freedom
 
@@ -124,7 +126,7 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     alph <- 1 - conf.level
 
     stop_ci_lo <- FALSE
-    ncp_lo <- std_fx*sqrt(n)
+    ncp_lo <- zcc*sqrt(n)
     perc_lo <- 1 - (alph/2)
     while (stop_ci_lo == FALSE) {
 
@@ -135,13 +137,13 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         quant <- stats::qt(perc_lo, df = df, ncp = ncp_lo)
       )
 
-      if (quant <= std_fx*sqrt(n)) { # Wen the specified quantile reaches std_fx*sqrt(n) the search stops
+      if (quant <= zcc*sqrt(n)) { # Wen the specified quantile reaches zcc*sqrt(n) the search stops
         stop_ci_lo <- TRUE
       }
     }
 
     stop_ci_up <- FALSE
-    ncp_up <- std_fx*sqrt(n)
+    ncp_up <- zcc*sqrt(n)
     perc_up <- (alph/2)
     while (stop_ci_up == FALSE) {
 
@@ -152,100 +154,106 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         quant <- stats::qt(perc_up, df = df, ncp = ncp_up)
       )
 
-      if (quant >= std_fx*sqrt(n)) { # Wen the specified quantile reaches std_fx*sqrt(n) the search stops
+      if (quant >= zcc*sqrt(n)) { # Wen the specified quantile reaches zcc*sqrt(n) the search stops
         stop_ci_up <- TRUE
       }
     }
 
-    ci_lo <- ncp_lo/sqrt(n)
-    ci_up <- ncp_up/sqrt(n)
-    cint <- c(ci_lo, ci_up)
+    ci_lo_zcc <- ncp_lo/sqrt(n)
+    ci_up_zcc <- ncp_up/sqrt(n)
+    cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
-    if (estimate.p == TRUE) {
+  #  if (estimate.p == TRUE) {
       if (alternative == "less") {
 
-        ci_lo <- stats::pnorm(ci_lo)*100
-        ci_up <- stats::pnorm(ci_up)*100
-        cint <- c(ci_lo, ci_up)
+        ci_lo_p <- stats::pnorm(ci_lo_zcc)*100
+        ci_up_p <- stats::pnorm(ci_up_zcc)*100
+        cint_p <- c(ci_lo_p, ci_up_p)
 
       } else if (alternative == "greater") {
 
-        ci_lo <- (1 - stats::pnorm(ci_lo))*100
-        ci_up <- (1 - stats::pnorm(ci_up))*100
+        ci_lo_p <- (1 - stats::pnorm(ci_lo_zcc))*100
+        ci_up_p <- (1 - stats::pnorm(ci_up_zcc))*100
 
         # NOTE (!): Because of right side of dist, lower and upper CI must switch to
         # be consistent with lower CI to the left and upper to the right in output
-        cint <- c(ci_up, ci_lo)
+        cint_p <- c(ci_up_p, ci_lo_p)
 
       } else {
         if (tstat < 0) {
 
-          ci_lo <- stats::pnorm(ci_lo)*100
-          ci_up <- stats::pnorm(ci_up)*100
-          cint <- c(ci_lo, ci_up)
+          ci_lo_p <- stats::pnorm(ci_lo_zcc)*100
+          ci_up_p <- stats::pnorm(ci_up_zcc)*100
+          cint_p <- c(ci_lo_p, ci_up_p)
 
         } else {
 
-          ci_lo <- (1 - stats::pnorm(ci_lo))*100
-          ci_up <- (1 - stats::pnorm(ci_up))*100
+          ci_lo_p <- (1 - stats::pnorm(ci_lo_zcc))*100
+          ci_up_p <- (1 - stats::pnorm(ci_up_zcc))*100
 
           # NOTE (!): Because of right side of dist, lower and upper CI must switch to
           # be consistent with lower CI to the left and upper to the right in output
-          cint <- c(ci_up, ci_lo)
+          cint_p <- c(ci_up_p, ci_lo_p)
         }
       }
 
-    }
+   # }
 
-    attr(cint,"conf.level") <- conf.level # Give the CIs an attribute based in specified conf level
+    attr(cint_zcc,"conf.level") <- conf.level # Give the CIs an attribute based in specified conf level
+    attr(cint_p,"conf.level") <- conf.level # Give the CIs an attribute based in specified conf level
+
+    names(cint_zcc) <- c("Lower zcc CI", "Upper zcc CI")
+    names(cint_p) <- c("Lower p CI", "Upper p CI")
+    interval <- c(cint_zcc, cint_p)
+
+    if (print.p.int == FALSE) {
+      cint <- cint_zcc
+
+    } else(
+      cint <- cint_p
+    )
+
 
   } else {
     cint <- NULL # If conf.int set to FALSE no intervals will be calculated or given in output
+    interval <- NULL
   }
 
-  if (estimate.p == FALSE) {
-    # Set the estimates and names of estimates given in output
-    estimate <- c(std_fx, con_m, con_sd)
-    names(estimate) <- c("Standardised case difference", "mean (controls)", "SD (controls)")
-  } else {
 
-    estimate <- c(pval*100, con_m, con_sd)
+    estimate <- c(zcc, pval*100)
 
-    if (alternative == "two.sided") estimate <- c((pval/2)*100, con_m, con_sd)
+    if (alternative == "two.sided") estimate <- c(zcc, (pval/2)*100)
 
     if (alternative == "less") {
-      names(estimate) <- c("Proportion below case (%)", "mean (controls)", "SD (controls)")
+      names(estimate) <- c("Standardised case difference (z-cc)",
+                           "Proportion below case (%)")
     } else if (alternative == "greater") {
-      names(estimate) <- c("Proportion above case (%)", "mean (controls)", "SD (controls)")
+      names(estimate) <- c("Standardised case difference (z-cc)",
+                           "Proportion above case (%)")
     } else {
-      names(estimate) <- c(paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)"),
-                           "mean (controls)", "SD (controls)")
+      names(estimate) <- c("Standardised case difference (z-cc)",
+                           paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)"))
     }
 
-  }
+  # }
 
   # Set names for objects in output
   names(tstat) <- "t"
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between case and controls"
-
-
-  # Set name for estimates in output
-  if (estimate.p == F) {
-    interval <- "Interval for standardised difference"
-  } else {
-    interval <- "Interval for proportion (%)"
-  }
+  names(con_m) <- "Mean (controls)"
+  names(con_sd) <- "SD (controls)"
+  names(n) <- "Sample size"
+  names(stderr) <- "Std.err by C&H-method"
 
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat, parameter = df, p.value = pval,
                  estimate = estimate, null.value = null.value,
-                 sample.size = n,
                  conf.int = cint,
                  interval = interval,
-                 stderr = stderr,
+                 desc = c(con_m, con_sd, n, stderr),
                  alternative = alternative,
                  method = paste("Crawford-Howell (1998) t-test"),
                  data.name = paste0("case = ", format(round(case, 2), nsmall = 2),
