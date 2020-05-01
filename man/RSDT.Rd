@@ -14,7 +14,8 @@ RSDT(
   controls.n = NULL,
   cor.x.y = NULL,
   alpha = 0.05,
-  exact.method = T
+  exact.method = T,
+  na.rm = FALSE
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ correlation between the tasks.}
 
 \item{exact.method}{Method for deriving the test statistic. Should rarely be
 changed. See Crawford and Garthwaite (2005) for further information.}
+
+\item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:

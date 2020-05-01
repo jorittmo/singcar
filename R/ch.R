@@ -82,6 +82,7 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
   if (conf.int == FALSE & print.p.int == TRUE) warning("print.p.int will be ignored")
+  if (conf.level < 0 | conf.level > 0.9999999) stop("Confident level must be between 0 and 0.9999999")
 
   alternative <- match.arg(alternative)
 
@@ -137,7 +138,7 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         quant <- stats::qt(perc_lo, df = df, ncp = ncp_lo)
       )
 
-      if (quant <= zcc*sqrt(n)) { # Wen the specified quantile reaches zcc*sqrt(n) the search stops
+      if (quant <= zcc*sqrt(n)) { # When the specified quantile reaches zcc*sqrt(n) the search stops
         stop_ci_lo <- TRUE
       }
     }

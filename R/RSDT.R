@@ -27,6 +27,7 @@
 #' @param alpha Chosen risk of Type I errors.
 #' @param exact.method Method for deriving the test statistic. Should rarely be
 #'   changed. See Crawford and Garthwaite (2005) for further information.
+#' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the value of the t-statistic.\cr\cr
@@ -52,18 +53,62 @@
 RSDT <- function (case.x, case.y, controls.x, controls.y,
                   controls.x.sd = NULL, controls.y.sd = NULL,
                   controls.n = NULL, cor.x.y = NULL,
-                  alpha = 0.05, exact.method = T) {
+                  alpha = 0.05, exact.method = T, na.rm = FALSE) {
 
   if (length(case.x) > 1 | length(case.y) > 1) stop("Case scores should be single value")
-
   if (length(controls.x) > 1 & length(controls.y) > 1) {
     if (length(controls.x) != length(controls.y)) stop("Sample sizes must be equal")
   }
 
+  if (length(controls.x) > 1 & length(controls.y) > 1 & is.null(controls.n) == FALSE) message("Value on controls.n will be ignored")
+
   if (length(controls.x) > 1 & is.null(controls.x.sd) == FALSE) message("Value on controls.x.sd will be ignored")
   if (length(controls.y) > 1 & is.null(controls.y.sd) == FALSE) message("Value on controls.y.sd will be ignored")
-  if (length(controls.x) == 1 & is.null(controls.x.sd) == TRUE) stop("Please give sd on task x")
-  if (length(controls.y) == 1 & is.null(controls.y.sd) == TRUE) stop("Please give sd on task y")
+  if (length(controls.x) == 1 & is.null(controls.x.sd) == TRUE) stop("Please give sd and n on task x if controls.x is to be treated as mean")
+  if (length(controls.y) == 1 & is.null(controls.y.sd) == TRUE) stop("Please give sd and n on task y if controls.y is to be treated as mean")
+
+  if(is.na(case.x) == TRUE | is.na(case.y) == TRUE) stop("One or both case scores is NA")
+
+  if (na.rm == TRUE) {
+    if (sum(is.na(controls.x))  > 0 & sum(is.na(controls.y)) == 0 ) {
+      controls.y <- controls.y[!is.na(controls.x)]
+      controls.x <- controls.x[!is.na(controls.x)]
+      warning("Removal of NAs on controls.x resulted in removal of non-NAs on controls.y")
+    }
+
+    if (sum(is.na(controls.y))  > 0 & sum(is.na(controls.x)) == 0 ) {
+      controls.x <- controls.x[!is.na(controls.y)]
+      controls.y <- controls.y[!is.na(controls.y)]
+      warning("Removal of NAs on controls.y resulted in removal of non-NAs on controls.x")
+    }
+
+    if (sum(is.na(controls.y))  > 0 & sum(is.na(controls.x)) > 0 ) {
+
+      if (identical(!is.na(controls.x), !is.na(controls.y)) == TRUE) {
+        controls.x <- controls.x[!is.na(controls.x)]
+        controls.y <- controls.y[!is.na(controls.y)]
+      } else {
+        conx <- controls.x[!is.na(controls.x) & !is.na(controls.y)]
+        cony <- controls.y[!is.na(controls.x) & !is.na(controls.y)]
+
+        controls.x <- conx
+        controls.y <- cony
+
+        warning("Removal of NAs on one control sample resulted in removal of non-NAs on the other")
+      }
+
+    }
+
+
+
+
+  }
+
+  if (sum(is.na(controls.x)) > 0 | sum(is.na(controls.y)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
+
+  if (length(controls.x) > 1 & length(controls.y) > 1) {
+    if (length(controls.x) != length(controls.y)) stop("Sample sizes must be equal")
+  }
 
   con_m.x <- mean(controls.x) # Mean of the control sample on task x
   con_m.y <- mean(controls.y) # Mean of the control sample on task y
