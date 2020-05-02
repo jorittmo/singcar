@@ -29,8 +29,6 @@
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
-#' @param print.p.int Set to \code{TRUE} to print the confidence interval for
-#'   the point estimate of the p-value.
 #' @param conf.int Calculate confidence intervals for desired estimate. Uses
 #'   iterative method, set to \code{FALSE} for faster calculation (e.g. for
 #'   simulations).
@@ -47,17 +45,15 @@
 #' the p-value for the test.\cr\cr \code{estimate}    \tab estimated
 #' standardised difference (zcc) and point estimate of p-value. \cr\cr
 #' \code{null.value}   \tab the value of the difference under the null
-#' hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for zcc if
-#' not print.p.int set to TRUE \cr\cr \code{interval}     \tab named numerical
-#' vector containing confidence intervals for both zcc and p-value. \cr\cr
+#' hypothesis.\cr\cr \code{interval}     \tab named numerical vector containing
+#' level of confidence and confidence intervals for both zcc and p-value. \cr\cr
 #' \code{desc}     \tab named numerical containing descriptive statistics: mean
 #' and standard deviations of controls as well as sample size and standard error
 #' used in the t-formula. \cr\cr \code{alternative}     \tab a character string
 #' describing the alternative hypothesis.\cr\cr \code{method} \tab a character
 #' string indicating what type of t-test was performed.\cr\cr \code{data.name}
 #' \tab a character string giving the name(s) of the data as well as sum
-#' summaries.
-#' }
+#' summaries. }
 #'
 #' @export
 #'
@@ -67,7 +63,7 @@
 
 ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
                       alternative = c("less", "greater", "two.sided"),
-                      print.p.int = FALSE, conf.int = TRUE, conf.level = 0.95,
+                      conf.int = TRUE, conf.level = 0.95,
                       conf.int.spec = 0.01,  na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
@@ -81,7 +77,6 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
-  if (conf.int == FALSE & print.p.int == TRUE) warning("print.p.int will be ignored")
   if (conf.level < 0 | conf.level > 0.9999999) stop("Confident level must be between 0 and 0.9999999")
 
   alternative <- match.arg(alternative)
@@ -115,6 +110,9 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     pval <- 2 * (1 - stats::pt(abs(tstat), df = df))
 
   }
+
+  estimate <- c(zcc, pval*100)
+  if (alternative == "two.sided") estimate <- c(zcc, (pval/2)*100)
 
   # Calculate the CIs with method described in Crawford and Garthwaite (2002) and Cumming and Finch (2001)
 
@@ -164,12 +162,21 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     ci_up_zcc <- ncp_up/sqrt(n)
     cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
-  #  if (estimate.p == TRUE) {
+    zcc.name <- paste0("Standardised case difference (Z-CC), ",
+                       100*conf.level, "% CI [",
+                       format(round(cint_zcc[1], 2), nsmall = 2),", ",
+                       format(round(cint_zcc[2], 2), nsmall = 2),"]")
+
       if (alternative == "less") {
 
         ci_lo_p <- stats::pnorm(ci_lo_zcc)*100
         ci_up_p <- stats::pnorm(ci_up_zcc)*100
         cint_p <- c(ci_lo_p, ci_up_p)
+
+        p.name <- paste0("Proportion below case (%), ",
+                         100*conf.level, "% CI [",
+                         format(round(cint_p[1], 2), nsmall = 2),", ",
+                         format(round(cint_p[2], 2), nsmall = 2),"]")
 
       } else if (alternative == "greater") {
 
@@ -180,12 +187,22 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         # be consistent with lower CI to the left and upper to the right in output
         cint_p <- c(ci_up_p, ci_lo_p)
 
+        p.name <- paste0("Proportion above case (%), ",
+                         100*conf.level, "% CI [",
+                         format(round(cint_p[1], 2), nsmall = 2),", ",
+                         format(round(cint_p[2], 2), nsmall = 2),"]")
+
       } else {
         if (tstat < 0) {
 
           ci_lo_p <- stats::pnorm(ci_lo_zcc)*100
           ci_up_p <- stats::pnorm(ci_up_zcc)*100
           cint_p <- c(ci_lo_p, ci_up_p)
+
+          p.name <- paste0("Proportion below case (%), ",
+                           100*conf.level, "% CI [",
+                           format(round(cint_p[1], 2), nsmall = 2),", ",
+                           format(round(cint_p[2], 2), nsmall = 2),"]")
 
         } else {
 
@@ -195,48 +212,42 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
           # NOTE (!): Because of right side of dist, lower and upper CI must switch to
           # be consistent with lower CI to the left and upper to the right in output
           cint_p <- c(ci_up_p, ci_lo_p)
+
+          p.name <- paste0("Proportion above case (%), ",
+                           100*conf.level, "% CI [",
+                           format(round(cint_p[1], 2), nsmall = 2),", ",
+                           format(round(cint_p[2], 2), nsmall = 2),"]")
         }
       }
 
-   # }
-
-    attr(cint_zcc,"conf.level") <- conf.level # Give the CIs an attribute based in specified conf level
-    attr(cint_p,"conf.level") <- conf.level # Give the CIs an attribute based in specified conf level
 
     names(cint_zcc) <- c("Lower zcc CI", "Upper zcc CI")
     names(cint_p) <- c("Lower p CI", "Upper p CI")
-    interval <- c(cint_zcc, cint_p)
 
-    if (print.p.int == FALSE) {
-      cint <- cint_zcc
+    typ.int <- 100*conf.level
+    names(typ.int) <- "Confidence (%)"
 
-    } else(
-      cint <- cint_p
-    )
+    interval <- c(typ.int, cint_zcc, cint_p)
+
+    names(estimate) <- c(zcc.name, p.name)
 
 
   } else {
-    cint <- NULL # If conf.int set to FALSE no intervals will be calculated or given in output
+
     interval <- NULL
-  }
-
-
-    estimate <- c(zcc, pval*100)
-
-    if (alternative == "two.sided") estimate <- c(zcc, (pval/2)*100)
 
     if (alternative == "less") {
-      names(estimate) <- c("Standardised case difference (z-cc)",
+      names(estimate) <- c("Standardised case difference (Z-CC)",
                            "Proportion below case (%)")
     } else if (alternative == "greater") {
-      names(estimate) <- c("Standardised case difference (z-cc)",
+      names(estimate) <- c("Standardised case difference (Z-CC)",
                            "Proportion above case (%)")
     } else {
-      names(estimate) <- c("Standardised case difference (z-cc)",
+      names(estimate) <- c("Standardised case difference (Z-CC)",
                            paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)"))
     }
 
-  # }
+  }
 
   # Set names for objects in output
   names(tstat) <- "t"
@@ -252,7 +263,6 @@ ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat, parameter = df, p.value = pval,
                  estimate = estimate, null.value = null.value,
-                 conf.int = cint,
                  interval = interval,
                  desc = c(con_m, con_sd, n, stderr),
                  alternative = alternative,
