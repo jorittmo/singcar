@@ -5,7 +5,8 @@
 #' them to two a distribution of scores for both tasks estimated by a control
 #' sample. Calculates a standardised effects size of task difference as well as
 #' a point estimate of the proportion of the control population that would be
-#' expected to show a more extreme task difference.
+#' expected to show a more extreme task difference. The test is by default two
+#' sided.
 #'
 #' @param case.x Case's score on task X.
 #' @param case.y Case's score on task Y.
@@ -25,12 +26,15 @@
 #' @param cor.x.y If X or Y is given as mean and SD you must supply the
 #'   correlation between the tasks.
 #' @param alpha Chosen risk of Type I errors.
-#' @param exact.method Method for deriving the test statistic. Should rarely be
-#'   changed. See Crawford and Garthwaite (2005) for further information.
+#' @param exact.method If set to FALSE generates an approximate t-statistic used
+#' to derive the exact. The exact method can only generate an absolute t-statistic.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
-#'   \tabular{llll}{ \code{statistic}   \tab the value of the t-statistic.\cr\cr
+#'   \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
+#'   returns the value of an exact t-statistic, however, because of the
+#'   underlying equation, it cannot be negative. Set exact.method to
+#'   \code{FALSE} for an approximate t-value with correct sign. \cr\cr
 #'   \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
 #'   \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate}
 #'   \tab case scores expressed as z-scores on task X and Y. Standardised effect
@@ -53,7 +57,10 @@
 RSDT <- function (case.x, case.y, controls.x, controls.y,
                   controls.x.sd = NULL, controls.y.sd = NULL,
                   controls.n = NULL, cor.x.y = NULL,
+                  alternative = c("two.sided", "greater", "less"),
                   alpha = 0.05, exact.method = T, na.rm = FALSE) {
+
+  alternative <- match.arg(alternative)
 
   if (length(case.x) > 1 | length(case.y) > 1) stop("Case scores should be single value")
   if (length(controls.x) > 1 & length(controls.y) > 1) {
@@ -67,6 +74,8 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
   if (length(controls.x) == 1 & is.null(controls.x.sd) == TRUE) stop("Please give sd and n on task x if controls.x is to be treated as mean")
   if (length(controls.y) == 1 & is.null(controls.y.sd) == TRUE) stop("Please give sd and n on task y if controls.y is to be treated as mean")
 
+
+  # Handling of NA use cases below
   if(is.na(case.x) == TRUE | is.na(case.y) == TRUE) stop("One or both case scores is NA")
 
   if (na.rm == TRUE) {
@@ -99,12 +108,10 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
     }
 
-
-
-
   }
-
   if (sum(is.na(controls.x)) > 0 | sum(is.na(controls.y)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
+  # End of NA use cases
+
 
   if (length(controls.x) > 1 & length(controls.y) > 1) {
     if (length(controls.x) != length(controls.y)) stop("Sample sizes must be equal")
@@ -129,6 +136,9 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
     if (length(controls.y) > 1 & n != length(controls.y)) stop("Sample sizes must be equal")
   }
 
+  if (is.null(cor.x.y) == TRUE & length(controls.x) == 1) stop("Please set correlation between tasks")
+  if (is.null(cor.x.y) == TRUE & length(controls.y) == 1) stop("Please set correlation between tasks")
+
   if (is.null(cor.x.y) == FALSE){
     if (cor.x.y < -1 | cor.x.y > 1) stop("Correlation must be between -1 and 1")
   }
@@ -137,20 +147,16 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
   if (length(controls.x) > 1 & length(controls.y) > 1) r <- stats::cor(controls.x, controls.y)
 
+  df <- n - 1
 
   std.x <- (case.x - con_m.x)/con_sd.x
   std.y <- (case.y - con_m.y)/con_sd.y
 
-
-  df <- n - 1
-
-  t.crit <- abs(stats::qt(alpha/2, df= df))
-
-  zdcc <- (std.x - std.y) / sqrt(2 - 2*r)
+  zdcc <- (std.x - std.y) / sqrt(2 - 2*r) # Estimated effect size
 
   if (exact.method == T) {
 
-    # Exact probability - point estimate - alternative method for RSDT
+    # Exact probability - point estimate
 
     a <- (1 + r)*(1 - r^2)
 
@@ -170,13 +176,43 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
     tstat <- sqrt(
       (-b + sqrt(b^2 - (4*a*c))) / (2*a)
     )
-    names(tstat) <- "t"
+    names(tstat) <- "absolute t"
 
-    pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = F)
+    if (alternative == "two.sided") {
+      pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = FALSE)
+    } else if (alternative == "greater") {
+      # Since equation (7) from Crawford and Garthwaite (the exact method)
+      # cannot return a negative t-value we have to use zdcc to see
+      # in which direction the effect it pointing and the impose the correct sign.
+      if (zdcc > 0) {
+        pval <- stats::pt(tstat, df = df, lower.tail = FALSE)
+      } else {
+        pval <- stats::pt(-tstat, df = df, lower.tail = FALSE)
+      }
+
+    }
+
+     else { # I.e. if alternative == "less"
+
+      if (zdcc < 0) {
+        pval <- stats::pt(-tstat, df = df, lower.tail = TRUE)
+      } else {
+        pval <- stats::pt(tstat, df = df, lower.tail = TRUE)
+      }
+
+    }
 
   } else {
 
     # Method from which the above is derived
+
+    if (alternative == "two.sided") {
+      t.crit <- abs(stats::qt(alpha/2, df= df))
+    } else if (alternative == "greater") {
+      t.crit <- stats::qt(alpha, df= df, lower.tail = FALSE)
+    } else {
+      t.crit <- stats::qt(alpha, df= df)
+    }
 
     denom <- sqrt(
       ((n + 1)/n) *
@@ -197,25 +233,41 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
     names(tstat) <- "approx. t"
 
-    pval <- 2 * stats::pt(abs(psi), df = df, lower.tail = F)
+    if (alternative == "two.sided") {
+      pval <- 2 * stats::pt(abs(psi), df = df, lower.tail = FALSE)
+    } else if (alternative == "greater") {
+      pval <- stats::pt(psi, df = df, lower.tail = FALSE)
+    } else { # I.e. if alternative == "less"
+      pval <- stats::pt(psi, df = df, lower.tail = TRUE)
+    }
 
   }
 
 
-  estimate <- c(std.x, std.y, zdcc, (pval/2*100))
+
+  estimate <- c(std.x, std.y, zdcc, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
+
+  if (alternative == "two.sided") {
+    p.name <- "Proportion of control population with more extreme task difference"
+  } else if (alternative == "greater") {
+    p.name <- "Proportion of control population with larger positive task difference"
+  } else {
+    p.name <- "Proportion of control population with larger negative task difference"
+  }
+
 
   # Set names for objects in output
   names(estimate) <- c("Case score on task X as standard (z) score",
                        "Case score on task Y as standard (z) score",
                        "Std. effect size (Z-DCC) for task diff. between case and controls",
-                       "Percentage of control population with more extreme task difference")
+                       p.name)
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0(deparse(substitute(case.x)), " - ",
-                  deparse(substitute(case.y)), " and ",
-                  deparse(substitute(controls.x)), " - ",
-                  deparse(substitute(controls.y)))
+  dname <- paste0("Case score X: ", deparse(substitute(case.x)), ", ",
+                  "Case score Y: ", deparse(substitute(case.y)), ", ",
+                  "Controls score X: ", deparse(substitute(controls.x)), ", ",
+                  "Controls score Y: ",deparse(substitute(controls.y)))
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat,
@@ -224,7 +276,7 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
                  estimate = estimate,
                  sample.size = n,
                  null.value = null.value,
-                 alternative = "two.sided",
+                 alternative = alternative,
                  method = paste("Revised Standardised Difference Test"),
                  data.name = dname)
 
@@ -233,3 +285,6 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
 
 }
+
+
+
