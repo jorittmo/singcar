@@ -13,8 +13,9 @@ RSDT(
   controls.y.sd = NULL,
   controls.n = NULL,
   cor.x.y = NULL,
-  alpha = 0.05,
+  alternative = c("two.sided", "greater", "less"),
   exact.method = T,
+  alpha = 0.05,
   na.rm = FALSE
 )
 }
@@ -24,12 +25,12 @@ RSDT(
 \item{case.y}{Case's score on task Y.}
 
 \item{controls.x}{Controls' scores on task X. Takes either a vector of
-observations or a single value interpreted as mean. \emph{Note}: you can supply
-a vector as input for task X while mean and SD for task Y.}
+observations or a single value interpreted as mean. \emph{Note}: you can
+supply a vector as input for task X while mean and SD for task Y.}
 
 \item{controls.y}{Controls' scores on task Y. Takes either a vector of
-observations or a single value interpreted as mean. \emph{Note}: you can supply
-a vector as input for task Y while mean and SD for task X.}
+observations or a single value interpreted as mean. \emph{Note}: you can
+supply a vector as input for task Y while mean and SD for task X.}
 
 \item{controls.x.sd}{If single value for task X is given as input you must
 supply the standard deviation of the sample.}
@@ -44,38 +45,57 @@ SD, controls.n must equal the number of observations in controls.x.}
 \item{cor.x.y}{If X or Y is given as mean and SD you must supply the
 correlation between the tasks.}
 
-\item{alpha}{Chosen risk of Type I errors.}
+\item{alternative}{A character string specifying the alternative hypothesis,
+must be one of \code{"two.sided"} (default), \code{"greater"} or
+\code{"less"}. You can specify just the initial letter. Since the direction
+of the expected effect depends on which task is set as X and which is set
+as Y, be very careful if changing this parameter.}
 
-\item{exact.method}{Method for deriving the test statistic. Should rarely be
-changed. See Crawford and Garthwaite (2005) for further information.}
+\item{exact.method}{If set to \code{FALSE} generates an approximate
+t-statistic used to derive the exact. The exact method can only generate an
+absolute t-statistic. The approximate method also requires a pre-set
+alpha-value, see Crawford and Garthwate (2005) for more information.}
+
+\item{alpha}{Chosen risk of Type I errors. This is only relevant if setting
+\code{exact.method = FALSE} due to the test statistic depending on the
+critical value chosen.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
-  \tabular{llll}{ \code{statistic}   \tab the value of the t-statistic.\cr\cr
+  \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
+  returns the value of an exact t-statistic, however, because of the
+  underlying equation, it cannot be negative. Set exact.method to
+  \code{FALSE} for an approximate t-value with correct sign. \cr\cr
   \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
-  \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate}
-  \tab case scores expressed as z-scores on task X and Y. Standardised effect
-  size (Z-DCC) of task difference between case and controls and
-  point estimate of the proportion of the control population estimated to show a
-  more extreme task difference. \cr\cr \code{sample.size}   \tab the size of
-  the control sample\cr\cr \code{null.value}   \tab the value of the
-  difference under the null hypothesis.\cr\cr  \code{alternative}     \tab a
-  character string describing the alternative hypothesis.\cr\cr \code{method}
-  \tab a character string indicating what type of test was performed.\cr\cr
-  \code{data.name}     \tab a character string giving the name(s) of the data}
+  \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
+  case scores expressed as z-scores on task X and Y. Standardised effect size
+  (Z-DCC) of task difference between case and controls and point estimate of
+  the proportion of the control population estimated to show a more extreme
+  task difference. \cr\cr \code{sample.size}   \tab the size of the control
+  sample\cr\cr \code{null.value}   \tab the value of the difference under the
+  null hypothesis.\cr\cr  \code{alternative}     \tab a character string
+  describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+  string indicating what type of test was performed.\cr\cr \code{data.name}
+  \tab a character string giving the name(s) of the data}
 }
 \description{
-A test used to determine dissociation between two functions as assessed by
-two tasks.Takes two single values from a case (from two tasks) and compares
-them to two a distribution of scores for both tasks estimated by a control
-sample. Calculates a standardised effects size of task difference as well as
-a point estimate of the proportion of the control population that would be
-expected to show a more extreme task difference.
+A test on the difference between two tasks in a single case, by comparison to
+a control sample. Calculates a standardised effects size of task difference
+as well as a point estimate of the proportion of the control population that
+would be expected to show a more extreme task difference.
 }
 \examples{
 RSDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,
 controls.y.sd = 1, controls.n = 20, cor.x.y = 0.68)
 RSDT(-3.857, -1.875, controls.x = rnorm(20), controls.y = rnorm(20))
+
+}
+\references{
+{Crawford, J. R., & Garthwaite, P. H. (2005). Testing for
+Suspected Impairments and Dissociations in Single-Case Studies in
+Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and
+Revised Tests for Dissociations. \emph{Neuropsychology, 19}(3), 318 - 331.
+\url{https://doi.org/10.1037/0894-4105.19.3.318}}
 }

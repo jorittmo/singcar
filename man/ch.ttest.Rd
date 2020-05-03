@@ -10,7 +10,6 @@ ch.ttest(
   controls.sd = NULL,
   controls.n = NULL,
   alternative = c("less", "greater", "two.sided"),
-  print.p.int = FALSE,
   conf.int = TRUE,
   conf.level = 0.95,
   conf.int.spec = 0.01,
@@ -33,9 +32,6 @@ sample must be gven as well.}
 must be one of \code{"less"} (default), \code{"greater"} or
 \code{"two.sided"}. You can specify just the initial letter.}
 
-\item{print.p.int}{Set to \code{TRUE} to print the confidence interval for
-the point estimate of the p-value.}
-
 \item{conf.int}{Calculate confidence intervals for desired estimate. Uses
 iterative method, set to \code{FALSE} for faster calculation (e.g. for
 simulations).}
@@ -56,17 +52,15 @@ A list with class \code{"htest"} containing the following components:
 the p-value for the test.\cr\cr \code{estimate}    \tab estimated
 standardised difference (zcc) and point estimate of p-value. \cr\cr
 \code{null.value}   \tab the value of the difference under the null
-hypothesis.\cr\cr \code{conf.int}     \tab a confidence interval for zcc if
-not print.p.int set to TRUE \cr\cr \code{interval}     \tab named numerical
-vector containing confidence intervals for both zcc and p-value. \cr\cr
+hypothesis.\cr\cr \code{interval}     \tab named numerical vector containing
+level of confidence and confidence intervals for both zcc and p-value. \cr\cr
 \code{desc}     \tab named numerical containing descriptive statistics: mean
 and standard deviations of controls as well as sample size and standard error
 used in the t-formula. \cr\cr \code{alternative}     \tab a character string
 describing the alternative hypothesis.\cr\cr \code{method} \tab a character
 string indicating what type of t-test was performed.\cr\cr \code{data.name}
 \tab a character string giving the name(s) of the data as well as sum
-summaries.
-}
+summaries. }
 }
 \description{
 Takes a single observation and compares it to a distribution estimated by a
