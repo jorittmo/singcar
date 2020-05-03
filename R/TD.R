@@ -1,9 +1,9 @@
-#' Crawford and Howell's (1998) modified t-test
+#' Test of Deficit
 #'
-#' Takes a single observation and compares it to a distribution estimated by a
-#' control sample. Calculates standardised difference between case and controls
-#' or proportions falling above or below the case score as well as associated
-#' confidence intervals.
+#' Crawford and Howell's (1998) modified t-test. Takes a single observation and
+#' compares it to a distribution estimated by a control sample. Calculates
+#' standardised difference between case and controls or proportions falling
+#' above or below the case score as well as associated confidence intervals.
 #'
 #' Returns either the point estimate of the standardised difference
 #' between the case score and the mean of the controls or the point estimate
@@ -58,10 +58,22 @@
 #' @export
 #'
 #' @examples
-#' ch.ttest(-2, rnorm(15), alternative = "l")
+#' TD(-2, rnorm(15), alternative = "l")
+#'
+#' @references
+#' Crawford, J. R., & Howell, D. C. (1998). Comparing an Individual’s Test Score
+#' Against Norms Derived from Small Samples. \emph{The Clinical Neuropsychologist,
+#' 12}(4), 482–486. https://doi.org/10.1076/clin.12.4.482.7241
+#'
+#' Crawford, J. R., & Garthwaite, P. H. (2002). Investigation of the single case
+#' in neuropsychology: Confidence limits on the abnormality of test scores and
+#' test score differences. \emph{Neuropsychologia, 40}(8), 1196–1208.
+#' https://doi.org/10.1016/S0028-3932(01)00224-X
 
 
-ch.ttest <- function (case, controls, controls.sd = NULL, controls.n = NULL,
+
+
+TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
                       alternative = c("less", "greater", "two.sided"),
                       conf.int = TRUE, conf.level = 0.95,
                       conf.int.spec = 0.01,  na.rm = FALSE) {

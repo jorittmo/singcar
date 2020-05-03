@@ -3,7 +3,9 @@
 #' The singcar package provides functions for analysing single case data, mostly based on the work by Crawford and Garthwaite.
 #'
 #' @section singcar functions:
-#' \code{\link{ch.ttest}}
+#' \code{\link{TD}}
+#' \code{\link{RSDT}}
+#' \code{\link{UDT}}
 #'
 #' @docType package
 #' @name singcar

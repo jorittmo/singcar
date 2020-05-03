@@ -9,6 +9,8 @@ The singcar package provides functions for analysing single case data, mostly ba
 }
 \section{singcar functions}{
 
-\code{\link{ch.ttest}}
+\code{\link{TD}}
+\code{\link{RSDT}}
+\code{\link{UDT}}
 }
 
