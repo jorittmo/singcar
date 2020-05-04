@@ -82,9 +82,10 @@ A list with class \code{"htest"} containing the following components:
 }
 \description{
 A test on the difference between two tasks in a single case, by comparison to
-a control sample. Calculates a standardised effects size of task difference
-as well as a point estimate of the proportion of the control population that
-would be expected to show a more extreme task difference.
+the difference of the same two tasks in a control sample. Calculates a
+standardised effects size of task difference as well as a point estimate of
+the proportion of the control population that would be expected to show a
+more extreme task difference.
 }
 \examples{
 RSDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,

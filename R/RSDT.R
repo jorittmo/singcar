@@ -1,9 +1,10 @@
 #' Revised Standardised Difference Test
 #'
 #' A test on the difference between two tasks in a single case, by comparison to
-#' a control sample. Calculates a standardised effects size of task difference
-#' as well as a point estimate of the proportion of the control population that
-#' would be expected to show a more extreme task difference.
+#' the difference of the same two tasks in a control sample. Calculates a
+#' standardised effects size of task difference as well as a point estimate of
+#' the proportion of the control population that would be expected to show a
+#' more extreme task difference.
 #'
 #' @param case.x Case's score on task X.
 #' @param case.y Case's score on task Y.
@@ -84,6 +85,7 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
 
   if (length(controls.x) > 1 & is.null(controls.x.sd) == FALSE) message("Value on controls.x.sd will be ignored")
   if (length(controls.y) > 1 & is.null(controls.y.sd) == FALSE) message("Value on controls.y.sd will be ignored")
+
   if (length(controls.x) == 1 & is.null(controls.x.sd) == TRUE) stop("Please give sd and n on task x if controls.x is to be treated as mean")
   if (length(controls.y) == 1 & is.null(controls.y.sd) == TRUE) stop("Please give sd and n on task y if controls.y is to be treated as mean")
 

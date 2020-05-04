@@ -5,8 +5,8 @@
 #' standardised difference between case and controls or proportions falling
 #' above or below the case score as well as associated confidence intervals.
 #'
-#' Returns either the point estimate of the standardised difference
-#' between the case score and the mean of the controls or the point estimate
+#' Returns the point estimate of the standardised difference
+#' between the case score and the mean of the controls and the point estimate
 #' of the p-value (i.e. the percentage of the population that would be
 #' expected to obtain a lower or higher score, depending on the alternative
 #' hypothesis).
