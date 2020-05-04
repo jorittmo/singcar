@@ -33,6 +33,8 @@ must be one of \code{"less"} (default), \code{"greater"} or
 
 \item{int.level}{Level of confidence for credible intervals.}
 
+\item{iter}{Number of iterations.}
+
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{

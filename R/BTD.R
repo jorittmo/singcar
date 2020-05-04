@@ -23,6 +23,7 @@
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
 #' @param int.level Level of confidence for credible intervals.
+#' @param iter Number of iterations.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -93,7 +94,7 @@ BTD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
 
   theta_hat <- ((n - 1)*con_sd^2) /  stats::rchisq(iter, df = df)
 
-  z <- rnorm(iter)
+  z <- stats::rnorm(iter)
 
   mu_hat <- con_m + (z * sqrt(theta_hat/n))
 
@@ -117,13 +118,13 @@ BTD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   zcc <- (case - con_m)/con_sd
   z_ast_est <- mean(z_ast)
 
-  zcc_int <- quantile(z_ast, c(alpha/2, (1 - alpha/2)))
+  zcc_int <- stats::quantile(z_ast, c(alpha/2, (1 - alpha/2)))
   names(zcc_int) <- c("Lower zcc CI", "Upper zcc CI")
 
   p_est <- mean(pval)
 
-  p_int <- quantile(pval, c(alpha/2, (1 - alpha/2)))*100
-  if (alternative == "two.sided") p_int <- quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
+  p_int <- stats::quantile(pval, c(alpha/2, (1 - alpha/2)))*100
+  if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
   estimate <- c(zcc, p_est*100)

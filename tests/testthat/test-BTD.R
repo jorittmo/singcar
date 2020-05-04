@@ -38,15 +38,15 @@ test_that("TD and BTD gives equal output", {
 
   expect_equal(round(p_bdt, 2), round(p_td, 2))
 
-  p_bdt <- BTD(2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t")[["p.value"]]
+  p_bdt <- BTD(2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t", iter = 1000)[["p.value"]]
   p_td <- TD(2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t")[["p.value"]]
 
-  expect_equal(round(p_bdt, 2), round(p_td, 2))
+  expect_equal(round(p_bdt, 1), round(p_td, 1))
 
-  p_bdt <- BTD(-2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t")[["p.value"]]
+  p_bdt <- BTD(-2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t", iter = 1000)[["p.value"]]
   p_td <- TD(-2, controls = 0, controls.sd = 1, controls.n = 15, alternative = "t")[["p.value"]]
 
-  expect_equal(round(p_bdt, 2), round(p_td, 2))
+  expect_equal(round(p_bdt, 1), round(p_td, 1))
 
 
 
