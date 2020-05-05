@@ -14,7 +14,7 @@ LazyData: true
 RoxygenNote: 7.1.0
 Imports: 
     stats,
-    nicheROVER
+    CholWishart
 Suggests: 
     knitr,
     rmarkdown,

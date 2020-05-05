@@ -180,14 +180,20 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     A <- matrix(c(sxx, sxy, sxy, syy), nrow = 2)
   }
 
-  Sigma_hat <- nicheROVER::rwish(iter, A, n, inv = T)
+
+  Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
 
 
   Tchol <- array(dim = c(2, 2, iter))
-  for (i in 1:iter) Tchol[ , , i] <- t(chol(Sigma_hat[ , , i]))
-
   Mu_hat <- matrix(nrow = iter, ncol = 2)
+  for (i in 1:iter) Tchol[ , , i] <- t(chol(Sigma_hat[ , , i]))
   for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
+
+  ## For those that thinks apply() gives more readability, but it slows the code
+  # Tchol <- apply(Sigma_hat, 3, function(x) t(chol(x)))
+  # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m.x, con_m.y) +
+  #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
+
 
   if (unstandardised == FALSE) {
 
@@ -215,31 +221,6 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     pval <- stats::pnorm(z_ast, lower.tail = TRUE)
   }
 
-  ## RANDOM SIMULATION FROM INVERSE WISHART ##
-  # Possibly it would be faster with package, but to diminish dependencies let's do it manually
-#
-#   Something is wrong in this code. Use package in the meantime
-#   C <- solve(A)
-#
-#   # Only upper triangular is used by chol.default. Transpose
-#   # to align with Crawford
-#
-#   D <- t(chol(C))
-#
-#   g12 <- stats::rnorm(1)
-#
-#   g11 <- stats::rchisq(1, df = n)
-#
-#   g22 <- stats::rchisq(1, df = n - 1)
-#
-#   G <- matrix(c(sqrt(g11), 0,
-#                 g12,  sqrt(g22)), nrow = 2)
-#
-#   B <- G%*%t(G)
-#
-#   W <- W + D%*%B%*%t(D)
-#
-#   Sigma_hat <- Sigma_hat + solve(W)
 
   alpha <- 1 - int.level
 
@@ -313,7 +294,7 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
                  interval = interval,
                  desc = c(con_m.x, con_sd.x, con_m.y, con_sd.y, n),
                  alternative = alternative,
-                 method = paste("Revised Standardised Difference Test"),
+                 method = paste("Bayesian Standardised Difference Test"),
                  data.name = dname)
 
   class(output) <- "htest"
