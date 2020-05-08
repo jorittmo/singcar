@@ -169,7 +169,8 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     con_mat <- cbind(controls.x, controls.y)
     # Calculate SSCP matrix and call it A as in Crawford Garthwaite-notation - the scale matrix
 
-    A <- t(con_mat)%*%con_mat
+    A <- (n - 1)* cov(con_mat)
+
   } else {
 
     sxx <- con_sd.x^2 * (n - 1)
@@ -180,17 +181,20 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     A <- matrix(c(sxx, sxy, sxy, syy), nrow = 2)
   }
 
+  seed <- sample(1:10)
 
+  set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
   Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
 
+  set.seed(seed)
+  Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Gives cholesky decomp on each sigma_hat iter
+  Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
 
-  Tchol <- array(dim = c(2, 2, iter))
   Mu_hat <- matrix(nrow = iter, ncol = 2)
-  for (i in 1:iter) Tchol[ , , i] <- t(chol(Sigma_hat[ , , i]))
   for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
 
+
   ## For those that thinks apply() gives more readability, but it slows the code
-  # Tchol <- apply(Sigma_hat, 3, function(x) t(chol(x)))
   # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m.x, con_m.y) +
   #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
 
@@ -302,3 +306,4 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
 
 
 }
+
