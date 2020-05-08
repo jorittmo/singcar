@@ -32,6 +32,7 @@
 #' @param iter Number of iterations.
 #' @param unstandardised Estimate z-value based on standardised or
 #'   unstandardised task scores.
+#' @param calibrated set to \code{TRUE} to use a calibrated prior distribution.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -74,6 +75,7 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
                   int.level = 0.95,
                   iter = 1000,
                   unstandardised = FALSE,
+                  calibrated = FALSE,
                   na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
@@ -181,22 +183,64 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     A <- matrix(c(sxx, sxy, sxy, syy), nrow = 2)
   }
 
-  seed <- sample(1:10)
+  if (calibrated == FALSE) {
 
-  set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
-  Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
+    seed <- sample(1:10)
 
-  set.seed(seed)
-  Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Gives cholesky decomp on each sigma_hat iter
-  Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
+    set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
+    Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
 
-  Mu_hat <- matrix(nrow = iter, ncol = 2)
-  for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
+    set.seed(seed)
+    Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Simulates same as above but with cholesky decomp in C++
+    Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
+
+    Mu_hat <- matrix(nrow = iter, ncol = 2)
+    for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
 
 
-  ## For those that thinks apply() gives more readability, but it slows the code
-  # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m.x, con_m.y) +
-  #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
+    ## For those that thinks apply() gives more readability, but it slows the code
+    # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m.x, con_m.y) +
+    #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
+
+  } else { # if calibrated == TRUE
+
+    A_ast <- ((n - 2)*A) / (n - 1)
+
+    step_it <- iter
+    Sigma_hat_acc_save <- array(dim = c(2, 2, 1))
+
+    while(dim(Sigma_hat_acc_save)[3] < iter + 1) {
+
+      # Sigma_hat <- CholWishart::rInvWishart(step_it, df = n - m - 2, solve(A_ast)) Är det verkligen A invers??
+      # Invers enligt pappret, men får helt galna värden. Däremot med vanlig kryssprodukt blir det värden vi hade väntat oss
+      Sigma_hat <- CholWishart::rInvWishart(step_it, df = n - 2, A_ast)
+
+      rho_hat_pass <- Sigma_hat[1, 2, ] / sqrt(Sigma_hat[1, 1, ] * Sigma_hat[2, 2, ])
+
+      u <- runif(step_it, min = 0, max = 1)
+
+      Sigma_hat_acc <- Sigma_hat[ , , (u^2 <= (1 - rho_hat_pass^2))]
+
+      Sigma_hat_acc_save <- abind::abind(Sigma_hat_acc_save, Sigma_hat_acc, along = 3)
+
+      # Sigma_hat_acc_save <- array(c(Sigma_hat_acc_save, Sigma_hat_acc), # Bind the arrays together
+      #                             dim = c(2, 2, (dim(Sigma_hat_acc_save)[3] + dim(Sigma_hat_acc)[3])))
+
+      step_it <- iter - dim(Sigma_hat_acc_save)[3] + 1
+
+    }
+
+    Sigma_hat <- Sigma_hat_acc_save[ , , -1] # Remove the first matrix that is fild with NA
+    rm(Sigma_hat_acc_save, step_it, u, Sigma_hat_acc, rho_hat_pass) # Remove all variables not needed
+
+    Tchol <- array(dim = c(2, 2, iter))
+    for (i in 1:iter) Tchol[ , , i] <- t(chol(Sigma_hat[ , , i]))
+
+    Mu_hat <- matrix(nrow = iter, ncol = 2)
+    for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
+
+  }
+
 
 
   if (unstandardised == FALSE) {
