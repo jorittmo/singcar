@@ -17,6 +17,7 @@ BSDT(
   int.level = 0.95,
   iter = 1000,
   unstandardised = FALSE,
+  calibrated = FALSE,
   na.rm = FALSE
 )
 }
@@ -54,30 +55,29 @@ as Y, be very careful if changing this parameter.}
 
 \item{int.level}{Level of confidence for credible intervals.}
 
-\item{iter}{Number of iterations.}
+\item{iter}{Number of iterations. Greater number gives better
+estimation but takes longer to calculate.}
 
 \item{unstandardised}{Estimate z-value based on standardised or
 unstandardised task scores.}
+
+\item{calibrated}{set to \code{TRUE} to use a calibrated prior distribution.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
-  \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
-  returns the value of an exact t-statistic, however, because of the
-  underlying equation, it cannot be negative. Set exact.method to
-  \code{FALSE} for an approximate t-value with correct sign. \cr\cr
-  \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
-  \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
+  \tabular{llll}{ \code{statistic}   \tab the average z-value over
+  \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
+  p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
   case scores expressed as z-scores on task X and Y. Standardised effect size
   (Z-DCC) of task difference between case and controls and point estimate of
   the proportion of the control population estimated to show a more extreme
-  task difference. \cr\cr \code{sample.size}   \tab the size of the control
-  sample\cr\cr \code{null.value}   \tab the value of the difference under the
-  null hypothesis.\cr\cr  \code{alternative}     \tab a character string
-  describing the alternative hypothesis.\cr\cr \code{method} \tab a character
-  string indicating what type of test was performed.\cr\cr \code{data.name}
-  \tab a character string giving the name(s) of the data}
+  task difference. \cr\cr  \code{null.value}   \tab the value of the
+  difference under the null hypothesis.\cr\cr  \code{alternative}     \tab a
+  character string describing the alternative hypothesis.\cr\cr \code{method}
+  \tab a character string indicating what type of test was performed.\cr\cr
+  \code{data.name} \tab a character string giving the name(s) of the data}
 }
 \description{
 A test on the difference between two tasks in a single case, by comparison to

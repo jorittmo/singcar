@@ -29,28 +29,25 @@
 #'   of the expected effect depends on which task is set as X and which is set
 #'   as Y, be very careful if changing this parameter.
 #' @param int.level Level of confidence for credible intervals.
-#' @param iter Number of iterations.
+#' @param iter Number of iterations. Greater number gives better
+#'   estimation but takes longer to calculate.
 #' @param unstandardised Estimate z-value based on standardised or
 #'   unstandardised task scores.
 #' @param calibrated set to \code{TRUE} to use a calibrated prior distribution.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
-#'   \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
-#'   returns the value of an exact t-statistic, however, because of the
-#'   underlying equation, it cannot be negative. Set exact.method to
-#'   \code{FALSE} for an approximate t-value with correct sign. \cr\cr
-#'   \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
-#'   \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
+#'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
+#'   \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
+#'   p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
 #'   case scores expressed as z-scores on task X and Y. Standardised effect size
 #'   (Z-DCC) of task difference between case and controls and point estimate of
 #'   the proportion of the control population estimated to show a more extreme
-#'   task difference. \cr\cr \code{sample.size}   \tab the size of the control
-#'   sample\cr\cr \code{null.value}   \tab the value of the difference under the
-#'   null hypothesis.\cr\cr  \code{alternative}     \tab a character string
-#'   describing the alternative hypothesis.\cr\cr \code{method} \tab a character
-#'   string indicating what type of test was performed.\cr\cr \code{data.name}
-#'   \tab a character string giving the name(s) of the data}
+#'   task difference. \cr\cr  \code{null.value}   \tab the value of the
+#'   difference under the null hypothesis.\cr\cr  \code{alternative}     \tab a
+#'   character string describing the alternative hypothesis.\cr\cr \code{method}
+#'   \tab a character string indicating what type of test was performed.\cr\cr
+#'   \code{data.name} \tab a character string giving the name(s) of the data}
 #'
 #' @export
 #'
@@ -171,7 +168,7 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     con_mat <- cbind(controls.x, controls.y)
     # Calculate SSCP matrix and call it A as in Crawford Garthwaite-notation - the scale matrix
 
-    A <- (n - 1)* cov(con_mat)
+    A <- (n - 1)* stats::cov(con_mat)
 
   } else {
 
@@ -202,7 +199,7 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m.x, con_m.y) +
     #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
 
-  } else { # if calibrated == TRUE
+  } else { # i.e if calibrated == TRUE
 
     A_ast <- ((n - 2)*A) / (n - 1)
 
@@ -211,20 +208,17 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
 
     while(dim(Sigma_hat_acc_save)[3] < iter + 1) {
 
-      # Sigma_hat <- CholWishart::rInvWishart(step_it, df = n - m - 2, solve(A_ast)) Är det verkligen A invers??
-      # Invers enligt pappret, men får helt galna värden. Däremot med vanlig kryssprodukt blir det värden vi hade väntat oss
       Sigma_hat <- CholWishart::rInvWishart(step_it, df = n - 2, A_ast)
 
       rho_hat_pass <- Sigma_hat[1, 2, ] / sqrt(Sigma_hat[1, 1, ] * Sigma_hat[2, 2, ])
 
-      u <- runif(step_it, min = 0, max = 1)
+      u <- stats::runif(step_it, min = 0, max = 1)
 
-      Sigma_hat_acc <- Sigma_hat[ , , (u^2 <= (1 - rho_hat_pass^2))]
+      Sigma_hat_acc <- array(Sigma_hat[ , , (u^2 <= (1 - rho_hat_pass^2))],
+                             dim = c(2, 2, sum(u^2 <= (1 - rho_hat_pass^2))))
 
-      Sigma_hat_acc_save <- abind::abind(Sigma_hat_acc_save, Sigma_hat_acc, along = 3)
-
-      # Sigma_hat_acc_save <- array(c(Sigma_hat_acc_save, Sigma_hat_acc), # Bind the arrays together
-      #                             dim = c(2, 2, (dim(Sigma_hat_acc_save)[3] + dim(Sigma_hat_acc)[3])))
+      Sigma_hat_acc_save <- array(c(Sigma_hat_acc_save, Sigma_hat_acc), # Bind the arrays together
+                                  dim = c(2, 2, (dim(Sigma_hat_acc_save)[3] + dim(Sigma_hat_acc)[3] + 1)))
 
       step_it <- iter - dim(Sigma_hat_acc_save)[3] + 1
 
