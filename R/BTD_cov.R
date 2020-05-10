@@ -1,0 +1,198 @@
+#' Bayesian Test of Deficit with Covariates
+#'
+#' @param case_task The case score from the task of interest. Can only be of
+#'   length 1.
+#' @param case_covar A vector containing the case scores on all covariates
+#'   included. Can be of any length except 0, in that case use
+#'   \code{\link{BTD}}.
+#' @param control_task A vector containing the scores from the controls on the
+#'   task of interest.
+#' @param control_covar A vector, matrix or dataframe cointaining the control
+#'   scores on the covariates included. If matrix or dataframe each column
+#'   represents a covariate.
+#' @param alternative A character string specifying the alternative hypothesis,
+#'   must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'   \code{"less"}. You can specify just the initial letter.
+#' @param int.level The probability level on the Bayesian credible intervals.
+#' @param iter Number of iterations to be performed. Greater number gives better
+#'   estimation but takes longer to calculate.
+#'
+#' @return A list with class \code{"htest"} containing the following components:
+#'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
+#'   \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
+#'   p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
+#'   case scores expressed as z-scores on task X and Y. Standardised effect size
+#'   (Z-CCC) of task difference between case and controls and point estimate of
+#'   the proportion of the control population estimated to show a more extreme
+#'   task difference. \cr\cr  \code{null.value}   \tab the value of the
+#'   difference between tasks under the null hypothesis.\cr\cr \code{interval}
+#'   \tab named numerical vector containing level of confidence and confidence
+#'   intervals for both effect size and p-value.\cr\cr \code{desc}     \tab data
+#'   frame containing means and standard deviations for controls as well as case
+#'   scores. \cr\cr \code{cor.mat} \tab matrix giving the correlations between
+#'   the task of interest and the covariates included. \cr\cr \code{sample.size}
+#'   \tab number of controls..\cr\cr \code{alternative}     \tab a character
+#'   string describing the alternative hypothesis.\cr\cr \code{method} \tab a
+#'   character string indicating what type of test was performed.\cr\cr
+#'   \code{data.name} \tab a character string giving the name(s) of the data}
+#' @export
+#'
+#' @examples
+#'  controls <- MASS::mvrnorm(18, mu = c(100, 13),
+#'   Sigma = matrix(c(15^2, 0.65*15*3, 0.65*15*3, 3^2),
+#'   nrow = 2, byrow = TRUE), empirical = TRUE)
+#'
+#'   BTD_cov(78, 13, controls[ , 1], controls[ , 2], iter = 1000)
+
+BTD_cov <- function (case_task, case_covar, control_task, control_covar,
+                     alternative = c("less", "two.sided", "greater"),
+                     int.level = 0.95,
+                     iter = 1000) {
+
+  alternative <- match.arg(alternative)
+
+  alpha <- 1 - int.level
+
+  n <- length(control_task)
+
+  m <- length(case_covar)
+
+  k <- length(case_task)
+
+  m_ct <- mean(control_task)
+
+  sd_ct <- stats::sd(control_task)
+
+  ## DATA ESTIMATION ##
+
+
+  X <- cbind(rep(1, n), control_covar)
+  Y <- control_task
+
+  B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
+
+  Sigma_ast <- (1/(n - m - 1)) * t(Y - X %*% B_ast) %*% (Y - X %*% B_ast)
+
+
+  ## PRIOR
+
+  Sigma_hat <- c(CholWishart::rInvWishart(iter, df = (n - m + k - 2), (n - m - 1)*Sigma_ast))
+
+  B_ast_vec <- c(B_ast)
+
+  lazy <- Sigma_hat[1] %x% solve(t(X) %*% X) # Get the dimensions in a lazy way
+
+  Lambda <- array(dim = c(nrow(lazy), ncol(lazy), iter))
+  for(i in 1:iter) Lambda[ , , i] <- Sigma_hat[i] %x% solve(t(X) %*% X) # %x% = Kronecker product
+  rm(lazy)
+
+  B_vec <- matrix(ncol = (m+1)*k, nrow = iter)
+  for(i in 1:iter) B_vec[i, ] <- MASS::mvrnorm(1, mu = B_ast_vec, Lambda[ , , i])
+
+
+  mu_hat <- vector(length = iter)
+  for (i in 1:iter) mu_hat[i] <- matrix(B_vec[i, ], ncol = (m+1), byrow = TRUE) %*% c(1, case_covar) # THIS SEEMS CORRECT NOW
+
+
+  z_hat_ccc <- (case_task - mu_hat) / sqrt(Sigma_hat)
+
+  # TWO SIDED P-value
+
+  if (alternative == "less") {
+
+    pval <- stats::pnorm(z_hat_ccc)
+
+  } else if (alternative == "greater") {
+
+    pval <- stats::pnorm(z_hat_ccc, lower.tail = FALSE)
+
+  } else if (alternative == "two.sided") {
+
+    pval <- 2 * stats::pnorm(abs(z_hat_ccc), lower.tail = FALSE)
+
+  }
+
+  zccc <- (case_task - m_ct) / sd_ct
+  z_ast_est <- mean(z_hat_ccc)
+
+  zccc_int <- stats::quantile(z_hat_ccc, c(alpha/2, (1 - alpha/2)))
+  names(zccc_int) <- c("Lower zccc CI", "Upper zccc CI")
+
+  p_est <- mean(pval)
+
+  p_int <- stats::quantile(pval, c(alpha/2, (1 - alpha/2)))*100
+  if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
+  names(p_int) <- c("Lower p CI", "Upper p CI")
+
+  estimate <- c(zccc, p_est*100)
+  if (alternative == "two.sided") estimate <- c(zccc, (p_est/2)*100)
+
+  zccc.name <- paste0("Std. case difference (Z-CCC), ",
+                     100*int.level, "% credible interval [",
+                     format(round(zccc_int[1], 2), nsmall = 2),", ",
+                     format(round(zccc_int[2], 2), nsmall = 2),"]")
+
+  if (alternative == "less") {
+    alt.p.name <- "Proportion below case (%), "
+  } else if (alternative == "greater") {
+    alt.p.name <- "Proportion above case (%), "
+  } else {
+    if (zccc < 0) {
+      alt.p.name <- "Proportion below case (%), "
+    } else {
+      alt.p.name <- "Proportion above case (%), "
+    }
+  }
+
+  p.name <- paste0(alt.p.name,
+                   100*int.level, "% credible interval [",
+                   format(round(p_int[1], 2), nsmall = 2),", ",
+                   format(round(p_int[2], 2), nsmall = 2),"]")
+
+
+  names(estimate) <- c(zccc.name, p.name)
+
+
+  control_task <- matrix(control_task, ncol = 1, dimnames = list(NULL, "Y1"))
+  xname <- c()
+  for (i in 1:length(case_covar)) xname[i] <- paste0("X", i)
+  control_covar <- matrix(control_covar, ncol = length(case_covar),
+                          dimnames = list(NULL, xname))
+  cor.mat <- stats::cor(cbind(control_task, control_covar))
+
+  desc <- data.frame(Means = colMeans(cbind(control_task, control_covar)),
+                     SD = apply(cbind(control_task, control_covar), 2, stats::sd),
+                     Case_score = c(case_task, case_covar))
+
+  typ.int <- 100*int.level
+  names(typ.int) <- "Interval level (%)"
+  interval <- c(typ.int, zccc_int, p_int)
+
+  names(z_ast_est) <- "est. z"
+#  names(df) <- "df"
+  null.value <- 0 # Null hypothesis: difference = 0
+  names(null.value) <- "difference between case and controls"
+
+
+
+  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  output <- list(statistic = z_ast_est,
+                 #   parameter = df,
+                 p.value = p_est,
+                 estimate = estimate,
+                 null.value = null.value,
+                 interval = interval,
+                 desc = desc,
+                 cor.mat = cor.mat,
+                 sample.size = n,
+                 alternative = alternative,
+                 method = paste("Bayesian Test of deficit with Covariates"),
+                 data.name = paste0("case = ", format(round(case_task, 2), nsmall = 2),
+                                    " and controls (M = ", format(round(m_ct, 2), nsmall = 2),
+                                    ", SD = ", format(round(sd_ct, 2), nsmall = 2),
+                                    ", N = ", n, ")"))
+
+  class(output) <- "htest"
+  output
+
+}
