@@ -6,9 +6,6 @@ test_that("we get approx same results as C&G on BSDT_cov", {
                                     nrow = 3, byrow = T),
                      empirical = TRUE)
 
-  case_tasks <- c(70, 78)
-  case_covar <- 30
-
   # p-values and intervals from C&G programs given these values
 
   calib_prior_tt <- c(0.16247, -2.8085, -0.465, 0.251, 32.114) # Values from C&G software

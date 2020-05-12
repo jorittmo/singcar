@@ -4,9 +4,13 @@
 #' @param case_covar A vector containing the case scores on all covariates
 #'   included.
 #' @param control_tasks A matrix or dataframe with 2 columns and n rows
-#'   containing the control scores for the two tasks.
+#'   containing the control scores for the two tasks. Or a matrix or dataframe
+#'   containing summary statistics where the first column represents the means
+#'   for each task and the second column represents the standard deviation.
 #' @param control_covar A matrix or dataframe cointaining the control scores on
-#'   the covariates included.
+#'   the covariates included. Or a matrix or dataframe
+#'   containing summary statistics where the first column represents the means
+#'   for each covariate and the second column represents the standard deviation.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
@@ -19,6 +23,13 @@
 #'   (2011) for further information. Calibrated prior is recommended.
 #' @param iter Number of iterations to be performed. Greater number gives better
 #'   estimation but takes longer to calculate.
+#' @param use_sumstats If set to \code{TRUE}, \code{control_tasks} and
+#'   \code{control_covar} are treated as matrices with summary statistics. Where
+#'   the first column represents the means for each variable and the second
+#'   column represents the standard deviation.
+#' @param cor_mat A correlation matrix of all variables included. NOTE: the two
+#'   first variables should be the tasks of interest.
+#' @param control_n An integer specifying the sample size of the controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
@@ -52,11 +63,31 @@
 #'
 BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       alternative = c("two.sided", "greater", "less"),
-                      int.level = 0.95,
-                      calibrated = TRUE,
-                      iter = 1000) {
+                      int.level = 0.95, calibrated = TRUE, iter = 1000,
+                      use_sumstats = FALSE, cor_mat = NULL, control_n = NULL) {
 
   alternative <- match.arg(alternative)
+
+  # ERRORS BELOW
+
+  if (use_sumstats & is.null(cor_mat)) stop("Please supply correlation matrix if using summary input")
+  if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
+
+
+
+  if (use_sumstats) {
+
+    sum_stats <- rbind(control_tasks, control_covar)
+
+    cov_mat <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
+
+    lazy_gen <- MASS::mvrnorm(control_n, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
+
+    control_tasks <- lazy_gen[ , 1:2]
+
+    control_covar <- lazy_gen[ , -c(1, 2)]
+
+  }
 
   n <- nrow(control_tasks)
 
@@ -75,7 +106,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
 
-  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast)
+  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast) # This should be multiplied by (1/n - m - 1) but the I get a discrepancy with C&G
 
   if (calibrated == TRUE) {
 
@@ -98,8 +129,6 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
       Sigma_hat_acc <- array(Sigma_hat[ , , (u^2 <= (1 - rho_hat_pass^2))],
                              dim = c(2, 2, sum(u^2 <= (1 - rho_hat_pass^2))))
-
-    #  Sigma_hat_acc_save <- abind::abind(Sigma_hat_acc_save, Sigma_hat_acc, along = 3)
 
       Sigma_hat_acc_save <- array(c(Sigma_hat_acc_save, Sigma_hat_acc), # Bind the arrays together
                                    dim = c(2, 2, (dim(Sigma_hat_acc_save)[3] + dim(Sigma_hat_acc)[3])))
@@ -129,7 +158,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   B_vec <- matrix(ncol = (m+1)*k, nrow = iter)
   for(i in 1:iter) B_vec[i, ] <- MASS::mvrnorm(1, mu = B_ast_vec, Lambda[ , , i])
 
-  mu_hat <- matrix(ncol = k, nrow = iter) # Ska det verkligen vara m +1 och inte k kolumner?!!!!!!!!!!!!!!!
+  mu_hat <- matrix(ncol = k, nrow = iter)
   for (i in 1:iter) mu_hat[i, ] <- matrix(B_vec[i, ], ncol = (m + 1), byrow = TRUE) %*% c(1, case_covar) # THIS SEEMS CORRECT NOW
 
   # Each row indicates the conditional expected values
@@ -157,7 +186,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   alpha <- 1 - int.level
 
   z_ast_est <- mean(z_hat_dccc)
-  names(z_ast_est) <- "est. z"
+  names(z_ast_est) <- "ave. z"
 
   zdccc_int <- stats::quantile(z_hat_dccc, c(alpha/2, (1 - alpha/2)))
   names(zdccc_int) <- c("Lower zdccc CI", "Upper zdccc CI")
@@ -168,12 +197,23 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100 # This seems wrong
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
-  std.y1 <- (case_tasks[1] - m_ct[1]) / sd_ct[1]
-  std.y2 <- (case_tasks[2] - m_ct[2]) / sd_ct[2]
 
-  zdccc <- std.y1 - std.y2 / sqrt(2 - 2*r) # THIS DOES NOT ALIGN WITH C&G. PERHAPS EMAIL GARTHWAITE.
 
-  estimate <- c(std.y1, std.y2, zdccc, ifelse(alternative == "two.sided", (p_est/2*100), p_est*100))
+  z.y1 <- (case_tasks[1] - m_ct[1]) / sd_ct[1]
+  z.y2 <- (case_tasks[2] - m_ct[2]) / sd_ct[2]
+
+  mu_ast <- t(B_ast) %*% c(1, case_covar)
+
+  cov_ast <- Sigma_ast/(n - 1) # This is aligns witht the program but in the paper it should be (n - m - 1)
+
+  rho_ast <- cov_ast[1, 2]/sqrt(cov_ast[1, 1] * cov_ast[2, 2])
+
+  std.y1 <- (case_tasks[1] - mu_ast[1]) / sqrt(cov_ast[1, 1])
+  std.y2 <- (case_tasks[2] - mu_ast[2]) / sqrt(cov_ast[2, 2])
+
+  zdccc <-  (std.y1 - std.y2) / sqrt(2 - 2*rho_ast)
+
+  estimate <- c(z.y1, z.y2, zdccc, ifelse(alternative == "two.sided", (p_est/2*100), p_est*100))
 
   if (alternative == "two.sided") {
     alt.p.name <- "Proportion of control population with more extreme task difference, "

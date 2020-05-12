@@ -6,16 +6,26 @@
 #'   included. Can be of any length except 0, in that case use
 #'   \code{\link{BTD}}.
 #' @param control_task A vector containing the scores from the controls on the
-#'   task of interest.
+#'   task of interest. Or a vector of length 2 containing the mean and standard
+#'   deviation of the task. In that order.
 #' @param control_covar A vector, matrix or dataframe cointaining the control
 #'   scores on the covariates included. If matrix or dataframe each column
-#'   represents a covariate.
+#'   represents a covariate. Or a matrix or dataframe
+#'   containing summary statistics where the first column represents the means
+#'   for each covariate and the second column represents the standard deviation.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter.
 #' @param int.level The probability level on the Bayesian credible intervals.
 #' @param iter Number of iterations to be performed. Greater number gives better
 #'   estimation but takes longer to calculate.
+#' @param use_sumstats If set to \code{TRUE}, \code{control_tasks} and
+#'   \code{control_covar} are treated as matrices with summary statistics. Where
+#'   the first column represents the means for each variable and the second
+#'   column represents the standard deviation.
+#' @param cor_mat A correlation matrix of all variables included. NOTE: the two
+#'   first variables should be the tasks of interest.
+#' @param control_n An integer specifying the sample size of the controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
@@ -46,10 +56,25 @@
 
 BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      alternative = c("less", "two.sided", "greater"),
-                     int.level = 0.95,
-                     iter = 1000) {
+                     int.level = 0.95, iter = 1000,
+                     use_sumstats = FALSE, cor_mat = NULL, control_n = NULL) {
 
   alternative <- match.arg(alternative)
+
+
+  if (use_sumstats) {
+
+    sum_stats <- rbind(control_task, control_covar)
+
+    cov_mat <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
+
+    lazy_gen <- MASS::mvrnorm(control_n, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
+
+    control_task <- lazy_gen[ , 1]
+
+    control_covar <- lazy_gen[ , -1]
+
+  }
 
   alpha <- 1 - int.level
 
@@ -71,12 +96,13 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
 
-  Sigma_ast <- (1/(n - m - 1)) * t(Y - X %*% B_ast) %*% (Y - X %*% B_ast)
+  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast) # Now sums of squares, to be real sigma: * (1/(n - m - 1))
 
 
-  ## PRIOR
 
-  Sigma_hat <- c(CholWishart::rInvWishart(iter, df = (n - m + k - 2), (n - m - 1)*Sigma_ast))
+  ## PRIOR ##
+
+  Sigma_hat <- c(CholWishart::rInvWishart(iter, df = (n - m + k - 2), Sigma_ast))
 
   B_ast_vec <- c(B_ast)
 
@@ -112,7 +138,13 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   }
 
-  zccc <- (case_task - m_ct) / sd_ct
+  mu_ast <- t(B_ast) %*% c(1, case_covar)
+
+  var_ast <- Sigma_ast/(n - 1)
+
+  ## BELOW DOES NOT ALIGN WITH C&G 0.3 diff
+  zccc <- (case_task - mu_ast) / sqrt(var_ast) # Calculate point estimate based on conditional sample means and sd
+
   z_ast_est <- mean(z_hat_ccc)
 
   zccc_int <- stats::quantile(z_hat_ccc, c(alpha/2, (1 - alpha/2)))
@@ -196,3 +228,4 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   output
 
 }
+
