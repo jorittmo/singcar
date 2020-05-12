@@ -12,7 +12,10 @@ BSDT_cov(
   alternative = c("two.sided", "greater", "less"),
   int.level = 0.95,
   calibrated = TRUE,
-  iter = 1000
+  iter = 1000,
+  use_sumstats = FALSE,
+  cor_mat = NULL,
+  control_n = NULL
 )
 }
 \arguments{
@@ -22,10 +25,14 @@ BSDT_cov(
 included.}
 
 \item{control_tasks}{A matrix or dataframe with 2 columns and n rows
-containing the control scores for the two tasks.}
+containing the control scores for the two tasks. Or a matrix or dataframe
+containing summary statistics where the first column represents the means
+for each task and the second column represents the standard deviation.}
 
 \item{control_covar}{A matrix or dataframe cointaining the control scores on
-the covariates included.}
+the covariates included. Or a matrix or dataframe containing summary
+statistics where the first column represents the means for each covariate
+and the second column represents the standard deviation.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"two.sided"} (default), \code{"greater"} or
@@ -42,6 +49,16 @@ Berger and Sun (2008) and sample size treated as n - 1. See Crawford et al.
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
 estimation but takes longer to calculate.}
+
+\item{use_sumstats}{If set to \code{TRUE}, \code{control_tasks} and
+\code{control_covar} are treated as matrices with summary statistics. Where
+the first column represents the means for each variable and the second
+column represents the standard deviation.}
+
+\item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
+first variables should be the tasks of interest.}
+
+\item{control_n}{An integer specifying the sample size of the controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
@@ -66,7 +83,23 @@ A list with class \code{"htest"} containing the following components:
   character string giving the name(s) of the data}
 }
 \description{
-Bayesian Standardised Difference Test with Covariates
+Tests whether the standardized difference between a case's scores
+on two tasks (Y1 and Y2) is significantly different from the standardized
+differences between these tasks in a control sample, while controlling for
+the effects of covariates.  For example, it could be used to test whether a
+case's standardized difference between two tasks is significantly greater
+than the standardized differences in controls when controlling for a measure
+of processing speed.  Under the null hypothesis the case's standardized
+difference, conditioned on the covariate(s), is an observation from the
+distribution of conditional standardized differences in the control
+population.  The program provides (a) a signficance test, (b) point and
+interval estimates of the effect size for the difference between the case and
+controls, and (c) point and interval estimates of the abnormality of the
+case's standardized difference (i.e., it estimates the percentage of controls
+that would exhibit a more extreme standardized difference).
+}
+\details{
+Developed by Crawford, Garthwaite and Ryan (2011).
 }
 \examples{
   controls <- MASS::mvrnorm(20, mu = c(100, 80, 50),
@@ -75,5 +108,13 @@ Bayesian Standardised Difference Test with Covariates
 
    BSDT_cov(c(70, 78), 30, controls[ , 1:2], controls[ , 3], iter = 1000)
 
+}
+\references{
+Berger, J. O., & Sun, D. (2008). Objective Priors for the Bivariate Normal
+Model. \emph{The Annals of Statistics, 36}(2), 963–982. JSTOR.
 
+Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing a single
+case to a control sample: Testing for neuropsychological deficits and
+dissociations in the presence of covariates. \emph{Cortex, 47}(10),
+1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
 }

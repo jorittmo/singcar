@@ -11,7 +11,10 @@ BTD_cov(
   control_covar,
   alternative = c("less", "two.sided", "greater"),
   int.level = 0.95,
-  iter = 1000
+  iter = 1000,
+  use_sumstats = FALSE,
+  cor_mat = NULL,
+  control_n = NULL
 )
 }
 \arguments{
@@ -23,11 +26,14 @@ included. Can be of any length except 0, in that case use
 \code{\link{BTD}}.}
 
 \item{control_task}{A vector containing the scores from the controls on the
-task of interest.}
+task of interest. Or a vector of length 2 containing the mean and standard
+deviation of the task. In that order.}
 
 \item{control_covar}{A vector, matrix or dataframe cointaining the control
 scores on the covariates included. If matrix or dataframe each column
-represents a covariate.}
+represents a covariate. Or a matrix or dataframe containing summary
+statistics where the first column represents the means for each covariate
+and the second column represents the standard deviation.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"two.sided"} (default), \code{"greater"} or
@@ -37,6 +43,16 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
 estimation but takes longer to calculate.}
+
+\item{use_sumstats}{If set to \code{TRUE}, \code{control_tasks} and
+\code{control_covar} are treated as matrices with summary statistics. Where
+the first column represents the means for each variable and the second
+column represents the standard deviation.}
+
+\item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
+first variables should be the tasks of interest.}
+
+\item{control_n}{An integer specifying the sample size of the controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
@@ -59,7 +75,20 @@ A list with class \code{"htest"} containing the following components:
   \code{data.name} \tab a character string giving the name(s) of the data}
 }
 \description{
-Bayesian Test of Deficit with Covariates
+Tests for a deficit on a task of interest in the single case,
+controlling for the effects of covariates. For example, it could be used to
+test whether a case's score on a task is significantly lower than the scores
+of controls when controlling for years of education.  Under the null
+hypothesis the case's score, conditioned on the covariate(s), is an
+observation from the distribution of conditional scores in the control
+population.  The function provides (a) a signficance test, (b) point and
+interval estimates of the effect size for the difference between the case and
+controls, and (c) point and interval estimates of the abnormality of the
+case's score (i.e., it estimates the percentage of controls that would
+exhibit a more extreme conditional score).
+}
+\details{
+Developed by Crawford, Garthwaite and Ryan (2011).
 }
 \examples{
  controls <- MASS::mvrnorm(18, mu = c(100, 13),
@@ -67,4 +96,11 @@ Bayesian Test of Deficit with Covariates
   nrow = 2, byrow = TRUE), empirical = TRUE)
 
   BTD_cov(78, 13, controls[ , 1], controls[ , 2], iter = 1000)
+
+}
+\references{
+Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
+  a single case to a control sample: Testing for neuropsychological deficits
+  and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
+  1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
 }

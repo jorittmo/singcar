@@ -1,5 +1,19 @@
 #' Bayesian Test of Deficit with Covariates
 #'
+#' Tests for a deficit on a task of interest in the single case,
+#' controlling for the effects of covariates. For example, it could be used to
+#' test whether a case's score on a task is significantly lower than the scores
+#' of controls when controlling for years of education.  Under the null
+#' hypothesis the case's score, conditioned on the covariate(s), is an
+#' observation from the distribution of conditional scores in the control
+#' population.  The function provides (a) a signficance test, (b) point and
+#' interval estimates of the effect size for the difference between the case and
+#' controls, and (c) point and interval estimates of the abnormality of the
+#' case's score (i.e., it estimates the percentage of controls that would
+#' exhibit a more extreme conditional score).
+#'
+#' Developed by Crawford, Garthwaite and Ryan (2011).
+#'
 #' @param case_task The case score from the task of interest. Can only be of
 #'   length 1.
 #' @param case_covar A vector containing the case scores on all covariates
@@ -10,9 +24,9 @@
 #'   deviation of the task. In that order.
 #' @param control_covar A vector, matrix or dataframe cointaining the control
 #'   scores on the covariates included. If matrix or dataframe each column
-#'   represents a covariate. Or a matrix or dataframe
-#'   containing summary statistics where the first column represents the means
-#'   for each covariate and the second column represents the standard deviation.
+#'   represents a covariate. Or a matrix or dataframe containing summary
+#'   statistics where the first column represents the means for each covariate
+#'   and the second column represents the standard deviation.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter.
@@ -53,6 +67,11 @@
 #'   nrow = 2, byrow = TRUE), empirical = TRUE)
 #'
 #'   BTD_cov(78, 13, controls[ , 1], controls[ , 2], iter = 1000)
+#'
+#' @references Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
+#'   a single case to a control sample: Testing for neuropsychological deficits
+#'   and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
+#'   1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
 
 BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      alternative = c("less", "two.sided", "greater"),
@@ -61,6 +80,9 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   alternative <- match.arg(alternative)
 
+  if (use_sumstats & (is.null(cor_mat) | is.null(control_n))) stop("Please supply both correlation matrix and sample size")
+  if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
+  if (length(case_task) != 1) stop("case_task should be single value")
 
   if (use_sumstats) {
 
