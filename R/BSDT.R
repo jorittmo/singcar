@@ -191,6 +191,8 @@ BSDT <- function (case.x, case.y, controls.x, controls.y,
     Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Simulates same as above but with cholesky decomp in C++
     Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
 
+    set.seed(NULL)
+
     Mu_hat <- matrix(nrow = iter, ncol = 2)
     for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m.x, con_m.y) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
 
