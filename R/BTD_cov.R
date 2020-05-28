@@ -6,7 +6,7 @@
 #' of controls when controlling for years of education.  Under the null
 #' hypothesis the case's score, conditioned on the covariate(s), is an
 #' observation from the distribution of conditional scores in the control
-#' population.  The function provides (a) a signficance test, (b) point and
+#' population.  Returns (a) a signficance test, (b) point and
 #' interval estimates of the effect size for the difference between the case and
 #' controls, and (c) point and interval estimates of the abnormality of the
 #' case's score (i.e., it estimates the percentage of controls that would

@@ -9,7 +9,7 @@
 #' of processing speed.  Under the null hypothesis the case's standardized
 #' difference, conditioned on the covariate(s), is an observation from the
 #' distribution of conditional standardized differences in the control
-#' population.  The program provides (a) a signficance test, (b) point and
+#' population. Returns (a) a signficance test, (b) point and
 #' interval estimates of the effect size for the difference between the case and
 #' controls, and (c) point and interval estimates of the abnormality of the
 #' case's standardized difference (i.e., it estimates the percentage of controls
@@ -80,12 +80,12 @@
 #' @references
 #'
 #' Berger, J. O., & Sun, D. (2008). Objective Priors for the Bivariate Normal
-#' Model. \emph{The Annals of Statistics, 36}(2), 963–982. JSTOR.
+#' Model. \emph{The Annals of Statistics, 36}(2), 963-982. JSTOR.
 #'
 #' Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing a single
 #' case to a control sample: Testing for neuropsychological deficits and
 #' dissociations in the presence of covariates. \emph{Cortex, 47}(10),
-#' 1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
+#' 1166-1178. https://doi.org/10.1016/j.cortex.2011.02.017
 
 BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       alternative = c("two.sided", "greater", "less"),
