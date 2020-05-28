@@ -283,6 +283,7 @@ RSDT <- function (case.x, case.y, controls.x, controls.y,
                   "Case score Y: ", deparse(substitute(case.y)), ", ",
                   "Controls score X: ", deparse(substitute(controls.x)), ", ",
                   "Controls score Y: ",deparse(substitute(controls.y)))
+  names(pval) <- NULL
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat,
