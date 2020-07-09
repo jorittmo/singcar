@@ -7,10 +7,10 @@
 BTD(
   case,
   controls,
-  controls.sd = NULL,
-  controls.n = NULL,
+  sd = NULL,
+  sample_size = NULL,
   alternative = c("less", "greater", "two.sided"),
-  int.level = 0.95,
+  int_level = 0.95,
   iter = 1000,
   na.rm = FALSE
 )
@@ -21,17 +21,17 @@ BTD(
 \item{controls}{Numeric vector of observations from the control sample. If
 single value, treated as mean.}
 
-\item{controls.sd}{If input of controls is single value, the standard
+\item{sd}{If input of controls is single value, the standard
 deviation of the sample must be given as well.}
 
-\item{controls.n}{If input of controls is single value, the size of the
+\item{sample_size}{If input of controls is single value, the size of the
 sample must be given as well.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"less"} (default), \code{"greater"} or
 \code{"two.sided"}. You can specify just the initial letter.}
 
-\item{int.level}{Level of confidence for credible intervals.}
+\item{int_level}{Level of confidence for credible intervals.}
 
 \item{iter}{Number of iterations.}
 
@@ -69,7 +69,7 @@ expected to obtain a lower or higher score, depending on the alternative
 hypothesis).
 }
 \examples{
-BTD(case = -2, controls = 0, controls.sd = 1, controls.n = 20)
+BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
 
 BTD(case = size_weight_illusion[1, "V_SWI"],
     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")

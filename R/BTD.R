@@ -15,14 +15,14 @@
 #' @param case Case observation, can only be a single value.
 #' @param controls Numeric vector of observations from the control sample. If
 #'   single value, treated as mean.
-#' @param controls.sd If input of controls is single value, the standard
+#' @param sd If input of controls is single value, the standard
 #'   deviation of the sample must be given as well.
-#' @param controls.n If input of controls is single value, the size of the
+#' @param sample_size If input of controls is single value, the size of the
 #'   sample must be given as well.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
-#' @param int.level Level of confidence for credible intervals.
+#' @param int_level Level of confidence for credible intervals.
 #' @param iter Number of iterations.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
@@ -46,7 +46,7 @@
 #' @export
 #'
 #' @examples
-#' BTD(case = -2, controls = 0, controls.sd = 1, controls.n = 20)
+#' BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
 #'
 #' BTD(case = size_weight_illusion[1, "V_SWI"],
 #'     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
@@ -61,35 +61,35 @@
 
 
 
-BTD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
+BTD <- function (case, controls, sd = NULL, sample_size = NULL,
                 alternative = c("less", "greater", "two.sided"),
-                int.level = 0.95, iter = 1000, na.rm = FALSE) {
+                int_level = 0.95, iter = 1000, na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
-  if (length(controls)<2 & is.null(controls.sd) == TRUE) {
+  if (length(controls)<2 & is.null(sd) == TRUE) {
     stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
   }
 
-  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == TRUE) stop("Input sample size")
+  if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == TRUE) stop("Input sample size")
   if (is.na(case)==TRUE) stop("Case is NA")
 
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
-  if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
+  if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
 
   alternative <- match.arg(alternative)
 
   con_m <- mean(controls) # Mean of the control sample
 
   con_sd <- stats::sd(controls) # Standard deviation of the control sample (returns NA if summary stats used)
-  if (length(controls)<2 & is.null(controls.sd) == FALSE) con_sd <- controls.sd
+  if (length(controls)<2 & is.null(sd) == FALSE) con_sd <- sd
 
   n <- length(controls)
-  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == FALSE) n <- controls.n
+  if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == FALSE) n <- sample_size
 
   df <- n - 1 # The degrees of freedom
-  alpha <- 1 - int.level
+  alpha <- 1 - int_level
 
   ## BAYESIAN PROCESS AS EXPLAINED BY CRAWFORD AND GARTHWAITE (2007)##
 
@@ -134,7 +134,7 @@ BTD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   if (alternative == "two.sided") estimate <- c(zcc, (p_est/2)*100)
 
   zcc.name <- paste0("Std. case difference (Z-CC), ",
-                     100*int.level, "% credible interval [",
+                     100*int_level, "% credible interval [",
                      format(round(zcc_int[1], 2), nsmall = 2),", ",
                      format(round(zcc_int[2], 2), nsmall = 2),"]")
 
@@ -151,14 +151,14 @@ BTD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int.level, "% credible interval [",
+                   100*int_level, "% credible interval [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
   names(estimate) <- c(zcc.name, p.name)
 
 
-  typ.int <- 100*int.level
+  typ.int <- 100*int_level
   names(typ.int) <- "Interval level (%)"
   interval <- c(typ.int, zcc_int, p_int)
 
