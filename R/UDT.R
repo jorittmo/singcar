@@ -4,28 +4,28 @@
 #' a control sample. Use only when the two tasks are measured on the \emph{same}
 #' scale.
 #'
-#' @param case.x Case's score on task X.
-#' @param case.y Case's score on task Y.
-#' @param controls.x Controls' scores on task X. Takes either a vector of
+#' @param case_a Case's score on task A.
+#' @param case_b Case's score on task B.
+#' @param controls_a Controls' scores on task A. Takes either a vector of
 #'   observations or a single value interpreted as mean. \emph{Note}: you can
-#'   supply a vector as input for task X while mean and SD for task Y.
-#' @param controls.y Controls' scores on task Y. Takes either a vector of
+#'   supply a vector as input for task A while mean and SD for task B.
+#' @param controls_b Controls' scores on task B. Takes either a vector of
 #'   observations or a single value interpreted as mean. \emph{Note}: you can
-#'   supply a vector as input for task Y while mean and SD for task X.
-#' @param controls.x.sd If single value for task X is given as input you must
+#'   supply a vector as input for task B while mean and SD for task A.
+#' @param sd_a If single value for task A is given as input you must
 #'   supply the standard deviation of the sample.
-#' @param controls.y.sd If single value for task Y is given as input you must
+#' @param sd_b If single value for task B is given as input you must
 #'   supply the standard deviation of the sample.
-#' @param controls.n If X or Y is given as mean and SD you must supply the
-#'   sample size. If controls.x is given as vector and controls.y as mean and
-#'   SD, controls.n must equal the number of observations in controls.x.
-#' @param cor.x.y If X or Y is given as mean and SD you must supply the
+#' @param sample_size If A or B is given as mean and SD you must supply the
+#'   sample size. If controls_a is given as vector and controls_b as mean and
+#'   SD, sample_size must equal the number of observations in controls_a.
+#' @param r_ab If A and/or B is given as mean and SD you must supply the
 #'   correlation between the tasks.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
-#'   of the expected effect depends on which task is set as X and which is set
-#'   as Y, be very careful if changing this parameter.
+#'   of the expected effect depends on which task is set as A and which is set
+#'   as B, be very careful if changing this parameter.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -44,11 +44,11 @@
 #' @export
 #'
 #' @examples
-#' UDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,
-#' controls.y.sd = 1, controls.n = 20, cor.x.y = 0.68)
+#' UDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,
+#' sd_b = 1, sample_size = 20, r_ab = 0.68)
 #'
-#' UDT(case.x = size_weight_illusion[1, "V_SWI"], case.y = size_weight_illusion[1, "K_SWI"],
-#'  controls.x = size_weight_illusion[-1, "V_SWI"], controls.y = size_weight_illusion[-1, "K_SWI"])
+#' UDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1, "K_SWI"],
+#'  controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"])
 #'
 #' @references {Crawford, J. R., & Garthwaite, P. H. (2005). Testing for
 #' Suspected Impairments and Dissociations in Single-Case Studies in
@@ -58,54 +58,54 @@
 
 
 
-UDT <- function (case.x, case.y, controls.x, controls.y,
-                  controls.x.sd = NULL, controls.y.sd = NULL,
-                  controls.n = NULL, cor.x.y = NULL,
+UDT <- function (case_a, case_b, controls_a, controls_b,
+                  sd_a = NULL, sd_b = NULL,
+                  sample_size = NULL, r_ab = NULL,
                   alternative = c("two.sided", "greater", "less"),
                   na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
 
-  if (length(case.x) > 1 | length(case.y) > 1) stop("Case scores should be single value")
-  if (length(controls.x) > 1 & length(controls.y) > 1) {
-    if (length(controls.x) != length(controls.y)) stop("Sample sizes must be equal")
+  if (length(case_a) > 1 | length(case_b) > 1) stop("Case scores should be single value")
+  if (length(controls_a) > 1 & length(controls_b) > 1) {
+    if (length(controls_a) != length(controls_b)) stop("Sample sizes must be equal")
   }
 
-  if (length(controls.x) > 1 & length(controls.y) > 1 & is.null(controls.n) == FALSE) message("Value on controls.n will be ignored")
+  if (length(controls_a) > 1 & length(controls_b) > 1 & is.null(sample_size) == FALSE) message("Value on sample_size will be ignored")
 
-  if (length(controls.x) > 1 & is.null(controls.x.sd) == FALSE) message("Value on controls.x.sd will be ignored")
-  if (length(controls.y) > 1 & is.null(controls.y.sd) == FALSE) message("Value on controls.y.sd will be ignored")
-  if (length(controls.x) == 1 & is.null(controls.x.sd) == TRUE) stop("Please give sd and n on task x if controls.x is to be treated as mean")
-  if (length(controls.y) == 1 & is.null(controls.y.sd) == TRUE) stop("Please give sd and n on task y if controls.y is to be treated as mean")
+  if (length(controls_a) > 1 & is.null(sd_a) == FALSE) message("Value on sd_a will be ignored")
+  if (length(controls_b) > 1 & is.null(sd_b) == FALSE) message("Value on sd_b will be ignored")
+  if (length(controls_a) == 1 & is.null(sd_a) == TRUE) stop("Please give sd and n on task x if controls_a is to be treated as mean")
+  if (length(controls_b) == 1 & is.null(sd_b) == TRUE) stop("Please give sd and n on task y if controls_b is to be treated as mean")
 
 
   # Handling of NA use cases below
-  if(is.na(case.x) == TRUE | is.na(case.y) == TRUE) stop("One or both case scores is NA")
+  if(is.na(case_a) == TRUE | is.na(case_b) == TRUE) stop("One or both case scores is NA")
 
   if (na.rm == TRUE) {
-    if (sum(is.na(controls.x))  > 0 & sum(is.na(controls.y)) == 0 ) {
-      controls.y <- controls.y[!is.na(controls.x)]
-      controls.x <- controls.x[!is.na(controls.x)]
-      warning("Removal of NAs on controls.x resulted in removal of non-NAs on controls.y")
+    if (sum(is.na(controls_a))  > 0 & sum(is.na(controls_b)) == 0 ) {
+      controls_b <- controls_b[!is.na(controls_a)]
+      controls_a <- controls_a[!is.na(controls_a)]
+      warning("Removal of NAs on controls_a resulted in removal of non-NAs on controls_b")
     }
 
-    if (sum(is.na(controls.y))  > 0 & sum(is.na(controls.x)) == 0 ) {
-      controls.x <- controls.x[!is.na(controls.y)]
-      controls.y <- controls.y[!is.na(controls.y)]
-      warning("Removal of NAs on controls.y resulted in removal of non-NAs on controls.x")
+    if (sum(is.na(controls_b))  > 0 & sum(is.na(controls_a)) == 0 ) {
+      controls_a <- controls_a[!is.na(controls_b)]
+      controls_b <- controls_b[!is.na(controls_b)]
+      warning("Removal of NAs on controls_b resulted in removal of non-NAs on controls_a")
     }
 
-    if (sum(is.na(controls.y))  > 0 & sum(is.na(controls.x)) > 0 ) {
+    if (sum(is.na(controls_b))  > 0 & sum(is.na(controls_a)) > 0 ) {
 
-      if (identical(!is.na(controls.x), !is.na(controls.y)) == TRUE) {
-        controls.x <- controls.x[!is.na(controls.x)]
-        controls.y <- controls.y[!is.na(controls.y)]
+      if (identical(!is.na(controls_a), !is.na(controls_b)) == TRUE) {
+        controls_a <- controls_a[!is.na(controls_a)]
+        controls_b <- controls_b[!is.na(controls_b)]
       } else {
-        conx <- controls.x[!is.na(controls.x) & !is.na(controls.y)]
-        cony <- controls.y[!is.na(controls.x) & !is.na(controls.y)]
+        con_a <- controls_a[!is.na(controls_a) & !is.na(controls_b)]
+        con_b <- controls_b[!is.na(controls_a) & !is.na(controls_b)]
 
-        controls.x <- conx
-        controls.y <- cony
+        controls_a <- con_a
+        controls_b <- con_b
 
         warning("Removal of NAs on one control sample resulted in removal of non-NAs on the other")
       }
@@ -113,53 +113,53 @@ UDT <- function (case.x, case.y, controls.x, controls.y,
     }
 
   }
-  if (sum(is.na(controls.x)) > 0 | sum(is.na(controls.y)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
+  if (sum(is.na(controls_a)) > 0 | sum(is.na(controls_b)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
   # End of NA use cases
 
 
-  if (length(controls.x) > 1 & length(controls.y) > 1) {
-    if (length(controls.x) != length(controls.y)) stop("Sample sizes must be equal")
+  if (length(controls_a) > 1 & length(controls_b) > 1) {
+    if (length(controls_a) != length(controls_b)) stop("Sample sizes must be equal")
   }
 
-  con_m.x <- mean(controls.x) # Mean of the control sample on task x
-  con_m.y <- mean(controls.y) # Mean of the control sample on task y
+  con_m_a <- mean(controls_a) # Mean of the control sample on task x
+  con_m_b <- mean(controls_b) # Mean of the control sample on task y
 
-  con_sd.x <- stats::sd(controls.x) # Standard deviation of the control sample on task x
-  if (length(controls.x) == 1 & is.null(controls.x.sd) == FALSE) con_sd.x <- controls.x.sd
+  con_sd_a <- stats::sd(controls_a) # Standard deviation of the control sample on task x
+  if (length(controls_a) == 1 & is.null(sd_a) == FALSE) con_sd_a <- sd_a
 
-  con_sd.y <- stats::sd(controls.y) # Standard deviation of the control sample on task y
-  if (length(controls.y) == 1 & is.null(controls.y.sd) == FALSE) con_sd.y <- controls.y.sd
+  con_sd_b <- stats::sd(controls_b) # Standard deviation of the control sample on task y
+  if (length(controls_b) == 1 & is.null(sd_b) == FALSE) con_sd_b <- sd_b
 
 
   # Since controls x and y need to be of equal length n is the length of any of them
-  n <- length(controls.x)
-  if (length(controls.x) == 1 | length(controls.y) == 1) {
-    if (is.null(controls.n) == TRUE) stop("Please set sample size")
-    n <- controls.n
-    if (length(controls.x) > 1 & n != length(controls.x)) stop("Sample sizes must be equal")
-    if (length(controls.y) > 1 & n != length(controls.y)) stop("Sample sizes must be equal")
+  n <- length(controls_a)
+  if (length(controls_a) == 1 | length(controls_b) == 1) {
+    if (is.null(sample_size) == TRUE) stop("Please set sample size")
+    n <- sample_size
+    if (length(controls_a) > 1 & n != length(controls_a)) stop("Sample sizes must be equal")
+    if (length(controls_b) > 1 & n != length(controls_b)) stop("Sample sizes must be equal")
   }
 
-  if (is.null(cor.x.y) == TRUE & length(controls.x) == 1) stop("Please set correlation between tasks")
-  if (is.null(cor.x.y) == TRUE & length(controls.y) == 1) stop("Please set correlation between tasks")
+  if (is.null(r_ab) == TRUE & length(controls_a) == 1) stop("Please set correlation between tasks")
+  if (is.null(r_ab) == TRUE & length(controls_b) == 1) stop("Please set correlation between tasks")
 
-  if (is.null(cor.x.y) == FALSE){
-    if (cor.x.y < -1 | cor.x.y > 1) stop("Correlation must be between -1 and 1")
+  if (is.null(r_ab) == FALSE){
+    if (r_ab < -1 | r_ab > 1) stop("Correlation must be between -1 and 1")
   }
 
-  r <- cor.x.y
+  r <- r_ab
 
-  if (length(controls.x) > 1 & length(controls.y) > 1) r <- stats::cor(controls.x, controls.y)
+  if (length(controls_a) > 1 & length(controls_b) > 1) r <- stats::cor(controls_a, controls_b)
 
   df <- n - 1
 
-  def.x <- (case.x - con_m.x)
-  def.y <- (case.y - con_m.y)
+  def_a <- (case_a - con_m_a)
+  def_b <- (case_b - con_m_b)
 
-  dif <- (def.x - def.y)
+  dif <- (def_a - def_b)
 
   std.er <- sqrt(
-    (con_sd.x^2 + con_sd.y^2 - 2*con_sd.x*con_sd.y*r) * ((n + 1) / n)
+    (con_sd_a^2 + con_sd_b^2 - 2*con_sd_a*con_sd_b*r) * ((n + 1) / n)
   )
 
 
@@ -174,7 +174,7 @@ UDT <- function (case.x, case.y, controls.x, controls.y,
     pval <- stats::pt(tstat, df = df, lower.tail = TRUE)
   }
 
-  estimate <- c(def.x, def.y, dif, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
+  estimate <- c(def_a, def_b, dif, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
 
   if (alternative == "two.sided") {
     p.name <- "Proportion of control population with more extreme task difference"
@@ -186,25 +186,25 @@ UDT <- function (case.x, case.y, controls.x, controls.y,
 
 
   # Set names for objects in output
-  names(estimate) <- c("Case score on task X",
-                       "Case score on task Y",
+  names(estimate) <- c("Case score on task A",
+                       "Case score on task B",
                        "Task difference",
                        p.name)
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score X: ", deparse(substitute(case.x)), ", ",
-                  "Case score Y: ", deparse(substitute(case.y)), ", ",
-                  "Controls score X: ", deparse(substitute(controls.x)), ", ",
-                  "Controls score Y: ", deparse(substitute(controls.y)))
+  dname <- paste0("Case score A: ", deparse(substitute(case_a)), ", ",
+                  "Case score B: ", deparse(substitute(case_b)), ", ",
+                  "Controls score A: ", deparse(substitute(controls_a)), ", ",
+                  "Controls score B: ", deparse(substitute(controls_b)))
 
 
-  names(con_m.x) <- "Mean X"
-  names(con_m.y) <- "Mean Y"
-  names(con_sd.x) <- "SD X"
-  names(con_sd.y) <- "SD Y"
+  names(con_m_a) <- "Mean A"
+  names(con_m_b) <- "Mean B"
+  names(con_sd_a) <- "SD A"
+  names(con_sd_b) <- "SD B"
   names(n) <- "Sample size"
-  control.desc <- c(con_m.x, con_m.y, con_sd.x, con_sd.y, n)
+  control.desc <- c(con_m_a, con_m_b, con_sd_a, con_sd_b, n)
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat,
