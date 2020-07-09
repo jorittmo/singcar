@@ -11,16 +11,17 @@ test_that("check that summary stats give same output as non-summary for BSDT", {
             -0.37181171, -0.31255830, -0.03610260,  0.85230736,
             2.06553374, -0.10455893,  0.33921656, -0.05297144)
 
-# set.seed(123)
-# p_non_sum <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony)[["p.value"]]
-#
-# set.seed(123)
-# BSDT(case_a = -2, case_b = -3, controls_a = mean(conx), controls_b = mean(cony),
-#               sd_a = stats::sd(conx), sd_b = stats::sd(cony),
-#               sample_size = 20, r_ab = cor(conx, cony), iter = 100000)[["p.value"]]
-#
-# p_sum
-# expect_equal()
+
+set.seed(123)
+p_nsum <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony, iter = 1000)[["p.value"]]
+
+
+set.seed(123)
+p_sum <- BSDT(case_a = -2, case_b = -3, controls_a = mean(conx), controls_b = mean(cony),
+              sd_a = stats::sd(conx), sd_b = stats::sd(cony),
+              sample_size = 20, r_ab = cor(conx, cony), iter = 1000)[["p.value"]]
+
+expect_equal(p_nsum, p_sum)
 
 })
 
