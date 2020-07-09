@@ -2,8 +2,13 @@
 
 export(BSDT)
 export(BSDT_cov)
+export(BSDT_power)
 export(BTD)
 export(BTD_cov)
+export(BTD_power)
 export(RSDT)
+export(RSDT_power)
 export(TD)
+export(TD_power)
 export(UDT)
+export(UDT_power)
