@@ -184,7 +184,8 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
   if (calibrated == FALSE) {
 
-    seed <- sample(1:10)
+    seed <- runif(5)
+    old_seed <- .Random.seed
 
     set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
     Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
@@ -193,7 +194,7 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
     Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Simulates same as above but with cholesky decomp in C++
     Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
 
-    set.seed(NULL)
+    .Random.seed <<- old_seed
 
     Mu_hat <- matrix(nrow = iter, ncol = 2)
     for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m_a, con_m_b) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
