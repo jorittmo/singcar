@@ -71,11 +71,12 @@
 #' @export
 #'
 #' @examples
-#'   controls <- MASS::mvrnorm(20, mu = c(100, 80, 50),
-#'    Sigma = matrix(c(15^2, 108, 78, 108, 10^2, 12,78, 12, 10^2),
-#'    nrow = 3, byrow = TRUE), empirical = TRUE)
-#'
-#'    BSDT_cov(c(70, 78), 30, controls[ , 1:2], controls[ , 3], iter = 1000)
+#' BSDT_cov(case_tasks = c(size_weight_illusion[1, "V_SWI"],
+#'                         size_weight_illusion[1, "K_SWI"]),
+#'          case_covar = size_weight_illusion[1, "YRS"],
+#'          control_tasks = cbind(size_weight_illusion[-1, "V_SWI"],
+#'                                size_weight_illusion[-1, "K_SWI"]),
+#'          control_covar = size_weight_illusion[-1, "YRS"])
 #'
 #' @references
 #'

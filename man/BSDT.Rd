@@ -89,7 +89,9 @@ more extreme task difference.
 \examples{
 BSDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,
 controls.y.sd = 1, controls.n = 20, cor.x.y = 0.68)
-BSDT(-3.857, -1.875, controls.x = rnorm(20), controls.y = rnorm(20))
+
+BSDT(case.x = size_weight_illusion[1, "V_SWI"], case.y = size_weight_illusion[1, "K_SWI"],
+ controls.x = size_weight_illusion[-1, "V_SWI"], controls.y = size_weight_illusion[-1, "K_SWI"])
 
 }
 \references{

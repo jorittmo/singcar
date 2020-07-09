@@ -91,11 +91,11 @@ exhibit a more extreme conditional score).
 Developed by Crawford, Garthwaite and Ryan (2011).
 }
 \examples{
- controls <- MASS::mvrnorm(18, mu = c(100, 13),
-  Sigma = matrix(c(15^2, 0.65*15*3, 0.65*15*3, 3^2),
-  nrow = 2, byrow = TRUE), empirical = TRUE)
 
-  BTD_cov(78, 13, controls[ , 1], controls[ , 2], iter = 1000)
+BTD_cov(case_task = size_weight_illusion[1, "V_SWI"],
+         case_covar = size_weight_illusion[1, "YRS"],
+         control_task = size_weight_illusion[-1, "V_SWI"],
+         control_covar = size_weight_illusion[-1, "YRS"])
 
 }
 \references{

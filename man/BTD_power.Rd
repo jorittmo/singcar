@@ -47,3 +47,6 @@ deviation for the control sample. The mean and standard deviation defaults to
 0 and 1, so if no other values are given the case score is interpreted as
 deviation from the mean in standard deviations.
 }
+\examples{
+BTD_power(case = -2, mean = 0, sd = 1, sample_size = 20)
+}

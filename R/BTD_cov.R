@@ -62,11 +62,11 @@
 #' @export
 #'
 #' @examples
-#'  controls <- MASS::mvrnorm(18, mu = c(100, 13),
-#'   Sigma = matrix(c(15^2, 0.65*15*3, 0.65*15*3, 3^2),
-#'   nrow = 2, byrow = TRUE), empirical = TRUE)
 #'
-#'   BTD_cov(78, 13, controls[ , 1], controls[ , 2], iter = 1000)
+#' BTD_cov(case_task = size_weight_illusion[1, "V_SWI"],
+#'          case_covar = size_weight_illusion[1, "YRS"],
+#'          control_task = size_weight_illusion[-1, "V_SWI"],
+#'          control_covar = size_weight_illusion[-1, "YRS"])
 #'
 #' @references Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
 #'   a single case to a control sample: Testing for neuropsychological deficits

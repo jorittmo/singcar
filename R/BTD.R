@@ -48,6 +48,9 @@
 #' @examples
 #' BTD(case = -2, controls = 0, controls.sd = 1, controls.n = 20)
 #'
+#' BTD(case = size_weight_illusion[1, "V_SWI"],
+#'     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
+#'
 #' @references
 #' Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
 #' control or normative sample in neuropsychology: Development of a Bayesian
