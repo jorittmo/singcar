@@ -33,9 +33,10 @@
 #'   a dataframe consisting of both the sample size and the exact power such
 #'   size would yield.
 #' @export
-#'   TD_power(case = )
 #'
 #' @examples
+#' TD_power(case = -2, mean = 0, sd = 1, sample_size = 20)
+#' TD_power(case = -2, mean = 0, sd = 1, power = 0.8)
 
 TD_power <- function(case, mean = 0, sd = 1,
                      sample_size = NULL,
@@ -53,15 +54,15 @@ TD_power <- function(case, mean = 0, sd = 1,
 
     if (alternative == "two.sided") {
 
-      power = pt(qt(alpha/2, df = n-1,
-                    lower.tail = T),
-                 ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
-                 df = n-1,
-                 lower.tail = T) - pt(-qt(alpha/2, df = n-1,
-                                          lower.tail = T),
-                                      ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
-                                      df = n-1,
-                                      lower.tail = T) + 1
+      power = stats::pt(stats::qt(alpha/2, df = n-1,
+                                  lower.tail = T),
+                        ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                        df = n-1,
+                        lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
+                                                               lower.tail = T),
+                                                    ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                                                    df = n-1,
+                                                    lower.tail = T) + 1
 
       return(power)
 
@@ -69,11 +70,11 @@ TD_power <- function(case, mean = 0, sd = 1,
 
     if (alternative == "one.sided") {
 
-      power = pt(qt(0.05, df = n-1,
-                    lower.tail = T),
-                 ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
-                 df = n-1,
-                 lower.tail = T
+      power = stats::pt(stats::qt(alpha, df = n-1,
+                                  lower.tail = T),
+                        ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                        df = n-1,
+                        lower.tail = T
       )
 
       return(power)
@@ -94,12 +95,32 @@ TD_power <- function(case, mean = 0, sd = 1,
 
     while(keep_going == TRUE){
 
-      search_pwr = pt(qt(0.05, df = n-1,
-                         lower.tail = T),
-                      ncp = ((zcc)/(sigma*sqrt((n+1)/n))),
-                      df = n-1,
-                      lower.tail = T
-      )
+      if (alternative == "two.sided") {
+
+        search_pwr = stats::pt(stats::qt(alpha/2, df = n-1,
+                                         lower.tail = T),
+                               ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                               df = n-1,
+                               lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
+                                                                      lower.tail = T),
+                                                           ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                                                           df = n-1,
+                                                           lower.tail = T) + 1
+
+      }
+
+      if (alternative == "one.sided") {
+
+        search_pwr = stats::pt(stats::qt(alpha, df = n-1,
+                                         lower.tail = T),
+                               ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                               df = n-1,
+                               lower.tail = T
+        )
+
+
+      }
+
 
       if (abs(prev_search_pwr - search_pwr) < spec) {
         keep_going = FALSE
@@ -149,6 +170,7 @@ TD_power <- function(case, mean = 0, sd = 1,
 #' @export
 #'
 #' @examples
+#' BTD_power(case = -2, mean = 0, sd = 1, sample_size = 20)
 
 BTD_power <- function(case, mean = 0, sd = 1,
                       sample_size,
@@ -165,9 +187,9 @@ BTD_power <- function(case, mean = 0, sd = 1,
   BTD_p_sim <- function(case, mean, sd, n) {
 
 
-    con <- rnorm(n, mean = mean, sd = sd)
+    con <- stats::rnorm(n, mean = mean, sd = sd)
 
-    case <- rnorm(1, mean = mean, sd = sd) + case
+    case <- stats::rnorm(1, mean = mean, sd = sd) + case
 
     pval <- singcar::BTD(case, con, iter = iter, alternative = "two.sided")[["p.value"]]
 

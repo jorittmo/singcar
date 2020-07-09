@@ -44,6 +44,9 @@
 #' @export
 #'
 #' @examples
+#' UDT_power(case_a = -3, case_b = -1, mean_a = 0, mean_b = 0,
+#'           sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
+#' UDT_power(case_a = -3, case_b = -1, power = 0.8)
 UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                       sd_a = 1, sd_b = 1, r_ab = 0.5,
                       sample_size = NULL, power = NULL,
@@ -60,15 +63,15 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
       tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
-      power = pt(qt(alpha/2, df = n-1,
-                    lower.tail = T),
-                 ncp = tstat,
-                 df = n-1,
-                 lower.tail = T) - pt(-qt(alpha/2, df = n-1,
-                                          lower.tail = T),
-                                      ncp = tstat,
-                                      df = n-1,
-                                      lower.tail = T) + 1
+      power = stats::pt(stats::qt(alpha/2, df = n-1,
+                                  lower.tail = T),
+                        ncp = tstat,
+                        df = n-1,
+                        lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
+                                                               lower.tail = T),
+                                                    ncp = tstat,
+                                                    df = n-1,
+                                                    lower.tail = T) + 1
 
       return(power)
 
@@ -78,11 +81,11 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
       tstat <- abs((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
-      power = pt(qt(alpha, df = n-1,
-                    lower.tail = F),
-                 ncp = tstat,
-                 df = n-1,
-                 lower.tail = F)
+      power = stats::pt(stats::qt(alpha, df = n-1,
+                                  lower.tail = F),
+                        ncp = tstat,
+                        df = n-1,
+                        lower.tail = F)
 
       return(power)
 
@@ -107,15 +110,15 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
         tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
-        search_pwr = pt(qt(alpha/2, df = n-1,
-                           lower.tail = T),
-                        ncp = tstat,
-                        df = n-1,
-                        lower.tail = T) - pt(-qt(alpha/2, df = n-1,
-                                                 lower.tail = T),
-                                             ncp = tstat,
-                                             df = n-1,
-                                             lower.tail = T) + 1
+        search_pwr = stats::pt(stats::qt(alpha/2, df = n-1,
+                                         lower.tail = T),
+                               ncp = tstat,
+                               df = n-1,
+                               lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
+                                                                      lower.tail = T),
+                                                           ncp = tstat,
+                                                           df = n-1,
+                                                           lower.tail = T) + 1
 
         if (abs(prev_search_pwr - search_pwr) < spec) {
           keep_going = FALSE
@@ -140,11 +143,11 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
         tstat <- abs((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
-        search_pwr = pt(qt(alpha, df = n-1,
-                      lower.tail = F),
-                   ncp = tstat,
-                   df = n-1,
-                   lower.tail = F)
+        search_pwr = stats::pt(stats::qt(alpha, df = n-1,
+                                         lower.tail = F),
+                               ncp = tstat,
+                               df = n-1,
+                               lower.tail = F)
 
         if (abs(prev_search_pwr - search_pwr) < spec) {
           keep_going = FALSE
@@ -204,6 +207,8 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #' @export
 #'
 #' @examples
+#' RSDT_power(case_a = -3, case_b = -1, mean_a = 0, mean_b = 0,
+#'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
 
 
 RSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
@@ -292,6 +297,8 @@ RSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
 #' @export
 #'
 #' @examples
+#' BSDT_power(case_a = -3, case_b = -1, mean_a = 0, mean_b = 0,
+#'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
 
 
 BSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
