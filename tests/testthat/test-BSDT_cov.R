@@ -1,4 +1,6 @@
 test_that("we get approx same results as C&G on BSDT_cov", {
+
+  set.seed(123456)
   x <- MASS::mvrnorm(20, mu = c(100, 80, 50),
                      Sigma = matrix(c(15^2, 108, 78,
                                       108, 10^2, 12,
@@ -11,7 +13,7 @@ test_that("we get approx same results as C&G on BSDT_cov", {
   calib_prior_tt <- c(0.16247, -2.8085, -0.465, 0.251, 32.114) # Values from C&G software
   jeff_prior_tt <- c(0.14009, -2.882, -0.559, 0.197, 28.816) # Values from C&G software
 
-  set.seed(273498)
+
   sc_c <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
                           calibrated = T, iter = 10000)
   sc_calib_tt <- c(sc_c[["p.value"]],
@@ -22,7 +24,7 @@ test_that("we get approx same results as C&G on BSDT_cov", {
 
   expect_equal(sc_calib_tt, calib_prior_tt, tolerance = 1e-2)
 
-  set.seed(123456)
+
   sc_j <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
                          calibrated = F, iter = 10000)
 
@@ -38,6 +40,8 @@ test_that("we get approx same results as C&G on BSDT_cov", {
 })
 
 test_that("alternative hypotheses direction", {
+
+  set.seed(123456)
   x <- MASS::mvrnorm(20, mu = c(100, 80, 50),
                      Sigma = matrix(c(15^2, 108, 78,
                                       108, 10^2, 12,
@@ -46,22 +50,22 @@ test_that("alternative hypotheses direction", {
                      empirical = TRUE)
 
 
-  set.seed(123456)
+
   pos_z <- BSDT_cov(c(78, 70), 30, x[ , 2:1], x[ , 3],
                    calibrated = T, iter = 1000, alternative = "less")[["p.value"]]
   expect_equal(pos_z > 0.5, TRUE)
-  set.seed(123456)
+
   pos_z <- BSDT_cov(c(78, 70), 30, x[ , 2:1], x[ , 3],
                     calibrated = T, iter = 1000, alternative = "greater")[["p.value"]]
   expect_equal(pos_z < 0.5, TRUE)
 
 
 
-  set.seed(123456)
+
   neg_z <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
                     calibrated = T, iter = 1000, alternative = "less")[["p.value"]]
   expect_equal(neg_z < 0.5, TRUE)
-  set.seed(123456)
+
   neg_z <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
                     calibrated = T, iter = 1000, alternative = "greater")[["p.value"]]
   expect_equal(neg_z > 0.5, TRUE)
