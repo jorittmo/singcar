@@ -5,14 +5,14 @@
 \title{Revised Standardised Difference Test}
 \usage{
 RSDT(
-  case.x,
-  case.y,
-  controls.x,
-  controls.y,
-  controls.x.sd = NULL,
-  controls.y.sd = NULL,
-  controls.n = NULL,
-  cor.x.y = NULL,
+  case_a,
+  case_b,
+  controls_a,
+  controls_b,
+  sd_a = NULL,
+  sd_b = NULL,
+  sample_size = NULL,
+  r_ab = NULL,
   alternative = c("two.sided", "greater", "less"),
   exact.method = T,
   alpha = 0.05,
@@ -20,29 +20,29 @@ RSDT(
 )
 }
 \arguments{
-\item{case.x}{Case's score on task X.}
+\item{case_a}{Case's score on task A.}
 
-\item{case.y}{Case's score on task Y.}
+\item{case_b}{Case's score on task B.}
 
-\item{controls.x}{Controls' scores on task X. Takes either a vector of
+\item{controls_a}{Controls' scores on task A. Takes either a vector of
 observations or a single value interpreted as mean. \emph{Note}: you can
-supply a vector as input for task X while mean and SD for task Y.}
+supply a vector as input for task A while mean and SD for task B.}
 
-\item{controls.y}{Controls' scores on task Y. Takes either a vector of
+\item{controls_b}{Controls' scores on task B. Takes either a vector of
 observations or a single value interpreted as mean. \emph{Note}: you can
-supply a vector as input for task Y while mean and SD for task X.}
+supply a vector as input for task B while mean and SD for task A.}
 
-\item{controls.x.sd}{If single value for task X is given as input you must
+\item{sd_a}{If single value for task A is given as input you must
 supply the standard deviation of the sample.}
 
-\item{controls.y.sd}{If single value for task Y is given as input you must
+\item{sd_b}{If single value for task B is given as input you must
 supply the standard deviation of the sample.}
 
-\item{controls.n}{If X or Y is given as mean and SD you must supply the
-sample size. If controls.x is given as vector and controls.y as mean and
-SD, controls.n must equal the number of observations in controls.x.}
+\item{sample_size}{If X or Y is given as mean and SD you must supply the
+sample size. If controls_a is given as vector and controls_b as mean and
+SD, sample_size must equal the number of observations in controls_a.}
 
-\item{cor.x.y}{If X or Y is given as mean and SD you must supply the
+\item{r_ab}{If X or Y is given as mean and SD you must supply the
 correlation between the tasks.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
@@ -70,7 +70,7 @@ A list with class \code{"htest"} containing the following components:
   \code{FALSE} for an approximate t-value with correct sign. \cr\cr
   \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
   \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
-  case scores expressed as z-scores on task X and Y. Standardised effect size
+  case scores expressed as z-scores on task A and Y. Standardised effect size
   (Z-DCC) of task difference between case and controls and point estimate of
   the proportion of the control population estimated to show a more extreme
   task difference. \cr\cr \code{sample.size}   \tab the size of the control
@@ -88,11 +88,11 @@ the proportion of the control population that would be expected to show a
 more extreme task difference.
 }
 \examples{
-RSDT(-3.857, -1.875, controls.x = 0, controls.y = 0, controls.x.sd = 1,
-controls.y.sd = 1, controls.n = 20, cor.x.y = 0.68)
+RSDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,
+sd_b = 1, sample_size = 20, r_ab = 0.68)
 
-RSDT(case.x = size_weight_illusion[1, "V_SWI"], case.y = size_weight_illusion[1, "K_SWI"],
- controls.x = size_weight_illusion[-1, "V_SWI"], controls.y = size_weight_illusion[-1, "K_SWI"])
+RSDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1, "K_SWI"],
+ controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"])
 
 }
 \references{
