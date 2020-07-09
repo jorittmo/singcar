@@ -7,12 +7,12 @@
 TD(
   case,
   controls,
-  controls.sd = NULL,
-  controls.n = NULL,
+  sd = NULL,
+  sample_size = NULL,
   alternative = c("less", "greater", "two.sided"),
-  conf.int = TRUE,
-  conf.level = 0.95,
-  conf.int.spec = 0.01,
+  conf_int = TRUE,
+  conf_level = 0.95,
+  conf_int_spec = 0.01,
   na.rm = FALSE
 )
 }
@@ -22,23 +22,23 @@ TD(
 \item{controls}{Numeric vector of observations from the control sample. If
 single value, treated as mean.}
 
-\item{controls.sd}{If input of controls is single value, the standard
+\item{sd}{If input of controls is single value, the standard
 deviation of the sample must be gven as well.}
 
-\item{controls.n}{If input of controls is single value, the size of the
+\item{sample_size}{If input of controls is single value, the size of the
 sample must be gven as well.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"less"} (default), \code{"greater"} or
 \code{"two.sided"}. You can specify just the initial letter.}
 
-\item{conf.int}{Calculate confidence intervals for desired estimate. Uses
+\item{conf_int}{Calculate confidence intervals for desired estimate. Uses
 iterative method, set to \code{FALSE} for faster calculation (e.g. for
 simulations).}
 
-\item{conf.level}{Level of confidence for intervals.}
+\item{conf_level}{Level of confidence for intervals.}
 
-\item{conf.int.spec}{The size of iterative steps for calculating confidence
+\item{conf_int_spec}{The size of iterative steps for calculating confidence
 intervals. Smaller values gives more precise intervals but takes longer to
 calculate.}
 
@@ -86,7 +86,7 @@ See \url{https://stat.ethz.ch/pipermail/r-help/2008-June/164843.html}.
 }
 
 \examples{
-BTD(case = -2, controls = 0, controls.sd = 1, controls.n = 20)
+BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
 
 TD(case = size_weight_illusion[1, "V_SWI"],
    controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")

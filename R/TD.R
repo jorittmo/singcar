@@ -22,18 +22,18 @@
 #' @param case Case observation, can only be a single value.
 #' @param controls Numeric vector of observations from the control sample. If
 #'   single value, treated as mean.
-#' @param controls.sd If input of controls is single value, the standard
+#' @param sd If input of controls is single value, the standard
 #'   deviation of the sample must be gven as well.
-#' @param controls.n If input of controls is single value, the size of the
+#' @param sample_size If input of controls is single value, the size of the
 #'   sample must be gven as well.
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
-#' @param conf.int Calculate confidence intervals for desired estimate. Uses
+#' @param conf_int Calculate confidence intervals for desired estimate. Uses
 #'   iterative method, set to \code{FALSE} for faster calculation (e.g. for
 #'   simulations).
-#' @param conf.level Level of confidence for intervals.
-#' @param conf.int.spec The size of iterative steps for calculating confidence
+#' @param conf_level Level of confidence for intervals.
+#' @param conf_int_spec The size of iterative steps for calculating confidence
 #'   intervals. Smaller values gives more precise intervals but takes longer to
 #'   calculate.
 #' @param na.rm Remove \code{NA}s from controls.
@@ -58,7 +58,7 @@
 #' @export
 #'
 #' @examples
-#' BTD(case = -2, controls = 0, controls.sd = 1, controls.n = 20)
+#' BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
 #'
 #' TD(case = size_weight_illusion[1, "V_SWI"],
 #'    controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
@@ -76,33 +76,33 @@
 
 
 
-TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
+TD <- function (case, controls, sd = NULL, sample_size = NULL,
                       alternative = c("less", "greater", "two.sided"),
-                      conf.int = TRUE, conf.level = 0.95,
-                      conf.int.spec = 0.01,  na.rm = FALSE) {
+                      conf_int = TRUE, conf_level = 0.95,
+                      conf_int_spec = 0.01,  na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
-  if (length(controls)<2 & is.null(controls.sd) == TRUE) {
+  if (length(controls)<2 & is.null(sd) == TRUE) {
     stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
   }
 
-  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == TRUE) stop("Input sample size")
+  if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == TRUE) stop("Input sample size")
   if (is.na(case)==TRUE) stop("Case is NA")
 
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
-  if (conf.level < 0 | conf.level > 0.9999999) stop("Confident level must be between 0 and 0.9999999")
+  if (conf_level < 0 | conf_level > 0.9999999) stop("Confident level must be between 0 and 0.9999999")
 
   alternative <- match.arg(alternative)
 
   con_m <- mean(controls) # Mean of the control sample
 
   con_sd <- stats::sd(controls) # Standard deviation of the control sample (returns NA if summary stats used)
-  if (length(controls)<2 & is.null(controls.sd) == FALSE) con_sd <- controls.sd
+  if (length(controls)<2 & is.null(sd) == FALSE) con_sd <- sd
 
   n <- length(controls)
-  if (length(controls)<2 & is.null(controls.sd) == FALSE & is.null(controls.n) == FALSE) n <- controls.n
+  if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == FALSE) n <- sample_size
 
   stderr <- con_sd * sqrt((n + 1)/n) # Standard error by C&H (1998) method
 
@@ -135,17 +135,17 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
   # which have their alpha/2 and 1-alpha/2 percentile at the std effect size * sqrt(n), respectively.
   # These non-centrality paramters / sqrt(n) are then taken as the limits of the CIs.
 
-  if (conf.int == T) {
+  if (conf_int == T) {
 
-    alph <- 1 - conf.level
+    alph <- 1 - conf_level
 
     stop_ci_lo <- FALSE
     ncp_lo <- zcc*sqrt(n)
     perc_lo <- 1 - (alph/2)
     while (stop_ci_lo == FALSE) {
 
-      # Here we search downwards with each step being as big as specified in conf.int.spec
-      ncp_lo <- ncp_lo - conf.int.spec
+      # Here we search downwards with each step being as big as specified in conf_int_spec
+      ncp_lo <- ncp_lo - conf_int_spec
 
       suppressWarnings( # Depending on ncp and percentile qt gives approximations, which produces warnings
         quant <- stats::qt(perc_lo, df = df, ncp = ncp_lo)
@@ -161,8 +161,8 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     perc_up <- (alph/2)
     while (stop_ci_up == FALSE) {
 
-      # Here we search upwards with each step being as big as specified in conf.int.spec
-      ncp_up <- ncp_up + conf.int.spec
+      # Here we search upwards with each step being as big as specified in conf_int_spec
+      ncp_up <- ncp_up + conf_int_spec
 
       suppressWarnings( # Depending on ncp and percentile qt gives approximations, which produces warnings
         quant <- stats::qt(perc_up, df = df, ncp = ncp_up)
@@ -178,7 +178,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
     zcc.name <- paste0("Standardised case difference (Z-CC), ",
-                       100*conf.level, "% CI [",
+                       100*conf_level, "% CI [",
                        format(round(cint_zcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zcc[2], 2), nsmall = 2),"]")
 
@@ -189,7 +189,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         cint_p <- c(ci_lo_p, ci_up_p)
 
         p.name <- paste0("Proportion below case (%), ",
-                         100*conf.level, "% CI [",
+                         100*conf_level, "% CI [",
                          format(round(cint_p[1], 2), nsmall = 2),", ",
                          format(round(cint_p[2], 2), nsmall = 2),"]")
 
@@ -203,7 +203,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
         cint_p <- c(ci_up_p, ci_lo_p)
 
         p.name <- paste0("Proportion above case (%), ",
-                         100*conf.level, "% CI [",
+                         100*conf_level, "% CI [",
                          format(round(cint_p[1], 2), nsmall = 2),", ",
                          format(round(cint_p[2], 2), nsmall = 2),"]")
 
@@ -215,7 +215,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
           cint_p <- c(ci_lo_p, ci_up_p)
 
           p.name <- paste0("Proportion below case (%), ",
-                           100*conf.level, "% CI [",
+                           100*conf_level, "% CI [",
                            format(round(cint_p[1], 2), nsmall = 2),", ",
                            format(round(cint_p[2], 2), nsmall = 2),"]")
 
@@ -229,7 +229,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
           cint_p <- c(ci_up_p, ci_lo_p)
 
           p.name <- paste0("Proportion above case (%), ",
-                           100*conf.level, "% CI [",
+                           100*conf_level, "% CI [",
                            format(round(cint_p[1], 2), nsmall = 2),", ",
                            format(round(cint_p[2], 2), nsmall = 2),"]")
         }
@@ -239,7 +239,7 @@ TD <- function (case, controls, controls.sd = NULL, controls.n = NULL,
     names(cint_zcc) <- c("Lower zcc CI", "Upper zcc CI")
     names(cint_p) <- c("Lower p CI", "Upper p CI")
 
-    typ.int <- 100*conf.level
+    typ.int <- 100*conf_level
     names(typ.int) <- "Confidence (%)"
 
     interval <- c(typ.int, cint_zcc, cint_p)
