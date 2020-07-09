@@ -75,8 +75,8 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
   if (length(controls_a) > 1 & is.null(sd_a) == FALSE) message("Value on sd_a will be ignored")
   if (length(controls_b) > 1 & is.null(sd_b) == FALSE) message("Value on sd_b will be ignored")
-  if (length(controls_a) == 1 & is.null(sd_a) == TRUE) stop("Please give sd and n on task x if controls_a is to be treated as mean")
-  if (length(controls_b) == 1 & is.null(sd_b) == TRUE) stop("Please give sd and n on task y if controls_b is to be treated as mean")
+  if (length(controls_a) == 1 & is.null(sd_a) == TRUE) stop("Please give sd and n on task A if controls_a is to be treated as mean")
+  if (length(controls_b) == 1 & is.null(sd_b) == TRUE) stop("Please give sd and n on task B if controls_b is to be treated as mean")
 
 
   # Handling of NA use cases below
