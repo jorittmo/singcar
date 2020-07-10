@@ -211,7 +211,8 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
 
 
-RSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
+RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
+                       sd_a = 1, sd_b = 1, r_ab = 0.5,
                        sample_size,
                        alternative = c("two.sided", "one.sided"),
                        alpha = 0.05, nsim = 10000) {
@@ -301,7 +302,8 @@ RSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
 #'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
 
 
-BSDT_power <- function(case_a, case_b, mean_a, mean_b, sd_a, sd_b, r_ab,
+BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
+                       sd_a = 1, sd_b = 1, r_ab = 0.5,
                        sample_size,
                        alternative = c("two.sided", "one.sided"),
                        alpha = 0.05, nsim = 1000, iter = 1000) {
