@@ -184,7 +184,7 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
   if (calibrated == FALSE) {
 
-    seed <- runif(5)
+    seed <- stats::runif(5)
     old_seed <- .Random.seed
 
     set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
