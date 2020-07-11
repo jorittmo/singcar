@@ -46,6 +46,10 @@ TD_power <- function(case, mean = 0, sd = 1,
 
   if (!is.null(sample_size) & !is.null(power)) stop("Must supply only one of sample size or desired power")
   if (is.null(sample_size) & is.null(power)) stop("Must supply either sample size or desired power")
+  if (!is.null(power)) if (power > 1 | power < 0) stop("Desired power must be between 0 and 1")
+  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
 
   alternative <- match.arg(alternative)
   n = sample_size
@@ -174,11 +178,12 @@ TD_power <- function(case, mean = 0, sd = 1,
 
 BTD_power <- function(case, mean = 0, sd = 1,
                       sample_size,
-                      alternative = c("one.sided", "two.sided"),
+                      alternative = c("less", "greater", "two.sided"),
                       alpha = 0.05,
                       nsim = 1000, iter = 1000) {
 
-  if (is.null(sample_size) & is.null(power)) stop("Must supply either sample size or desired power")
+  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
 
   alternative <- match.arg(alternative)
   n = sample_size
@@ -191,7 +196,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 
     case <- stats::rnorm(1, mean = mean, sd = sd) + case
 
-    pval <- singcar::BTD(case, con, iter = iter, alternative = "two.sided")[["p.value"]]
+    pval <- singcar::BTD(case, con, iter = iter, alternative = alternative)[["p.value"]]
 
     pval
   }
@@ -205,11 +210,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 
   }
 
-
-  power = switch(alternative,
-                 two.sided = sum(pval < alpha)/length(pval),
-                 one.sided = sum(pval/2 < alpha)/length(pval)
-  )
+  power = sum(pval < alpha)/length(pval)
 
   return(power)
 

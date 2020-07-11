@@ -9,7 +9,7 @@ BTD_power(
   mean = 0,
   sd = 1,
   sample_size,
-  alternative = c("one.sided", "two.sided"),
+  alternative = c("less", "greater", "two.sided"),
   alpha = 0.05,
   nsim = 1000,
   iter = 1000

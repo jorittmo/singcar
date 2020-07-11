@@ -53,6 +53,12 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                       alternative = c("two.sided", "one.sided"),
                       alpha = 0.05, spec = 0.005) {
 
+  if (!is.null(sample_size) & !is.null(power)) stop("Must supply only one of sample size or desired power")
+  if (is.null(sample_size) & is.null(power)) stop("Must supply either sample size or desired power")
+  if (!is.null(power)) if (power > 1 | power < 0) stop("Desired power must be between 0 and 1")
+  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
   alternative <- match.arg(alternative)
 
   n = sample_size
@@ -214,8 +220,11 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                        sd_a = 1, sd_b = 1, r_ab = 0.5,
                        sample_size,
-                       alternative = c("two.sided", "one.sided"),
+                       alternative = c("two.sided", "greater", "less"),
                        alpha = 0.05, nsim = 10000) {
+
+  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
 
   alternative <- match.arg(alternative)
 
@@ -237,7 +246,7 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     pval <- singcar::RSDT(case_a_gen, case_b_gen,
                           controls[ , 1], controls[, 2],
-                          alternative = "two.sided")[["p.value"]]
+                          alternative = alternative)[["p.value"]]
 
     pval
   }
@@ -252,10 +261,8 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   }
 
-  power = switch(alternative,
-                 two.sided = sum(pval < alpha)/length(pval),
-                 one.sided = sum(pval/2 < alpha)/length(pval)
-  )
+  power = sum(pval < alpha)/length(pval)
+
 
   return(power)
 }
@@ -305,8 +312,11 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                        sd_a = 1, sd_b = 1, r_ab = 0.5,
                        sample_size,
-                       alternative = c("two.sided", "one.sided"),
+                       alternative = c("two.sided", "greater", "less"),
                        alpha = 0.05, nsim = 1000, iter = 1000) {
+
+  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
 
   alternative <- match.arg(alternative)
 
@@ -328,7 +338,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     pval <- singcar::BSDT(case_a_gen, case_b_gen,
                           controls[ , 1], controls[, 2],
-                          alternative = "two.sided", iter = iter)[["p.value"]]
+                          alternative = alternative, iter = iter)[["p.value"]]
 
     pval
   }
@@ -343,10 +353,8 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   }
 
-  power = switch(alternative,
-                 two.sided = sum(pval < alpha)/length(pval),
-                 one.sided = sum(pval/2 < alpha)/length(pval)
-  )
+  power = sum(pval < alpha)/length(pval)
+
 
   return(power)
 }
