@@ -14,6 +14,9 @@ UDT(
   sample_size = NULL,
   r_ab = NULL,
   alternative = c("two.sided", "greater", "less"),
+  conf_int = TRUE,
+  conf_level = 0.95,
+  conf_int_spec = 0.01,
   na.rm = FALSE
 )
 }
@@ -48,6 +51,16 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 \code{"less"}. You can specify just the initial letter. Since the direction
 of the expected effect depends on which task is set as A and which is set
 as B, be very careful if changing this parameter.}
+
+\item{conf_int}{Calculate confidence intervals for desired estimate. Uses an
+iterative search algorithm, set to \code{FALSE} for faster calculation (e.g. for
+simulations).}
+
+\item{conf_level}{Level of confidence for intervals.}
+
+\item{conf_int_spec}{The size of iterative steps for calculating confidence
+intervals. Smaller values gives more precise intervals but takes longer to
+calculate. Defaults to a specificity of 0.01.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }

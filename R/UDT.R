@@ -26,6 +26,13 @@
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
 #'   of the expected effect depends on which task is set as A and which is set
 #'   as B, be very careful if changing this parameter.
+#' @param conf_int Calculate confidence intervals for desired estimate. Uses an
+#'   iterative search algorithm, set to \code{FALSE} for faster calculation (e.g. for
+#'   simulations).
+#' @param conf_level Level of confidence for intervals.
+#' @param conf_int_spec The size of iterative steps for calculating confidence
+#'   intervals. Smaller values gives more precise intervals but takes longer to
+#'   calculate. Defaults to a specificity of 0.01.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -59,10 +66,12 @@
 
 
 UDT <- function (case_a, case_b, controls_a, controls_b,
-                  sd_a = NULL, sd_b = NULL,
-                  sample_size = NULL, r_ab = NULL,
-                  alternative = c("two.sided", "greater", "less"),
-                  na.rm = FALSE) {
+                 sd_a = NULL, sd_b = NULL,
+                 sample_size = NULL, r_ab = NULL,
+                 alternative = c("two.sided", "greater", "less"),
+                 conf_int = TRUE, conf_level = 0.95,
+                 conf_int_spec = 0.01,
+                 na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
 
@@ -77,6 +86,8 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   if (length(controls_b) > 1 & is.null(sd_b) == FALSE) message("Value on sd_b will be ignored")
   if (length(controls_a) == 1 & is.null(sd_a) == TRUE) stop("Please give sd and n on task A if controls_a is to be treated as mean")
   if (length(controls_b) == 1 & is.null(sd_b) == TRUE) stop("Please give sd and n on task B if controls_b is to be treated as mean")
+  if (conf_int == TRUE & (conf_level < 0 | conf_level > 0.9999999)) stop("Confident level must be between 0 and 0.9999999")
+
 
 
   # Handling of NA use cases below
@@ -174,29 +185,160 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     pval <- stats::pt(tstat, df = df, lower.tail = TRUE)
   }
 
-  estimate <- c(def_a, def_b, dif, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
 
-  if (alternative == "two.sided") {
-    p.name <- "Proportion of control population with more extreme task difference"
-  } else if (alternative == "greater") {
-    p.name <- "Proportion of control population with more positive task difference"
+  z_a <- (case_a - con_m_a)/con_sd_a
+  z_b <- (case_b - con_m_b)/con_sd_b
+
+  zdcc <- (z_a - z_b)/sqrt(2-2*r)
+
+  estimate <- c(def_a, def_b, zdcc, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
+
+  if (conf_int == T) {
+
+    alph <- 1 - conf_level
+
+    stop_ci_lo <- FALSE
+    ncp_lo <- zdcc*sqrt(n)
+    perc_lo <- 1 - (alph/2)
+    while (stop_ci_lo == FALSE) {
+
+      # Here we search downwards with each step being as big as specified in conf_int_spec
+      ncp_lo <- ncp_lo - conf_int_spec
+
+      suppressWarnings( # Depending on ncp and percentile qt gives approximations, which produces warnings
+        quant <- stats::qt(perc_lo, df = df, ncp = ncp_lo)
+      )
+
+      if (quant <= zdcc*sqrt(n)) { # When the specified quantile reaches zcc*sqrt(n) the search stops
+        stop_ci_lo <- TRUE
+      }
+    }
+
+    stop_ci_up <- FALSE
+    ncp_up <- zdcc*sqrt(n)
+    perc_up <- (alph/2)
+    while (stop_ci_up == FALSE) {
+
+      # Here we search upwards with each step being as big as specified in conf_int_spec
+      ncp_up <- ncp_up + conf_int_spec
+
+      suppressWarnings( # Depending on ncp and percentile qt gives approximations, which produces warnings
+        quant <- stats::qt(perc_up, df = df, ncp = ncp_up)
+      )
+
+      if (quant >= zdcc*sqrt(n)) { # Wen the specified quantile reaches zcc*sqrt(n) the search stops
+        stop_ci_up <- TRUE
+      }
+    }
+
+    ci_lo_zdcc <- ncp_lo/sqrt(n)
+    ci_up_zdcc <- ncp_up/sqrt(n)
+    cint_zdcc <- c(ci_lo_zdcc, ci_up_zdcc)
+
+    zdcc.name <- paste0("Standardised task discrepancy (Z-DCC), ",
+                       100*conf_level, "% CI [",
+                       format(round(cint_zdcc[1], 2), nsmall = 2),", ",
+                       format(round(cint_zdcc[2], 2), nsmall = 2),"]")
+
+    if (alternative == "less") {
+
+      ci_lo_p <- stats::pnorm(ci_lo_zdcc)*100
+      ci_up_p <- stats::pnorm(ci_up_zdcc)*100
+      cint_p <- c(ci_lo_p, ci_up_p)
+
+      p.name <- paste0("Proportion below case (%), ",
+                       100*conf_level, "% CI [",
+                       format(round(cint_p[1], 2), nsmall = 2),", ",
+                       format(round(cint_p[2], 2), nsmall = 2),"]")
+
+    } else if (alternative == "greater") {
+
+      ci_lo_p <- (1 - stats::pnorm(ci_lo_zdcc))*100
+      ci_up_p <- (1 - stats::pnorm(ci_up_zdcc))*100
+
+      # NOTE (!): Because of right side of dist, lower and upper CI must switch to
+      # be consistent with lower CI to the left and upper to the right in output
+      cint_p <- c(ci_up_p, ci_lo_p)
+
+      p.name <- paste0("Proportion above case (%), ",
+                       100*conf_level, "% CI [",
+                       format(round(cint_p[1], 2), nsmall = 2),", ",
+                       format(round(cint_p[2], 2), nsmall = 2),"]")
+
+    } else { # I.e. two-sided
+      if (tstat < 0) {
+
+        ci_lo_p <- stats::pnorm(ci_lo_zdcc)*100
+        ci_up_p <- stats::pnorm(ci_up_zdcc)*100
+        cint_p <- c(ci_lo_p, ci_up_p)
+
+        p.name <- paste0("Proportion below case (%), ",
+                         100*conf_level, "% CI [",
+                         format(round(cint_p[1], 2), nsmall = 2),", ",
+                         format(round(cint_p[2], 2), nsmall = 2),"]")
+
+      } else {
+
+        ci_lo_p <- (1 - stats::pnorm(ci_lo_zdcc))*100
+        ci_up_p <- (1 - stats::pnorm(ci_up_zdcc))*100
+
+        # NOTE (!): Because of right side of dist, lower and upper CI must switch to
+        # be consistent with lower CI to the left and upper to the right in output
+        cint_p <- c(ci_up_p, ci_lo_p)
+
+        p.name <- paste0("Proportion above case (%), ",
+                         100*conf_level, "% CI [",
+                         format(round(cint_p[1], 2), nsmall = 2),", ",
+                         format(round(cint_p[2], 2), nsmall = 2),"]")
+      }
+    }
+
+
+    names(cint_zdcc) <- c("Lower Z-DCC CI", "Upper Z-DCC CI")
+    names(cint_p) <- c("Lower p CI", "Upper p CI")
+
+    typ.int <- 100*conf_level
+    names(typ.int) <- "Confidence (%)"
+
+    interval <- c(typ.int, cint_zdcc, cint_p)
+
+    names(estimate) <- c("Standardised case score, task A (Z-CC)",
+                         "Standardised case score, task B (Z-CC)",
+                         zdcc.name,
+                         p.name)
+
+
   } else {
-    p.name <- "Proportion of control population with more negative task difference"
+
+    interval <- NULL
+
+    if (alternative == "two.sided") {
+      p.name <- paste("Proportion of controls", ifelse(tstat < 0, "below", "above"), "case (%)")
+    } else if (alternative == "greater") {
+      p.name <- "Proportion of controls above case (%)"
+    } else {
+      p.name <- "Proportion of controls below case (%)"
+    }
+
+
+    names(estimate) <- c("Standardised case score, task A (Z-CC)",
+                         "Standardised case score, task B (Z-CC)",
+                         "Standardised task discrepancy (Z-DCC)",
+                         p.name)
+
   }
 
 
-  # Set names for objects in output
-  names(estimate) <- c("Case score on task A",
-                       "Case score on task B",
-                       "Task difference",
-                       p.name)
+
+
+  #  # Set names for objects in output
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score A: ", deparse(substitute(case_a)), ", ",
-                  "Case score B: ", deparse(substitute(case_b)), ", ",
-                  "Controls score A: ", deparse(substitute(controls_a)), ", ",
-                  "Controls score B: ", deparse(substitute(controls_b)))
+  dname <- paste0("Case score A: ", format(round(case_a, 2), nsmall = 2), ", ",
+                  "Case score B: ", format(round(case_b, 2), nsmall = 2), ", ",
+                  "Controls A (mean, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
+                  "Controls B (mean, sd): (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
 
 
   names(con_m_a) <- "Mean A"
@@ -206,11 +348,25 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   names(n) <- "Sample size"
   control.desc <- c(con_m_a, con_m_b, con_sd_a, con_sd_b, n)
 
+
+
+  # output <- list(statistic = tstat, parameter = df, p.value = pval,
+  #                estimate = estimate, null.value = null.value,
+  #                interval = interval,
+  #                desc = c(con_m, con_sd, n, stderr),
+  #                alternative = alternative,
+  #                method = paste("Crawford-Howell (1998) t-test"),
+  #                data.name = paste0("case = ", format(round(case, 2), nsmall = 2),
+  #                                   " and controls (M = ", format(round(con_m, 2), nsmall = 2),
+  #                                   ", SD = ", format(round(con_sd, 2), nsmall = 2),
+  #                                   ", N = ", n, ")"))
+
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat,
                  parameter = df,
                  p.value = pval,
                  estimate = estimate,
+                 interval = interval,
                  control.desc = control.desc,
                  null.value = null.value,
                  alternative = alternative,
@@ -222,6 +378,5 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
 
 }
-
 
 
