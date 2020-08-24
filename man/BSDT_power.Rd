@@ -2,7 +2,7 @@
 % Please edit documentation in R/dissoc_power.R
 \name{BSDT_power}
 \alias{BSDT_power}
-\title{Power calculator for the Bayesian standardised difference test (BSDT)}
+\title{Power calculator for BSDT}
 \usage{
 BSDT_power(
   case_a,

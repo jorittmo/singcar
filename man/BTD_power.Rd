@@ -2,7 +2,7 @@
 % Please edit documentation in R/deficit_power.R
 \name{BTD_power}
 \alias{BTD_power}
-\title{Power calculator for Bayesian test of deficit}
+\title{Power calculator for BTD}
 \usage{
 BTD_power(
   case,
@@ -25,8 +25,8 @@ BTD_power(
 \item{sample_size}{The size of the control sample, vary this parameter to see
 how the sample size affects power.}
 
-\item{alternative}{The alternative hypothesis. A string of either "two.sided"
-(default) or "one.sided".}
+\item{alternative}{The alternative hypothesis. A string of either "less" (default),
+"greater" or "two.sided".}
 
 \item{alpha}{The specified Type I error rate. This can also be varied, with
 effects on power.}

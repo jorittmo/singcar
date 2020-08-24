@@ -2,7 +2,7 @@
 % Please edit documentation in R/deficit_power.R
 \name{TD_power}
 \alias{TD_power}
-\title{Power calculator for the test of deficit}
+\title{Power calculator for TD}
 \usage{
 TD_power(
   case,
@@ -10,7 +10,7 @@ TD_power(
   sd = 1,
   sample_size = NULL,
   power = NULL,
-  alternative = c("one.sided", "two.sided"),
+  alternative = c("less", "greater", "two.sided"),
   alpha = 0.05,
   spec = 0.005
 )
@@ -30,8 +30,8 @@ specified, not both.}
 calculating necessary sample size. One of sample size or power must be
 specified, not both.}
 
-\item{alternative}{The alternative hypothesis. A string of either "two.sided"
-(default) or "one.sided".}
+\item{alternative}{The alternative hypothesis. A string of either "less" (default),
+"greater" or "two.sided".}
 
 \item{alpha}{The specified Type I error rate. This can also be varied, with
 effects on power.}

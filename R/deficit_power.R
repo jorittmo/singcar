@@ -1,4 +1,4 @@
-#' Power calculator for the test of deficit
+#' Power calculator for TD
 #'
 #' Calculates exact power given sample size or sample size given power, using
 #' analytical methods for the frequentist test of deficit for a specified case
@@ -15,8 +15,8 @@
 #' @param power A single value between 0 and 1 specifying desired power for
 #'   calculating necessary sample size. One of sample size or power must be
 #'   specified, not both.
-#' @param alternative The alternative hypothesis. A string of either "two.sided"
-#'   (default) or "one.sided".
+#' @param alternative The alternative hypothesis. A string of either "less" (default),
+#'   "greater" or "two.sided".
 #' @param alpha The specified Type I error rate. This can also be varied, with
 #'   effects on power.
 #' @param spec A single value between 0 and 1. If desired power is given as
@@ -41,7 +41,7 @@
 TD_power <- function(case, mean = 0, sd = 1,
                      sample_size = NULL,
                      power = NULL,
-                     alternative = c("one.sided", "two.sided"),
+                     alternative = c("less", "greater", "two.sided"),
                      alpha = 0.05, spec = 0.005) {
 
   if (!is.null(sample_size) & !is.null(power)) stop("Must supply only one of sample size or desired power")
@@ -72,7 +72,7 @@ TD_power <- function(case, mean = 0, sd = 1,
 
     }
 
-    if (alternative == "one.sided") {
+    if (alternative == "less") {
 
       power = stats::pt(stats::qt(alpha, df = n-1,
                                   lower.tail = T),
@@ -80,6 +80,23 @@ TD_power <- function(case, mean = 0, sd = 1,
                         df = n-1,
                         lower.tail = T
       )
+
+
+
+      return(power)
+
+    }
+
+    if (alternative == "greater") {
+
+      power = stats::pt(stats::qt(alpha, df = n-1,
+                                  lower.tail = F),
+                        ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                        df = n-1,
+                        lower.tail = F
+      )
+
+
 
       return(power)
 
@@ -148,7 +165,7 @@ TD_power <- function(case, mean = 0, sd = 1,
 
 
 
-#' Power calculator for Bayesian test of deficit
+#' Power calculator for BTD
 #'
 #' Calculates approximate power, given sample size, using Monte Carlo simulation for the
 #' Bayesian test of deficit for a specified case score, mean and standard
@@ -161,8 +178,8 @@ TD_power <- function(case, mean = 0, sd = 1,
 #' @param sd The expected standard deviation of the control sample.
 #' @param sample_size The size of the control sample, vary this parameter to see
 #'   how the sample size affects power.
-#' @param alternative The alternative hypothesis. A string of either "two.sided"
-#'   (default) or "one.sided".
+#' @param alternative The alternative hypothesis. A string of either "less" (default),
+#'   "greater" or "two.sided".
 #' @param alpha The specified Type I error rate. This can also be varied, with
 #'   effects on power.
 #' @param nsim The number of simulations for the power calculation. Defaults to
@@ -189,7 +206,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
   n = sample_size
 
 
-  BTD_p_sim <- function(case, mean, sd, n) {
+  BTD_p_sim <- function() {
 
 
     con <- stats::rnorm(n, mean = mean, sd = sd)
@@ -206,7 +223,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 
   for(i in 1:nsim) {
 
-    pval[i] <- BTD_p_sim(case = case, mean = mean, sd = sd,  n = n)
+    pval[i] <- BTD_p_sim()
 
   }
 
@@ -216,3 +233,104 @@ BTD_power <- function(case, mean = 0, sd = 1,
 
 }
 
+
+
+#' Power calculator for BTD_cov
+#'
+#' Computationally intense. Lower \code{iter} and/or \code{nsim} for less exact
+#' but faster calculations. Calculates approximate power, given sample size,
+#' using Monte Carlo simulation for the Bayesian test of deficit with covariates
+#' for specified (expected) case score, means and standard deviations for the
+#' control sample on the task of interest and included covariates. The number of
+#' covariates defaults to 1, means and standard deviations for the task and
+#' covariate defaults to 0 and 1, so if no other values are given the case score
+#' is interpreted as deviation from the mean in standard deviations for both task
+#' and covariate.
+#'
+#' @param case A single value from the expected case observation on the task of
+#'   interest.
+#' @param case_cov A vector of expected case observations from covariates of
+#'   interest.
+#' @param control_task A vector of length 2 containing the expected mean and standard
+#'   deviation of the task of interest. In that order.
+#' @param control_covar A matrix with 2 columns containing expected means (in the 1st
+#'   column) and standard deviations (in the 2nd column) of the included
+#'   covariates.
+#' @param cor_mat A correlation matrix containing the correlations of the the
+#'   task of interest and the coviariate(s). The first variable is treated as
+#'   the task of interest.
+#' @param sample_size Single value of the size of the sample for which you wish
+#'   to calculate power.
+#' @param alternative The alternative hypothesis. A string of either "less" (default),
+#'   "greater" or "two.sided".
+#' @param alpha The specified Type I error rate. This can also be varied, with
+#'   effects on power.
+#' @param nsim The number of simulations for the power calculation. Defaults to
+#'   1000 due to BTD already being computationally intense. Defaults to 1000.
+#' @param iter The number of simulations used by the BTD_cov.
+#'
+#' @return Returns a single value approximating the power of the test for the
+#'   given parameters.
+#' @export
+#'
+#' @examples
+#' cor_mat = matrix(c(1, 0.2, 0.3, 0.2, 1, 0.4, 0.3, 0.4, 1), ncol = 3)
+#'
+#' BTD_cov_power(case = -2, case_cov = c(105, 30), control_task = c(0, 1),
+#' control_covar = matrix(c(100, 40, 15, 10), ncol = 2), sample_size = 15,
+#' cor_mat = cor_mat, iter = 100, nsim = 100)
+
+BTD_cov_power <- function(case, case_cov, control_task = c(0, 1), control_covar = c(0, 1),
+                          cor_mat = diag(2),
+                          sample_size,
+                          alternative = c("less", "greater", "two.sided"),
+                          alpha = 0.05,
+                          nsim = 1000, iter = 1000) {
+
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
+  alternative <- match.arg(alternative)
+  n = sample_size
+
+  sum_stats <- rbind(control_task, control_covar)
+
+  if (length(sum_stats[ , 2]) != nrow(cor_mat)) stop("Number of variables and number of correlations do not match")
+
+  Sigma <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
+  mu <- sum_stats[ , 1]
+
+  BTD_cov_p_sim <- function() {
+
+
+    con <- MASS::mvrnorm(n+1, mu = mu, Sigma = Sigma)
+
+    case_scores <- c(case, case_cov)
+    case_score_emp <- vector(length = length(case_scores))
+
+    for (i in 1:length(case_scores)) {
+      case_score_emp[i] <- con[1, i] + case_scores[i]
+    }
+
+    con <- con [-1, ]
+
+    pval <- singcar::BTD_cov(case_task = case_score_emp[1], case_covar = case_score_emp[-1],
+                             control_task = con[ , 1], control_covar = con[ , -1],
+                             iter = iter, alternative = alternative)[["p.value"]]
+
+    pval
+  }
+
+
+  pval <- vector(length = nsim)
+
+  for(i in 1:nsim) {
+
+    pval[i] <- BTD_cov_p_sim()
+
+  }
+
+  power = sum(pval < alpha)/length(pval)
+
+  return(power)
+
+}

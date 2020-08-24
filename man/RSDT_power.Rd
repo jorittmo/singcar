@@ -2,7 +2,7 @@
 % Please edit documentation in R/dissoc_power.R
 \name{RSDT_power}
 \alias{RSDT_power}
-\title{Power calculator for the revised standardised difference test (RSDT)}
+\title{Power calculator for RSDT}
 \usage{
 RSDT_power(
   case_a,

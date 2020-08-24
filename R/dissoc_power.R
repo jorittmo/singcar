@@ -1,4 +1,4 @@
-#' Power calculator for the unstandardised difference test (UDT)
+#' Power calculator for UDT
 #'
 #' Calculates exact power given sample size or sample size given power, using
 #' analytical methods for the frequentist test of deficit for a specified case
@@ -177,7 +177,7 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 }
 
 
-#' Power calculator for the revised standardised difference test (RSDT)
+#' Power calculator for RSDT
 #'
 #' Calculates approximate power, given sample size, using Monte Carlo
 #' simulation, for specified case scores, means and standard deviations for the
@@ -267,7 +267,7 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   return(power)
 }
 
-#' Power calculator for the Bayesian standardised difference test (BSDT)
+#' Power calculator for BSDT
 #'
 #' Calculates approximate power, given sample size, using Monte Carlo
 #' simulation, for specified case scores, means and standard deviations for the
@@ -322,8 +322,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   n = sample_size
 
-  bsdt_p_sim <- function(case_a, case_b,mean_a, mean_b,
-                         sd_a, sd_b, r_ab) {
+  bsdt_p_sim <- function() {
 
     cor_mat <- matrix(c(1, r_ab, r_ab, 1), nrow = 2)
 
@@ -348,8 +347,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   for(i in 1:nsim) {
 
-    pval[i] <- bsdt_p_sim(case_a, case_b, mean_a, mean_b,
-                          sd_a, sd_b, r_ab)
+    pval[i] <- bsdt_p_sim()
 
   }
 
@@ -359,3 +357,105 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   return(power)
 }
 
+
+
+
+#' Power calculator for BSDT_cov
+#'
+#' Computationally intense. Lower \code{iter} and/or \code{nsim} for faster but
+#' less precise calculations. Calculates approximate power, given sample size,
+#' using Monte Carlo simulation for BSDT with covariates
+#' for specified (expected) case score, means and standard deviations for the
+#' control sample on the task of interest and included covariates. The number of
+#' covariates defaults to 1, means and standard deviations for the tasks and
+#' covariate defaults to 0 and 1, so if no other values are given the case scores
+#' is interpreted as deviation from the mean in standard deviations for both tasks
+#' and covariates.
+#'
+#' @param case_tasks A vector of length 2. The expected case scores from the
+#'   tasks of interest.
+#' @param case_cov A vector containing the expected case scores on all
+#'   covariates included.
+#' @param control_tasks A 2x2 matrix or dataframe containing the expected means
+#'   (first column) and standard deviations (second column). Defaults to two
+#'   variables with means 0 and sd = 1.
+#' @param control_covar A px2 matrix or dataframe containing the expected means
+#'   (first column) and standard deviations (second column), p being the number
+#'   of covariates. Defaults to one covariate with mean 0 and sd = 1.
+#' @param cor_mat A correlation matrix containing the correlations of the tasks
+#'   of interest and the coviariate(s). The first two variables are treated as
+#'   the tasks of interest.
+#' @param sample_size Single value of the size of the sample for which you wish
+#'   to calculate power.
+#' @param alternative The alternative hypothesis. A string of either "less",
+#'   "greater" or "two.sided" (default).
+#' @param alpha The specified Type I error rate. This can also be varied, with
+#'   effects on power.
+#' @param nsim The number of simulations for the power calculation. Defaults to
+#'   1000 due to BTD already being computationally intense. Defaults to 1000.
+#' @param iter The number of simulations used by the BTD_cov.
+#' @param calibrated Whether or not to use the standard theory (Jeffreys) prior
+#'   distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
+#'   et al. (2011) for further information. Calibrated prior is recommended.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 1, 1), ncol= 2), control_covar = c(0, 1),
+                          cor_mat = diag(3),
+                          sample_size,
+                          alternative = c("less", "greater", "two.sided"),
+                          alpha = 0.05,
+                          nsim = 1000, iter = 1000,
+                          calibrated = TRUE) {
+
+  if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
+  alternative <- match.arg(alternative)
+  n = sample_size
+
+  sum_stats <- rbind(control_tasks, control_covar)
+
+  if (length(sum_stats[ , 2]) != nrow(cor_mat)) stop("Number of variables and number of correlations do not match")
+
+  Sigma <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
+  mu <- sum_stats[ , 1]
+
+  BSDT_cov_p_sim <- function() {
+
+
+    con <- MASS::mvrnorm(n+1, mu = mu, Sigma = Sigma)
+
+    case_scores <- c(case_tasks, case_cov)
+    case_score_emp <- vector(length = length(case_scores))
+
+    for (i in 1:length(case_scores)) {
+      case_score_emp[i] <- con[1, i] + case_scores[i]
+    }
+
+    con <- con [-1, ]
+
+    pval <- singcar::BSDT_cov(case_tasks = case_score_emp[c(1, 2)], case_covar = case_score_emp[-c(1, 2)],
+                             control_task = con[ , c(1, 2)], control_covar = con[ , -c(1, 2)],
+                             iter = iter, alternative = alternative,
+                             calibrated = calibrated)[["p.value"]]
+
+    pval
+  }
+
+
+  pval <- vector(length = nsim)
+
+  for(i in 1:nsim) {
+
+    pval[i] <- BSDT_cov_p_sim()
+
+  }
+
+  power = sum(pval < alpha)/length(pval)
+
+  return(power)
+
+
+}

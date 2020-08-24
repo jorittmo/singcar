@@ -2,7 +2,7 @@
 % Please edit documentation in R/dissoc_power.R
 \name{UDT_power}
 \alias{UDT_power}
-\title{Power calculator for the unstandardised difference test (UDT)}
+\title{Power calculator for UDT}
 \usage{
 UDT_power(
   case_a,
