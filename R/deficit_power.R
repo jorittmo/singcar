@@ -130,13 +130,24 @@ TD_power <- function(case, mean = 0, sd = 1,
 
       }
 
-      if (alternative == "one.sided") {
+      if (alternative == "less") {
 
         search_pwr = stats::pt(stats::qt(alpha, df = n-1,
-                                         lower.tail = T),
-                               ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
-                               df = n-1,
-                               lower.tail = T
+                                    lower.tail = T),
+                          ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                          df = n-1,
+                          lower.tail = T
+        )
+
+      }
+
+      if (alternative == "greater") {
+
+        search_pwr = stats::pt(stats::qt(alpha, df = n-1,
+                                    lower.tail = F),
+                          ncp = ((case - mean)/(sd*sqrt((n+1)/n))),
+                          df = n-1,
+                          lower.tail = F
         )
 
 
@@ -288,6 +299,8 @@ BTD_cov_power <- function(case, case_cov, control_task = c(0, 1), control_covar 
                           nsim = 1000, iter = 1000) {
 
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
+  if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
 
   alternative <- match.arg(alternative)
   n = sample_size
