@@ -1,8 +1,3 @@
----
-bibliography: "power_primer.bib"
-csl: apa.csl
----
-
 
 # singcar
 
