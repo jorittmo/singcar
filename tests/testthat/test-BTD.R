@@ -1,4 +1,3 @@
-context("BTD produce accurate output")
 
 test_that("output is correct class", {
   outp <- BTD(-2, rnorm(15))

@@ -1,4 +1,3 @@
-context("TD produce accurate output")
 
 test_that("output is correct class", {
   outp <- TD(-2, rnorm(15))
@@ -14,7 +13,7 @@ test_that("errors are occuring as they should", {
   controls[1] <- NA
   expect_error(TD(-2, controls), "Controls contains NA, set na.rm = TRUE to proceed")
 
-  expect_error(TD(-2, 1), "Not enough obs. Set sd and n for input of controls to be treated as mean")
+  expect_error(TD(-2, 1), "Not enough obs. Set sd and sample size for input of controls to be treated as mean")
 
   expect_error(TD(-2, controls = 0, sd = 1), "Input sample size")
 

@@ -74,3 +74,58 @@ test_that("alternative hypotheses direction", {
 
 })
 
+test_that("errors and warnings are occuring as they should for BSDT", {
+
+  na_con <- rnorm(15)
+  na_con[1] <- NA
+
+  expect_error(BSDT_cov(c(-2, 0), 0, cbind(rnorm(15), na_con), rnorm(15)),
+               "control_tasks contains NA")
+
+  expect_error(BSDT_cov(c(-2, 0), 0, cbind(rnorm(15), rnorm(15)), na_con),
+               "control_covar contains NA")
+
+  expect_error(BSDT_cov(case_tasks = c(-2, 0), case_covar = 0,
+                        control_tasks = matrix(c(0, 0, 1, 1), ncol = 2),
+                        control_covar = matrix(c(0, 1), nrow = 1), sample_size = 20, cor_mat = diag(3)),
+               "If input is summary data, set use_sumstats = TRUE")
+
+  expect_error(BSDT_cov(case_tasks = c(-2, 0), case_covar = 0,
+                        control_tasks = matrix(c(0, 0, 1, 1), ncol = 2),
+                        control_covar = matrix(c(0, 1), nrow = 1), use_sumstats = TRUE),
+               "Please supply both correlation matrix and sample size")
+
+  expect_error(BSDT_cov(c(-2, 0, 0), 0, cbind(rnorm(15), rnorm(15)), rnorm(15)),
+               "case_task should have length 2")
+
+  expect_error(BSDT_cov(c(-2, 0), 0, cbind(rnorm(15), rnorm(15), rnorm(15)), rnorm(15)),
+               "columns in control_tasks should be 2")
+
+  expect_error(BSDT_cov(c(-2, 0), 0, cbind(rnorm(15), rnorm(15)), rnorm(16)),
+               "Must supply equal number of observations for tasks and covariates")
+  expect_error(BSDT_cov(c(-2, 0), 0, cbind(rnorm(15), rnorm(15)), cbind(rnorm(16), rnorm(16))),
+               "Must supply equal number of observations for tasks and covariates")
+
+
+
+})
+
+
+test_that("summary data and raw gives equal results", {
+
+
+  sigm <- matrix(c(1, 0.5, 0.1, 0.5, 1, 0.1, 0.1, 0.1, 1), ncol =3)
+
+  con <- MASS::mvrnorm(15, c(0, 0, 0), Sigma = sigm, empirical = TRUE)
+
+  set.seed(123)
+  expect_equal(BSDT_cov(c(-2, 0), 0, con[ , 1:2], con[ , 3])[["p.value"]],
+               BSDT_cov(case_tasks = c(-2, 0), case_covar = 0,
+                        control_tasks = matrix(c(0, 0, 1, 1), ncol = 2),
+                        control_covar = matrix(c(0, 1), nrow = 1),
+                        sample_size = 15, cor_mat = sigm, use_sumstats = TRUE)[["p.value"]], tolerance = 0.01)
+
+
+
+})
+
