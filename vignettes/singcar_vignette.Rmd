@@ -31,7 +31,7 @@ However, when this is not possible a control sample estimating the population,
 against which we wish to compare the patient, must be used. Both frequentist and
 Bayesian methods have been developed to do this, first and foremost by John
 Crawford and Paul Garthwaite (Crawford et al., 2011; Crawford & Garthwaite,
-2002, 2007, 2005; Crawford & Howell, 1998). It is these methods that singcar
+2002, 2007, 2005; Crawford & Howell, 1998). It is these methods that `singcar`
 implements. Power calculators for these tests are also provided. Although the
 canonical applications for these tests are in Cognitive Neuropsychology or
 Clinical Neuropsychology, they are potentially applicable to any circumstance in
