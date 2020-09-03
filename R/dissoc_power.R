@@ -50,7 +50,7 @@
 UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                       sd_a = 1, sd_b = 1, r_ab = 0.5,
                       sample_size = NULL, power = NULL,
-                      alternative = c("two.sided", "one.sided"),
+                      alternative = c("two.sided", "greater", "less"),
                       alpha = 0.05, spec = 0.005) {
 
   if (!is.null(sample_size) & !is.null(power)) stop("Must supply only one of sample size or desired power")
@@ -58,6 +58,7 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   if (!is.null(power)) if (power > 1 | power < 0) stop("Desired power must be between 0 and 1")
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+  if (r_ab < -1 | r_ab > 1) stop("Correlation between task a and b must be between -1 and 1")
 
   alternative <- match.arg(alternative)
 
@@ -83,20 +84,32 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     }
 
-    if (alternative == "one.sided") {
+    if (alternative == "less") {
 
-      tstat <- abs((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
+      tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
       power = stats::pt(stats::qt(alpha, df = n-1,
-                                  lower.tail = F),
-                        ncp = tstat,
-                        df = n-1,
-                        lower.tail = F)
+                                       lower.tail = T),
+                             ncp = tstat,
+                             df = n-1,
+                             lower.tail = T
+      )
+      return(power)
+    }
 
+    if (alternative == "greater") {
+
+      tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
+
+      power = stats::pt(stats::qt(alpha, df = n-1,
+                                       lower.tail = F),
+                             ncp = tstat,
+                             df = n-1,
+                             lower.tail = F
+      )
       return(power)
 
     }
-
 
   }
 
@@ -110,25 +123,57 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     keep_going = TRUE
 
-    if (alternative == "two.sided") {
+
 
       while(keep_going == TRUE){
 
-        tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
+        if (alternative == "two.sided") {
+          tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
 
-        search_pwr = stats::pt(stats::qt(alpha/2, df = n-1,
-                                         lower.tail = T),
-                               ncp = tstat,
-                               df = n-1,
-                               lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
-                                                                      lower.tail = T),
-                                                           ncp = tstat,
-                                                           df = n-1,
-                                                           lower.tail = T) + 1
+          search_pwr = stats::pt(stats::qt(alpha/2, df = n-1,
+                                           lower.tail = T),
+                                 ncp = tstat,
+                                 df = n-1,
+                                 lower.tail = T) - stats::pt(-stats::qt(alpha/2, df = n-1,
+                                                                        lower.tail = T),
+                                                             ncp = tstat,
+                                                             df = n-1,
+                                                             lower.tail = T) + 1
+        }
+
+
+
+
+        if (alternative == "less") {
+
+          tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
+
+          search_pwr = stats::pt(stats::qt(alpha, df = n-1,
+                                           lower.tail = T),
+                                 ncp = tstat,
+                                 df = n-1,
+                                 lower.tail = T
+          )
+
+        }
+
+        if (alternative == "greater") {
+
+          tstat <- ((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
+
+          search_pwr = stats::pt(stats::qt(alpha, df = n-1,
+                                           lower.tail = F),
+                                 ncp = tstat,
+                                 df = n-1,
+                                 lower.tail = F
+          )
+
+
+        }
 
         if (abs(prev_search_pwr - search_pwr) < spec) {
           keep_going = FALSE
-          print(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
+          message(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
                        " for any additional participant over n = ", n))
         }
 
@@ -141,37 +186,7 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
       }
 
       return(data.frame(n = n - 1, power = search_pwr))
-    }
 
-    if (alternative == "one.sided") {
-
-      while(keep_going == TRUE){
-
-        tstat <- abs((case_a - mean_a) - (case_b - mean_b)) / sqrt((sd_a^2 + sd_b^2 - 2*sd_a*sd_b*r_ab) * ((n + 1)/n))
-
-        search_pwr = stats::pt(stats::qt(alpha, df = n-1,
-                                         lower.tail = F),
-                               ncp = tstat,
-                               df = n-1,
-                               lower.tail = F)
-
-        if (abs(prev_search_pwr - search_pwr) < spec) {
-          keep_going = FALSE
-          print(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
-                       " for any additional participant over n = ", n))
-        }
-
-        prev_search_pwr = search_pwr
-
-        n = n + 1
-
-        if (search_pwr > power) keep_going = FALSE
-
-      }
-
-      return(data.frame(n = n - 1, power = search_pwr))
-
-    }
     }
 
 }
@@ -225,6 +240,7 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+  if (r_ab < -1 | r_ab > 1) stop("Correlation between task a and b must be between -1 and 1")
 
   alternative <- match.arg(alternative)
 
@@ -317,6 +333,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+  if (r_ab < -1 | r_ab > 1) stop("Correlation between task a and b must be between -1 and 1")
 
   alternative <- match.arg(alternative)
 
@@ -384,7 +401,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'   of covariates. Defaults to one covariate with mean 0 and sd = 1.
 #' @param cor_mat A correlation matrix containing the correlations of the tasks
 #'   of interest and the coviariate(s). The first two variables are treated as
-#'   the tasks of interest.
+#'   the tasks of interest. Defaults to no correlation between any.
 #' @param sample_size Single value of the size of the sample for which you wish
 #'   to calculate power.
 #' @param alternative The alternative hypothesis. A string of either "less",
@@ -398,19 +415,27 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'   distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
 #'   et al. (2011) for further information. Calibrated prior is recommended.
 #'
-#' @return
+#' @return Returns a single value approximating the power of the test for the
+#'   given parameters.
 #' @export
 #'
 #' @examples
+#' BSDT_cov_power(c(-2, 0), case_cov = c(0, 0, 0),
+#' control_covar = matrix(c(0, 0, 0, 1, 1, 1), ncol= 2),
+#' sample_size = 10, cor_mat = diag(5), iter = 50, nsim = 50)
+
 BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 1, 1), ncol= 2), control_covar = c(0, 1),
                           cor_mat = diag(3),
                           sample_size,
-                          alternative = c("less", "greater", "two.sided"),
+                          alternative = c("two.sided", "greater", "less"),
                           alpha = 0.05,
                           nsim = 1000, iter = 1000,
                           calibrated = TRUE) {
 
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+  if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
+  if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (length(case_tasks) != 2) stop("case_tasks should be of length 2")
 
   alternative <- match.arg(alternative)
   n = sample_size
