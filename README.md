@@ -2,7 +2,8 @@
 # singcar
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.org/AljosjaK/singcar.svg?branch=master)](https://travis-ci.org/jorittmo/singcar)
+[![Travis build status](https://travis-ci.org/jorittmo/singcar.svg?branch=master)](https://travis-ci.org/jorittmo/singcar)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 The aim of the R package `singcar` is to provide and encourage usage of
