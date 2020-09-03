@@ -22,7 +22,7 @@ test_that("we get approx same results as C&G on BSDT_cov", {
                    sc_c[["interval"]][["Lower p CI"]],
                    sc_c[["interval"]][["Upper p CI"]])
 
-  expect_equal(sc_calib_tt, calib_prior_tt, tolerance = 1e-2)
+  expect_equal(sc_calib_tt, calib_prior_tt, tolerance = 0.05)
 
 
   sc_j <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
@@ -34,7 +34,7 @@ test_that("we get approx same results as C&G on BSDT_cov", {
                   sc_j[["interval"]][["Lower p CI"]],
                   sc_j[["interval"]][["Upper p CI"]])
 
-  expect_equal(sc_jeff_tt, jeff_prior_tt, tolerance = 1e-2)
+  expect_equal(sc_jeff_tt, jeff_prior_tt, tolerance = 0.05)
 
 
 })
