@@ -39,3 +39,23 @@ which a measure taken from a single individual is to be compared against data
 from a normative sample (i.e. a control group). It should be noted that these
 statistical methods could also be applied as a general method of outlier
 detection in small samples.
+
+# References
+
+Crawford, J., & Garthwaite, P. (2002). Investigation of the single case in
+neuropsychology: Confidence limits on the abnormality of test scores and test
+score differences. Neuropsychologia, 40(8), 1196-1208.
+https://doi.org/10.1016/S0028-3932(01)00224-X
+
+Crawford, J., & Garthwaite, P. (2007). Comparison of a single case to a control
+or normative sample in neuropsychology: Development of a Bayesian approach.
+Cognitive Neuropsychology, 24(4), 343-372.
+https://doi.org/10.1080/02643290701290146
+
+Crawford, J., & Garthwaite, P. (2005). Testing for Suspected Impairments and Dissociations in Single-Case Studies in Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and Revised Tests for Dissociations. Neuropsychology, 19(3), 318-331. https://doi.org/10.1037/0894-4105.19.3.318
+
+Crawford, J., Garthwaite, P., & Ryan, K. (2011). Comparing a single case to a control sample: Testing for neuropsychological deficits and dissociations in the presence of covariates. Cortex, 47(10), 1166-1178. https://doi.org/10.1016/j.cortex.2011.02.017
+
+Crawford, J., & Howell, D. (1998). Comparing an Individual's Test Score Against Norms Derived from Small Samples. The Clinical Neuropsychologist, 12(4), 482-486. https://doi.org/10.1076/clin.12.4.482.7241
+
+Hassan, E. K., Sedda, A., Buckingham, G., & McIntosh, R. D. (2020). The size-weight illusion in visual form agnosic patient DF. Neurocase, 1-8. https://doi.org/10.1080/13554794.2020.1800748
