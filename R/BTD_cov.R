@@ -84,6 +84,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_task) != 1) stop("case_task should be single value")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
+  if (!is.null(cor_mat) | !is.null(sample_size)) if (use_sumstats == FALSE) stop("If input is summary data, set use_sumstats = TRUE")
 
   if (use_sumstats) {
 
@@ -210,9 +211,9 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   names(estimate) <- c(zccc.name, p.name)
 
 
-  control_task <- matrix(control_task, ncol = 1, dimnames = list(NULL, "Y1"))
+  control_task <- matrix(control_task, ncol = 1, dimnames = list(NULL, "Task"))
   xname <- c()
-  for (i in 1:length(case_covar)) xname[i] <- paste0("X", i)
+  for (i in 1:length(case_covar)) xname[i] <- paste0("COV", i)
   control_covar <- matrix(control_covar, ncol = length(case_covar),
                           dimnames = list(NULL, xname))
   cor.mat <- stats::cor(cbind(control_task, control_covar))

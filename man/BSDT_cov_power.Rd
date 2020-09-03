@@ -11,7 +11,7 @@ BSDT_cov_power(
   control_covar = c(0, 1),
   cor_mat = diag(3),
   sample_size,
-  alternative = c("less", "greater", "two.sided"),
+  alternative = c("two.sided", "greater", "less"),
   alpha = 0.05,
   nsim = 1000,
   iter = 1000,
@@ -35,7 +35,7 @@ of covariates. Defaults to one covariate with mean 0 and sd = 1.}
 
 \item{cor_mat}{A correlation matrix containing the correlations of the tasks
 of interest and the coviariate(s). The first two variables are treated as
-the tasks of interest.}
+the tasks of interest. Defaults to no correlation between any.}
 
 \item{sample_size}{Single value of the size of the sample for which you wish
 to calculate power.}
@@ -56,7 +56,8 @@ distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
 et al. (2011) for further information. Calibrated prior is recommended.}
 }
 \value{
-
+Returns a single value approximating the power of the test for the
+  given parameters.
 }
 \description{
 Computationally intense. Lower \code{iter} and/or \code{nsim} for faster but
@@ -68,4 +69,9 @@ covariates defaults to 1, means and standard deviations for the tasks and
 covariate defaults to 0 and 1, so if no other values are given the case scores
 is interpreted as deviation from the mean in standard deviations for both tasks
 and covariates.
+}
+\examples{
+BSDT_cov_power(c(-2, 0), case_cov = c(0, 0, 0),
+control_covar = matrix(c(0, 0, 0, 1, 1, 1), ncol= 2),
+sample_size = 10, cor_mat = diag(5), iter = 50, nsim = 50)
 }

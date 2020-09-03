@@ -378,5 +378,3 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
 
 }
-
-

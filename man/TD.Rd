@@ -40,7 +40,7 @@ simulations).}
 
 \item{conf_int_spec}{The size of iterative steps for calculating confidence
 intervals. Smaller values gives more precise intervals but takes longer to
-calculate.}
+calculate. Defaults to a specificity of 0.01.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }

@@ -193,7 +193,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
     tstat <- sqrt(
       (-b + sqrt(b^2 - (4*a*c))) / (2*a)
     )
-    names(tstat) <- "absolute t"
+    names(tstat) <- "approx. abs. t"
 
     if (alternative == "two.sided") {
       pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = FALSE)
@@ -274,17 +274,17 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
 
 
   # Set names for objects in output
-  names(estimate) <- c("Case score on task A as standard (z) score",
-                       "Case score on task B as standard (z) score",
-                       "Std. effect size (Z-DCC) for task diff. between case and controls",
+  names(estimate) <- c("Standardised case score, task A (Z-CC)",
+                       "Standardised case score, task B (Z-CC)",
+                       "Standardised task discrepancy (Z-DCC)",
                        p.name)
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score A: ", deparse(substitute(case_a)), ", ",
-                  "Case score B: ", deparse(substitute(case_b)), ", ",
-                  "Controls score A: ", deparse(substitute(controls_a)), ", ",
-                  "Controls score B: ",deparse(substitute(controls_b)))
+  dname <- paste0("Case score A: ", format(round(case_a, 2), nsmall = 2), ", ",
+                  "Case score B: ", format(round(case_b, 2), nsmall = 2), ", ",
+                  "Controls A (mean, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
+                  "Controls B (mean, sd): (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
   names(pval) <- NULL
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info

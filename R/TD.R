@@ -35,7 +35,7 @@
 #' @param conf_level Level of confidence for intervals.
 #' @param conf_int_spec The size of iterative steps for calculating confidence
 #'   intervals. Smaller values gives more precise intervals but takes longer to
-#'   calculate.
+#'   calculate. Defaults to a specificity of 0.01.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -77,13 +77,13 @@
 
 
 TD <- function (case, controls, sd = NULL, sample_size = NULL,
-                      alternative = c("less", "greater", "two.sided"),
-                      conf_int = TRUE, conf_level = 0.95,
-                      conf_int_spec = 0.01,  na.rm = FALSE) {
+                alternative = c("less", "greater", "two.sided"),
+                conf_int = TRUE, conf_level = 0.95,
+                conf_int_spec = 0.01,  na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(sd) == TRUE) {
-    stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
+    stop("Not enough obs. Set sd and sample size for input of controls to be treated as mean")
   }
 
   if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == TRUE) stop("Input sample size")
@@ -92,7 +92,8 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
-  if (conf_level < 0 | conf_level > 0.9999999) stop("Confident level must be between 0 and 0.9999999")
+  if (conf_int == TRUE & (conf_level < 0 | conf_level > 0.9999999)) stop("Confident level must be between 0 and 0.9999999")
+
 
   alternative <- match.arg(alternative)
 
@@ -177,7 +178,7 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
     ci_up_zcc <- ncp_up/sqrt(n)
     cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
-    zcc.name <- paste0("Standardised case difference (Z-CC), ",
+    zcc.name <- paste0("Standardised case score (Z-CC), ",
                        100*conf_level, "% CI [",
                        format(round(cint_zcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zcc[2], 2), nsmall = 2),"]")
@@ -252,13 +253,13 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
     interval <- NULL
 
     if (alternative == "less") {
-      names(estimate) <- c("Standardised case difference (Z-CC)",
+      names(estimate) <- c("Standardised case score (Z-CC)",
                            "Proportion below case (%)")
     } else if (alternative == "greater") {
-      names(estimate) <- c("Standardised case difference (Z-CC)",
+      names(estimate) <- c("Standardised case score (Z-CC)",
                            "Proportion above case (%)")
     } else {
-      names(estimate) <- c("Standardised case difference (Z-CC)",
+      names(estimate) <- c("Standardised case score (Z-CC)",
                            paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)"))
     }
 

@@ -84,7 +84,7 @@ A list with class \code{"htest"} containing the following components:
 }
 \description{
 Tests whether the standardized difference between a case's scores
-on two tasks (Y1 and Y2) is significantly different from the standardized
+on two tasks (A and B) is significantly different from the standardized
 differences between these tasks in a control sample, while controlling for
 the effects of covariates.  For example, it could be used to test whether a
 case's standardized difference between two tasks is significantly greater

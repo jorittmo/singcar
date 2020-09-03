@@ -303,13 +303,13 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
-  zdcc.name <- paste0("Std. effect size (Z-DCC) for task diff. between case and controls, ",
+  zdcc.name <- paste0("Standardised task discrepancy (Z-DCC), ",
                      100*int_level, "% credible interval [",
                      format(round(zdcc_int[1], 2), nsmall = 2),", ",
                      format(round(zdcc_int[2], 2), nsmall = 2),"]")
 
-  names(estimate) <- c("Case score on task A as standard (z) score",
-                       "Case score on task B as standard (z) score",
+  names(estimate) <- c("Standardised case score, task A (Z-CC)",
+                       "Standardised case score, task B (Z-CC)",
                        zdcc.name,
                        p.name)
 
@@ -327,10 +327,10 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
   names(con_m_b) <- "Mean (controls)"
   names(con_sd_b) <- "SD (controls)"
   names(n) <- "Sample size"
-  dname <- paste0("Case score A: ", deparse(substitute(case_a)), ", ",
-                  "Case score B: ", deparse(substitute(case_b)), ", ",
-                  "Controls score A: ", deparse(substitute(controls_a)), ", ",
-                  "Controls score B: ",deparse(substitute(controls_b)))
+  dname <- paste0("Case score A: ", format(round(case_a, 2), nsmall = 2), ", ",
+                  "Case score B: ", format(round(case_b, 2), nsmall = 2), ", ",
+                  "Controls A (mean, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
+                  "Controls B (mean, sd): (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = z_ast_est,

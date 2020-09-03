@@ -33,7 +33,7 @@ covariates.}
 
 \item{cor_mat}{A correlation matrix containing the correlations of the the
 task of interest and the coviariate(s). The first variable is treated as
-the task of interest.}
+the task of interest. Defaults to no correlation between any.}
 
 \item{sample_size}{Single value of the size of the sample for which you wish
 to calculate power.}

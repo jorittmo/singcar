@@ -14,7 +14,7 @@ UDT_power(
   r_ab = 0.5,
   sample_size = NULL,
   power = NULL,
-  alternative = c("two.sided", "one.sided"),
+  alternative = c("two.sided", "greater", "less"),
   alpha = 0.05,
   spec = 0.005
 )
