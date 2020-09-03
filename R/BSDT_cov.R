@@ -1,7 +1,7 @@
 #' Bayesian Standardised Difference Test with Covariates
 #'
 #' Tests whether the standardized difference between a case's scores
-#' on two tasks (Y1 and Y2) is significantly different from the standardized
+#' on two tasks (A and B) is significantly different from the standardized
 #' differences between these tasks in a control sample, while controlling for
 #' the effects of covariates.  For example, it could be used to test whether a
 #' case's standardized difference between two tasks is significantly greater
@@ -99,9 +99,18 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
-  if (length(case_tasks) != 2) stop("case_task should have lenght 2")
+  if (length(case_tasks) != 2) stop("case_task should have length 2")
   if (ncol(control_tasks) != 2) stop("columns in control_tasks should be 2")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
+  if (!is.null(cor_mat) | !is.null(sample_size)) if (use_sumstats == FALSE) stop("If input is summary data, set use_sumstats = TRUE")
+  if (sum(is.na(control_tasks)) > 0) stop("control_tasks contains NA")
+  if (sum(is.na(control_covar)) > 0) stop("control_covar contains NA")
+
+  if (use_sumstats == FALSE){
+    cov_obs <- ifelse(is.array(control_covar), nrow(control_covar), length(control_covar))
+    if (nrow(control_tasks) != cov_obs) stop("Must supply equal number of observations for tasks and covariates")
+    rm(cov_obs)
+  }
 
 
 
@@ -259,13 +268,13 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
-  zdccc.name <- paste0("Std. effect size (Z-DCCC) for task diff. between case and controls, ",
+  zdccc.name <- paste0("Standardised task discrepancy (Z-DCCC), ",
                       100*int.level, "% credible interval [",
                       format(round(zdccc_int[1], 2), nsmall = 2),", ",
                       format(round(zdccc_int[2], 2), nsmall = 2),"]")
 
-  names(estimate) <- c("Case score on task X as standard (z) score",
-                       "Case score on task Y as standard (z) score",
+  names(estimate) <- c("Standardised case score, task A (Z-CC)",
+                       "Standardised case score, task B (Z-CC)",
                        zdccc.name,
                        p.name)
 
@@ -276,9 +285,9 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   interval <- c(typ.int, zdccc_int, p_int)
 
 
-  colnames(control_tasks) <- c("Y1", "Y2")
+  colnames(control_tasks) <- c("A", "B")
   xname <- c()
-  for (i in 1:length(case_covar)) xname[i] <- paste0("X", i)
+  for (i in 1:length(case_covar)) xname[i] <- paste0("COV", i)
   control_covar <- matrix(control_covar, ncol = length(case_covar),
                           dimnames = list(NULL, xname))
   cor.mat <- stats::cor(cbind(control_tasks, control_covar))
@@ -292,10 +301,10 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   # names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score Y1: ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
-                  "Case score Y2: ", format(round(case_tasks[2], 2), nsmall = 2), ", ",
-                  "Controls score Y1: ", format(round(m_ct[1], 2), nsmall = 2), ", ",
-                  "Controls score Y2: ", format(round(m_ct[2], 2), nsmall = 2))
+  dname <- paste0("Case score A: ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
+                  "Case score B: ", format(round(case_tasks[2], 2), nsmall = 2), ", ",
+                  "Controls score A: ", format(round(m_ct[1], 2), nsmall = 2), ", ",
+                  "Controls score B: ", format(round(m_ct[2], 2), nsmall = 2))
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = z_ast_est,
