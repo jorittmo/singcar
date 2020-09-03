@@ -39,7 +39,7 @@
 #'   column represents the standard deviation.
 #' @param cor_mat A correlation matrix of all variables included. NOTE: the two
 #'   first variables should be the tasks of interest.
-#' @param control_n An integer specifying the sample size of the controls.
+#' @param sample_size An integer specifying the sample size of the controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
@@ -76,21 +76,24 @@
 BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      alternative = c("less", "two.sided", "greater"),
                      int.level = 0.95, iter = 1000,
-                     use_sumstats = FALSE, cor_mat = NULL, control_n = NULL) {
+                     use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
 
-  if (use_sumstats & (is.null(cor_mat) | is.null(control_n))) stop("Please supply both correlation matrix and sample size")
+  if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_task) != 1) stop("case_task should be single value")
+  if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
 
   if (use_sumstats) {
 
     sum_stats <- rbind(control_task, control_covar)
 
+    if (length(sum_stats[ , 2]) != nrow(cor_mat)) stop("Number of variables and number of correlations does not match")
+
     cov_mat <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
 
-    lazy_gen <- MASS::mvrnorm(control_n, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
+    lazy_gen <- MASS::mvrnorm(sample_size, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
 
     control_task <- lazy_gen[ , 1]
 
@@ -178,10 +181,10 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
-  estimate <- c(zccc, p_est*100)
+  estimate <- round(c(zccc, p_est*100), 6)
   if (alternative == "two.sided") estimate <- c(zccc, (p_est/2)*100)
 
-  zccc.name <- paste0("Std. case difference (Z-CCC), ",
+  zccc.name <- paste0("Std. case score (Z-CCC), ",
                      100*int.level, "% credible interval [",
                      format(round(zccc_int[1], 2), nsmall = 2),", ",
                      format(round(zccc_int[2], 2), nsmall = 2),"]")

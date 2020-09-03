@@ -21,7 +21,7 @@
 #' @param case_covar A vector containing the case scores on all covariates
 #'   included.
 #' @param control_tasks A matrix or dataframe with 2 columns and n rows
-#'   containing the control scores for the two tasks. Or a matrix or dataframe
+#'   containing the control scores for the two tasks. Or a 2x2 matrix or dataframe
 #'   containing summary statistics where the first column represents the means
 #'   for each task and the second column represents the standard deviation.
 #' @param control_covar A matrix or dataframe cointaining the control scores on
@@ -46,7 +46,7 @@
 #'   column represents the standard deviation.
 #' @param cor_mat A correlation matrix of all variables included. NOTE: the two
 #'   first variables should be the tasks of interest.
-#' @param control_n An integer specifying the sample size of the controls.
+#' @param sample_size An integer specifying the sample size of the controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
@@ -91,16 +91,17 @@
 BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       alternative = c("two.sided", "greater", "less"),
                       int.level = 0.95, calibrated = TRUE, iter = 1000,
-                      use_sumstats = FALSE, cor_mat = NULL, control_n = NULL) {
+                      use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
 
   # ERRORS BELOW
 
-  if (use_sumstats & (is.null(cor_mat) | is.null(control_n))) stop("Please supply both correlation matrix and sample size")
+  if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_tasks) != 2) stop("case_task should have lenght 2")
   if (ncol(control_tasks) != 2) stop("columns in control_tasks should be 2")
+  if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
 
 
 
@@ -110,7 +111,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
     cov_mat <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
 
-    lazy_gen <- MASS::mvrnorm(control_n, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
+    lazy_gen <- MASS::mvrnorm(sample_size, mu = sum_stats[ , 1], Sigma = cov_mat, empirical = TRUE)
 
     control_tasks <- lazy_gen[ , 1:2]
 
@@ -199,8 +200,8 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   s2_hat <- sqrt(Sigma_hat[2, 2, ])
 
-  z1 <- (case_tasks[1] - mu_hat[ , 1]) / s1_hat ## IS THE MEAN THE INTERCEPT + COEF OR JUST COEF?
-  z2 <- (case_tasks[2] - mu_hat[ , 2]) / s2_hat ## IS THE MEAN THE INTERCEPT + COEF OR JUST COEF?
+  z1 <- (case_tasks[1] - mu_hat[ , 1]) / s1_hat
+  z2 <- (case_tasks[2] - mu_hat[ , 2]) / s2_hat
 
   z_hat_dccc <- (z1-z2) / sqrt(2 - 2*rho_hat)
 
@@ -242,7 +243,8 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   zdccc <-  (std.y1 - std.y2) / sqrt(2 - 2*rho_ast)
 
-  estimate <- c(z.y1, z.y2, zdccc, ifelse(alternative == "two.sided", (p_est/2*100), p_est*100))
+  prop <- ifelse(alternative == "two.sided", round((p_est/2*100), 2), p_est*100)
+  estimate <- round(c(z.y1, z.y2, zdccc, prop), 6)
 
   if (alternative == "two.sided") {
     alt.p.name <- "Proportion of control population with more extreme task difference, "
@@ -293,7 +295,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   dname <- paste0("Case score Y1: ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
                   "Case score Y2: ", format(round(case_tasks[2], 2), nsmall = 2), ", ",
                   "Controls score Y1: ", format(round(m_ct[1], 2), nsmall = 2), ", ",
-                  "Controls score Y2: ", format(round(m_ct[1], 2), nsmall = 2))
+                  "Controls score Y2: ", format(round(m_ct[2], 2), nsmall = 2))
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = z_ast_est,
@@ -313,5 +315,4 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   output
 
 }
-
 

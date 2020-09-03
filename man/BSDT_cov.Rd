@@ -15,7 +15,7 @@ BSDT_cov(
   iter = 1000,
   use_sumstats = FALSE,
   cor_mat = NULL,
-  control_n = NULL
+  sample_size = NULL
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ BSDT_cov(
 included.}
 
 \item{control_tasks}{A matrix or dataframe with 2 columns and n rows
-containing the control scores for the two tasks. Or a matrix or dataframe
+containing the control scores for the two tasks. Or a 2x2 matrix or dataframe
 containing summary statistics where the first column represents the means
 for each task and the second column represents the standard deviation.}
 
@@ -58,7 +58,7 @@ column represents the standard deviation.}
 \item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
 first variables should be the tasks of interest.}
 
-\item{control_n}{An integer specifying the sample size of the controls.}
+\item{sample_size}{An integer specifying the sample size of the controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:

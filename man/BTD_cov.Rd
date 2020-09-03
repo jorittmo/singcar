@@ -14,7 +14,7 @@ BTD_cov(
   iter = 1000,
   use_sumstats = FALSE,
   cor_mat = NULL,
-  control_n = NULL
+  sample_size = NULL
 )
 }
 \arguments{
@@ -52,7 +52,7 @@ column represents the standard deviation.}
 \item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
 first variables should be the tasks of interest.}
 
-\item{control_n}{An integer specifying the sample size of the controls.}
+\item{sample_size}{An integer specifying the sample size of the controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
