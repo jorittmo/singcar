@@ -156,7 +156,7 @@ TD_power <- function(case, mean = 0, sd = 1,
 
       if (abs(prev_search_pwr - search_pwr) < spec) {
         keep_going = FALSE
-        print(paste0("Power(", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
+        message(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
                      " for any additional participant over n = ", n))
       }
 
@@ -210,8 +210,10 @@ BTD_power <- function(case, mean = 0, sd = 1,
                       alpha = 0.05,
                       nsim = 1000, iter = 1000) {
 
-  if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
+  if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
+
+
 
   alternative <- match.arg(alternative)
   n = sample_size
@@ -269,7 +271,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 #'   covariates.
 #' @param cor_mat A correlation matrix containing the correlations of the the
 #'   task of interest and the coviariate(s). The first variable is treated as
-#'   the task of interest.
+#'   the task of interest. Defaults to no correlation between any.
 #' @param sample_size Single value of the size of the sample for which you wish
 #'   to calculate power.
 #' @param alternative The alternative hypothesis. A string of either "less" (default),
@@ -301,6 +303,8 @@ BTD_cov_power <- function(case, case_cov, control_task = c(0, 1), control_covar 
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
 
   if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
+
+  if (sample_size < 2) stop("Sample size must be greater than 1")
 
   alternative <- match.arg(alternative)
   n = sample_size
