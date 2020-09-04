@@ -107,7 +107,7 @@ BSDT_cov(case_tasks = c(size_weight_illusion[1, "V_SWI"],
          case_covar = size_weight_illusion[1, "YRS"],
          control_tasks = cbind(size_weight_illusion[-1, "V_SWI"],
                                size_weight_illusion[-1, "K_SWI"]),
-         control_covar = size_weight_illusion[-1, "YRS"])
+         control_covar = size_weight_illusion[-1, "YRS"], iter = 100)
 
 }
 \references{

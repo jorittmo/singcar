@@ -95,7 +95,7 @@ Developed by Crawford, Garthwaite and Ryan (2011).
 BTD_cov(case_task = size_weight_illusion[1, "V_SWI"],
          case_covar = size_weight_illusion[1, "YRS"],
          control_task = size_weight_illusion[-1, "V_SWI"],
-         control_covar = size_weight_illusion[-1, "YRS"])
+         control_covar = size_weight_illusion[-1, "YRS"], iter = 100)
 
 }
 \references{

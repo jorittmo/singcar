@@ -69,5 +69,5 @@ case scores. Is computationally heavy and might therefore take a few seconds.
 }
 \examples{
 BSDT_power(case_a = -3, case_b = -1, mean_a = 0, mean_b = 0,
-           sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
+           sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20, iter = 100)
 }

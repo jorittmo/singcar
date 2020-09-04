@@ -322,7 +322,7 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'
 #' @examples
 #' BSDT_power(case_a = -3, case_b = -1, mean_a = 0, mean_b = 0,
-#'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20)
+#'            sd_a = 1, sd_b = 1, r_ab = 0.5, sample_size = 20, iter = 100)
 
 
 BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
@@ -422,7 +422,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #' @examples
 #' BSDT_cov_power(c(-2, 0), case_cov = c(0, 0, 0),
 #' control_covar = matrix(c(0, 0, 0, 1, 1, 1), ncol= 2),
-#' sample_size = 10, cor_mat = diag(5), iter = 50, nsim = 50)
+#' sample_size = 10, cor_mat = diag(5), iter = 20, nsim = 20)
 
 BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 1, 1), ncol= 2), control_covar = c(0, 1),
                           cor_mat = diag(3),

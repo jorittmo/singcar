@@ -73,5 +73,5 @@ and covariates.
 \examples{
 BSDT_cov_power(c(-2, 0), case_cov = c(0, 0, 0),
 control_covar = matrix(c(0, 0, 0, 1, 1, 1), ncol= 2),
-sample_size = 10, cor_mat = diag(5), iter = 50, nsim = 50)
+sample_size = 10, cor_mat = diag(5), iter = 20, nsim = 20)
 }
