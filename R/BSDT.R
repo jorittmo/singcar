@@ -41,6 +41,15 @@
 #'   unstandardised task scores.
 #' @param calibrated set to \code{TRUE} to use a calibrated prior distribution.
 #'   See Crawford, Garthwaite and Ryan (2011) for more details.
+#' @param chol_sim This is only relevant when not using the calibrated prior.
+#'   Indicates whether generation of cholesky decomposition of
+#'   inverse Wishart draws should be done by looping, i.e. when set to \code{FALSE} (default)
+#'   over the Wishart draws or if the Cholesky decomposed matrices should be generated
+#'   by simulation from the CholWishart pacakge (if set to \code{TRUE}). The latter
+#'   speeds up the code considerably but requires setting seeds. If \code{.Random.seed}
+#'   exists, this is saved and then written back to the global environment. Since
+#'   this can result in unexpected behaviour it is recommended to use looping if
+#'   computational time is not of the essence.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -63,7 +72,8 @@
 #' sd_b = 1, sample_size = 20, r_ab = 0.68, iter = 100)
 #'
 #' BSDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1, "K_SWI"],
-#'  controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"], iter = 100)
+#'  controls_a = size_weight_illusion[-1, "V_SWI"],
+#'  controls_b = size_weight_illusion[-1, "K_SWI"], iter = 100)
 #'
 #' @references
 #' Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
@@ -91,6 +101,7 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
                   iter = 10000,
                   unstandardised = FALSE,
                   calibrated = FALSE,
+                  chol_sim = FALSE,
                   na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
@@ -200,17 +211,28 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
   if (calibrated == FALSE) {
 
-    seed <- stats::runif(5)
-    old_seed <- .Random.seed
+    if (chol_sim == FALSE) {
+      Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
+      Tchol = array(dim = c(nrow(A), ncol(A), iter))
+      for (i in 1:iter) Tchol[, , i] <- chol(Sigma_hat[ , , i])
+      Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
 
-    set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
-    Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
+    }
 
-    set.seed(seed)
-    Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Simulates same as above but with cholesky decomp in C++
-    Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
+    if (chol_sim == TRUE) { # Using this speeds up the code considerably but sets seeds, so should be used with caution
+      seed <- stats::runif(5)
+      old_seed <- .Random.seed
 
-    .Random.seed <<- old_seed
+      set.seed(seed) # So that both the inverse wishart draws and the cholesky decomp on them are the same
+      Sigma_hat <- CholWishart::rInvWishart(iter, n, A)
+
+      set.seed(seed)
+      Tchol <- CholWishart::rInvCholWishart(iter, n, A) # Simulates same as above but with cholesky decomp in C++
+      Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
+
+      .Random.seed <<- old_seed
+    }
+
 
     Mu_hat <- matrix(nrow = iter, ncol = 2)
     for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m_a, con_m_b) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))

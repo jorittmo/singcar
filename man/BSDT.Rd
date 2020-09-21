@@ -18,6 +18,7 @@ BSDT(
   iter = 10000,
   unstandardised = FALSE,
   calibrated = FALSE,
+  chol_sim = FALSE,
   na.rm = FALSE
 )
 }
@@ -64,6 +65,16 @@ unstandardised task scores.}
 \item{calibrated}{set to \code{TRUE} to use a calibrated prior distribution.
 See Crawford, Garthwaite and Ryan (2011) for more details.}
 
+\item{chol_sim}{This is only relevant when not using the calibrated prior.
+Indicates whether generation of cholesky decomposition of
+inverse Wishart draws should be done by looping, i.e. when set to \code{FALSE} (default)
+over the Wishart draws or if the Cholesky decomposed matrices should be generated
+by simulation from the CholWishart pacakge (if set to \code{TRUE}). The latter
+speeds up the code considerably but requires setting seeds. If \code{.Random.seed}
+exists, this is saved and then written back to the global environment. Since
+this can result in unexpected behaviour it is recommended to use looping if
+computational time is not of the essence.}
+
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
@@ -99,7 +110,8 @@ BSDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,
 sd_b = 1, sample_size = 20, r_ab = 0.68, iter = 100)
 
 BSDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1, "K_SWI"],
- controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"], iter = 100)
+ controls_a = size_weight_illusion[-1, "V_SWI"],
+ controls_b = size_weight_illusion[-1, "K_SWI"], iter = 100)
 
 }
 \references{
