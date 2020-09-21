@@ -1,6 +1,6 @@
 Package: singcar
 Title: Comparing Single Cases to Small Samples
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Jonathan",
              family = "Rittmo",
@@ -16,7 +16,7 @@ Description: When comparing single cases to control populations and no parameter
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Depends: R (>= 2.10)
 Imports: 
     stats,
