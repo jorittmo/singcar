@@ -54,7 +54,7 @@ Either a single value of the exact power, if sample size is given. Or
 \description{
 Calculates exact power given sample size or sample size given power, using
 analytical methods for the frequentist test of deficit for a specified case
-score and, mean and standard deviation for the control sample. The mean and
+score and mean and standard deviation for the control sample. The mean and
 standard deviation defaults to 0 and 1, so if no other values are given the
 case score is interpreted as deviation from the mean in standard deviations.
 }
