@@ -1,14 +1,29 @@
 ---
-title: "singcar_vignette"
-output: rmarkdown::html_vignette
+title: "singcar: Comparing Single Cases to Small Samples"
+bibliography: singcar_vignette.bib
+csl: apa.csl
+author:
+- name: Jonathan Ö Rittmo
+- name: Robert D McIntosh
+link-citations: yes
+output:
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    number_sections: false
+header-includes: |
+  \usepackage{amsmath}
+  \usepackage{caption}
+  \usepackage{graphicx}
 vignette: >
-  %\VignetteIndexEntry{singcar_vignette}
+  %\VignetteIndexEntry{singcar: Comparing Single Cases to Small Samples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  dev = "png", 
+  dev.args = list(type = "cairo-png"),
   collapse = TRUE,
   comment = "#>"
 )
@@ -18,44 +33,692 @@ knitr::opts_chunk$set(
 library(singcar)
 ```
 
-# Overview
+# Introduction
 
 The aim of the R package `singcar` is to provide and encourage usage of
 appropriate statistical methods for comparing a case against a control sample.
 For instance, they may commonly be done in a neuropsychological context, in
 which an individual has incurred a specific brain injury and we wish to test
 whether this damage has led to an impairment of some cognitive function and
-whether two different functions are dissociable. For many functions there is
+whether two different functions are dissocia ble. For many functions there is
 normed data available which the patient can be compared against directly.
 However, when this is not possible a control sample estimating the population,
 against which we wish to compare the patient, must be used. Both frequentist and
-Bayesian methods have been developed to do this, first and foremost by John
-Crawford and Paul Garthwaite (Crawford et al., 2011; Crawford & Garthwaite,
-2002, 2007, 2005; Crawford & Howell, 1998). It is these methods that `singcar`
-implements. Power calculators for these tests are also provided. Although the
-canonical applications for these tests are in Cognitive Neuropsychology or
-Clinical Neuropsychology, they are potentially applicable to any circumstance in
-which a measure taken from a single individual is to be compared against data
-from a normative sample (i.e. a control group). It should be noted that these
+Bayesian methods have been developed to do this providing transparent control
+over Type I errors, first and foremost by John Crawford and Paul Garthwaite
+[@crawford_comparing_1998; @crawford_comparing_2011; @crawford_comparison_2007;
+@crawford_investigation_2002; @crawford_testing_2005]. It is these methods that
+`singcar` implements. Due to the somewhat overlooked issue of Type II errors
+power calculators for these tests are also provided. Although the canonical
+applications for these tests are in Cognitive Neuropsychology or Clinical
+Neuropsychology, they are potentially applicable to any circumstance in which a
+measure taken from a single individual is to be compared against data from a
+normative sample (i.e. a control group). It should be noted that these
 statistical methods could also be applied as a general method of outlier
 detection in small samples.
 
+## Installation
+
+You can install the developmental version of `singcar` by running the following:
+
+```{r installation, eval=FALSE}
+install.packages("devtools")
+library("devtools")
+install_github("jorittmo/singcar")
+library("singcar")
+```
+
+## Example
+
+The package comes with the dataset `size_weight_illusion`, a neuropsychological
+dataset from an investigation of the size-weight illusion in DF, a patient with
+visual form agnosia following following bilateral lesions to the lateral
+occipital complex [@hassan_size-weight_2020]. It was investigated whether
+DF experienced visual size-weight illusion to the same extent as controls (n = 28)
+and whether visual and kinesthetic size-weight illusion could be dissociable.
+Below follows examples of how to analyse this dataset using the tests provided
+in `singcar`.
+
+### Testing for a deficit
+
+If we want to assess whether DF has an impairment compared to controls on
+visual size-weight illusion we can test this using a modified two-sample t-test,
+called TD [test of deficit: @crawford_comparing_1998].
+
+```{r TD}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+TD(case = DF_V_SWI, controls = CON_V_SWI, conf_int = TRUE)
+ 
+```
+
+
+This can similarily be tested with a Bayesian version of the same test,
+yielding approximately (since this test is based on MCMC methods) the same output [@crawford_comparison_2007].
+
+```{r BTD}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient 
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+BTD(case = DF_V_SWI, controls = CON_V_SWI)
+```
+
+If the control sample for a study is not appropriately matched to the case on
+variables such as e.g. age or education level it is appropriate to use tests
+that account for this by allowing for the inclusion of covariates. Including
+theoretically sound covariates is often a good idea. To do this
+@crawford_comparing_2011 extended their Bayesian verison of the TD. This test
+assess the patient on the task of interest by essentially comparing him/her to
+the controls with the same score on the covariate.
+
+```{r BTD_cov}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+# Extracting the coviariate below
+DF_age <- size_weight_illusion[size_weight_illusion$PPT == "DF", "YRS"] # Patient
+CON_age <- size_weight_illusion[size_weight_illusion$PPT != "DF", "YRS"] # Controls
+
+BTD_cov(case_task = DF_V_SWI, case_covar = DF_age, control_task = CON_V_SWI,
+        control_covar = CON_age, iter = 100)
+```
+
+### Testing for a dissociation
+
+If we want to assess whether DF has a dissociation between two functions we can
+use a modified paired samples t-test to assess the size of the difference
+between the case scores from the two tasks to the distribution of differences
+between the tasks in the controls. This can however only be done directly using
+the t-distribution if the tasks are measured on the same scale and is called the
+unstandardised difference test [UDT: @crawford_testing_2005]. In the
+`size_weight_illusion` dataset it is possible to use this test to whether
+patient DF exhibits a dissociation between visual size-weight illusion and
+kinesthetic size-weight illusion because the visual and kinaesthetic conditions
+are parallel versions of the same task, with different sensory cues. This would
+be done as shown below:
+
+```{r UDT}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
+CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
+
+UDT(case_a = DF_V_SWI, case_b = DF_K_SWI, controls_a = CON_V_SWI, controls_b = CON_K_SWI)
+```
+
+Most often this is not possible because we wish to estimate abnormality of 
+discrepancy on tasks that are not comparable. So otherwise, that
+is if the scores must be standardised to be comparable, a statistic that
+approximates the t-distribution has been developed and should be used [the
+revised standardised difference test RSDT: @crawford_testing_2005]. 
+The visual and kinesthetic size-weight illusion will be used for illustrative
+purposes here as well:
+
+```{r RSDT}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
+CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
+
+RSDT(case_a = DF_V_SWI, case_b = DF_K_SWI, controls_a = CON_V_SWI, controls_b = CON_K_SWI)
+```
+
+A Bayesian version of this test was also developed (Crawford & Garthwaite, 2005),
+however, unlike `TD` and `BTD` the `RSDT` and `BSDT` (Bayesian standardised
+difference test) differ somewhat and `BSDT` has been shown to keep a better
+control of Type I errors if a patient exhibits extreme deficits on both tasks of
+interest. Therefore the `BSDT` is recommended above `RSDT`. The usage of the two
+R functions is very similar. Since the `BSDT` is based on MCMC methods it can be
+quite computationally intensive, depending on the number of iterations you choose.
+
+
+```{r BSDT}
+
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
+CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
+
+BSDT(case_a = DF_V_SWI, case_b = DF_K_SWI, controls_a = CON_V_SWI, controls_b = CON_K_SWI, iter = 1000)
+```
+
+Just as for `BTD` a version of `BSDT` allowing for
+covariates has been developed. This test assess the patient on the discrepancy
+between the tasks of interest by essentially comparing him/her to the controls
+with the same score on the covariate. 
+
+```{r BSDT_cov}
+# Extracting scores from the visual size-weight illusion from size_weight_illusion 
+DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
+CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
+
+DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
+CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
+
+# Extracting the coviariate below
+DF_age <- size_weight_illusion[size_weight_illusion$PPT == "DF", "YRS"] # Patient
+CON_age <- size_weight_illusion[size_weight_illusion$PPT != "DF", "YRS"] # Controls
+
+BSDT_cov(case_tasks = c(DF_V_SWI, DF_K_SWI ), case_covar = DF_age,
+         control_tasks = cbind(CON_V_SWI, CON_K_SWI), control_covar = CON_age, iter = 1000)
+```
+All of the functions above can also take summary (mean, sd, control sample size) data as input.
+
+### Power calculators
+
+A further capacity of `singcar` is that it can be used to calculate power for
+for these single case-control comparisons. Calculations for all Bayesian tests
+and `RSDT` are simulation based and (especially the tests with covariates) can
+be computationally intense. Calculators for `TD` and `UDT` (unstandardised
+difference test) are exact (their power functions have been derived
+analytically) and can both be used to find a specific sample size given a
+desired power. For the other calculators all parameters must be given. Means and
+standard deviations for the control population are at default set to 0 and 1
+meaning that the case value will be interpreted as differences from the mean in
+standard deviations, these parameter values can be changed as you like. Examples
+are given below:
+
+```{r power}
+TD_power(case = -2, power = 0.8, mean = 0, sd = 1, alternative = "two.sided")
+
+TD_power(case = 70, sample_size = 10, mean = 100, sd = 15, alternative = "less", alpha = 0.1)
+
+RSDT_power(case_a = 70, case_b = 20, mean_a = 100, mean_b = 25, sd_a = 15, sd_b = 10, sample_size = 10) 
+
+# Takes long time to compute therefore iterations and number of simulations are low. Iter corresponds
+# to number of simulations in BTD_cov, nsim to the number of simulations in the power calculator.
+BTD_cov_power(case = -2, case_cov = 0, control_task = c(0, 1),
+             control_covar = c(0, 1), cor_mat = diag(2), sample_size = 10, nsim = 50, iter = 50)
+
+```
+
+## Functions
+
+The main functions of `singcar` are hitherto:
+
+Frequentist tests:
+
+* `TD()`: The test of deficits. Used to test for abnormality on a single variate.
+* `UDT()`: The unstandardised difference test. Used to test for discrepancy 
+  between two variates measured on the same scale.
+* `RSDT()`: The revised standardised difference test. Used to test for discrepancy 
+  between two variates measured on different (or the same) scale.
+
+Bayesian tests:
+
+* `BTD()`: Bayesian test of deficit. Used to test for abnormality on a single variate.
+* `BSDT()`: Bayesian standardised difference test. Used to test for discrepancy 
+  between two variates measured on the same scale or different scales (depending on the `unstandardised`
+  argument).
+* `BTD_cov()`: Bayesian test of deficit with covariates. Used to test for abnormality on a single variate
+  conditioned on some covariate such as e.g. age or education level.
+* `BSDT_cov()`: Bayesian standardised difference test with covariates. Used to test for discrepancy 
+  between two variates conditioned on some covariates such as e.g. age or education level.
+
+Power calculators:
+
+* `TD_power()`: Calculates exact power given sample size or necessary sample
+ size for desired power using analytical methods for the test of deficit.
+* `BTD_power()`: Calculates approximate power given sample size using Monte
+ Carlo simulations for the Bayesian test of deficit.
+* `BTD_cov_power()`: Calculates approximate power given sample size using Monte
+ Carlo simulations for the Bayesian test of deficit with covariates.
+* `UDT_power()`: Calculates exact power given sample size or necessary sample
+ size for desired power using analytical methods for the unstandardised
+ difference test.
+* `RSDT_power()`: Calculates approximate power given sample size using Monte
+ Carlo simulations for the revised standardised difference test.
+* `BSDT_power()`: Calculates approximate power given sample size using Monte
+ Carlo simulations for the Bayesian standardised difference test.
+* `BSDT_cov_power()`: Calculates approximate power given sample size using Monte
+ Carlo simulations for the Bayesian standardised difference test with covariates.
+
+
+# Details
+
+## Statistical methods for finding deficits and dissociations
+
+The aim of this section is not to provide an exhaustive mathematical
+understanding of the formulas used but rather a conceptual understanding.
+This is written from a neuropsychological perspective. However, that does
+not make the tests exclusive to such an application.
+
+### Frequentist approaches
+
+In the latter part of the 90's Crawford and colleagues started developing
+statistical tests to use for evaluating single cases that were compared to
+normative control samples. Typically, the prior methods used treated the
+distribution estimated by the the control group as if the sample statistics were
+the population parameters. That is, the estimated distribution was treated as a
+standard normal distribution from which abnormality of the case score was
+estimated by:
+
+\begin{equation}
+z = \frac{x^* - \overline{x}}{\sqrt{s^2}}
+(\#eq:1)
+\end{equation}
+
+This is similar to the familiar z-formula but here $x^*$, $\overline{x}$ and
+$s^2$ is the case score, sample mean and sample variance respectively.
+$\overline{x}$ and $s^2$ is plugged in directly as the population parameters
+$\mu$ and $\sigma^2$ in the normal z-formula. The p-value obtained from the
+z-value would then be treated as the estimation of the case's abnormality. This
+is problematic because the sampling distribution of $s^2$ is right skewed for
+small sample sizes. This means that underestimation of $s^2$ is more probable
+than overestimation and hence the z-value would often be larger than it should,
+resulting in an overestimation of the abnormality and inflation of Type I errors
+(claiming that there is an effect when, in fact, there is not)
+[@crawford_comparing_1998].
+
+With a similar logic as in \@ref(eq:1), @payne_statistics_1957 developed a method for assessing
+abnormally large discrepancies between two tasks. I.e. a test that estimates
+the proportion of the control population that would exhibit a greater discrepancy
+than the case, as seen in \@ref(eq:2).
+
+\begin{equation}
+z_{disc} = \frac{(z^*_a - z^*_b) - {(\overline{z}_a - \overline{z}_b)} }{\sqrt{2-2r_{ab}}} = \frac{(z^*_a - z^*_b)}{\sqrt{2-2r_{ab}}}
+(\#eq:2)
+\end{equation}
+
+Where $z^*_a$ and $z^*_b$ are the standardised case scores on task A and B
+respectively, $\overline{z}_a$ and $\overline{z}_b$ the means from the sample on
+the two tasks (which both equates 0 because of standardisation) and  $r_{ab}$
+the correlation between the two tasks calculated from the sample scores.
+However, this test suffers from the same problem mentioned above and would
+overestimate the abnormality of the task discrepancies.
+
+A different approach to comparing a single observation to the mean of a sample
+was proposed by @sokal_biometry_1981 (p. 227) and popularised within
+neuropsychology by @crawford_comparing_1998. Here the t-distribution (with its
+fatter tails) is utilised to account for the underestimation of the sample
+variance. The approach is a modified two samples t-test where the case simply is
+treated as a sample of size 1. The degrees of freedom for this distribution is
+$n + 1 - 2 = n - 1$.
+
+\begin{equation}
+t_{n-1} = \frac{X^* - \overline{X}}{s \sqrt{\frac{n + 1}{n}}}
+(\#eq:3)
+\end{equation}
+
+This test of deficit (TD) has been shown to not exceed the specified error rate
+$\alpha$ unlike other similar tests [@crawford_comparing_2009;
+@crawford_inferential_2004; @crawford_single-case_2012]. Together with its
+simplicity this makes it a superior choice over many other ways of
+detecting outliers in small samples. One of its main advantages is that it
+provides the researcher with an *unbiased* point estimate of the abnormality of
+the case.
+
+@crawford_payne_1998 extended this to @payne_statistics_1957 test of task
+discrepancy or with @crawford_payne_1998\'s denotation: 'difference'^[In
+@crawford_payne_1998 they use the term 'difference' instead of discrepancy.
+This is a somewhat unfortunate usage since a difference can pretty much refer to
+anything. Hence, 'discrepancy' will be used for the most part when referring to
+the difference between scores from two tasks]. I.e. they devised a test that treated sample
+estimations as statistics rather than population parameters for dissociations as well, seen
+in \@ref(eq:4).
+\begin{equation}
+t_{n-1} = \frac{(z^*_a - z^*_b) {- (\overline{z}_a - \overline{z}_b)} }{\sqrt{(2-2r_{ab})(\frac{n+1}{n})}} = \frac{(z^*_a - z^*_b)}{\sqrt{(2-2r_{ab})(\frac{n+1}{n})}}
+(\#eq:4)
+\end{equation}
+Unfortunately the standardised task scores of the case $z^*_a$ and  $z^*_b$
+suffer from the same problem described for \@ref(eq:1) and Type I errors
+would again be inflated. However, standardisation
+of the scores is only necessary if the two tasks are measured on different scales.
+If they are measured on the same the test holds and we have the unstandardised
+difference test (UDT):
+
+\begin{equation}
+t_{UDT_{n-1}} = \frac{(x^*_a - \overline{x}_a) - (x^*_b - \overline{x}_b) }{\sqrt{(s^2_a +s^2_b -2s_a s_br_{ab})(\frac{n+1}{n})}}
+(\#eq:5)
+\end{equation}
+
+The denominator in the \@ref(eq:5) collapse to the denominator in \@ref(eq:4)
+since $s_a^2$ and $s_b^2$ become 1 after standardisation.
+However, since assessment of task discrepancy between tasks measured on different scales
+is common, a test that could take standardised scores but still account for the skewness in
+the sampling distribution of the sample variance was needed. In
+@garthwaite_distribution_2004 the authors examined the difference between two
+correlated, t distributed variables and aimed to derive a quantity with a
+distribution that would not depend on any population parameters. The math
+behind this derivation is too technical to be covered here, but
+in summation they used asymptotic expansion to find a function of the
+correlation between the variables that when used as a denominator to 
+$(t_1 - t_2)$, where $t_1$ and $t_2$ are our t distributed variables, would
+approximate a t-distribution. The quantity found was:
+
+
+\begin{equation}
+\psi=\frac{\frac{(x^*_a-\overline{x}_a)}{s_{a}}-\frac{(x^*_b-\overline{x}_b)}{s_{b}}}{
+\sqrt{
+(\frac{n+1}{n}) 
+\left( (2-2 r)+
+\frac{2(1-r^{2})}{n-1}+
+\frac{(5+y^{2})(1-r^{2})}{2(n-1)^{2}}+
+\frac{r(1+y^{2})(1-r^{2})}{2(n-1)^{2}}\right)
+}}
+\end{equation}
+
+Where $r$ is the correlation between the tasks and $y$ the critical two-tailed
+t-value with $n-1$ degrees of freedom. @garthwaite_distribution_2004 demonstrate
+that $\mathbb{P}[\psi > y]\approx\mathbb{P}[t >y]$, where $\approx$ indicates
+approximate equivalence. To obtain a precise probability for $\psi$ one solves
+for $\psi = y$. See @garthwaite_distribution_2004 and
+@crawford_testing_2005 for details. Choosing the positive root of $\psi = y$ yields:
+
+\begin{align}
+\begin{split}
+y & = \sqrt{\frac{ -b + \sqrt{b^2 - 4ac}}{2a}}, \text{where} \\
+a & = (1+r)(1-r^2), \\
+b & =  (1-r)[4(n-1)^2+4(1+r)(n-1)+(1+r)(5+r)], \\
+c & =  - 2\left[\frac{X^*_{A} - \overline{X}_A}{s_A}-\frac{X^*_B -\overline{X}_B}{s_B}\right]^2\left(\frac{n(n-1)^2}{n+1}\right)
+\end{split}
+(\#eq:7)
+\end{align}
+
+Where $y$ is used as a t-statistic. This quantity is referred to as the revised
+standardised difference test (RSDT). @crawford_testing_2005 show with Monte
+Carlo simulations that this test is superior to both their own previous test
+[@crawford_payne_1998] and @payne_statistics_1957\'s in controlling Type I
+errors. Even for very small sample sizes of $n=5$, RSDT was shown to barely
+exceed the specified 5% error rate. So three valid frequentist tests remain, for
+deficits that is TD \@ref(eq:3), for dissociations that is UDT \@ref(eq:5) and
+RSDT \@ref(eq:7).
+
+For TD and UDT, @crawford_investigation_2002 utilise the
+non-central t-distribution to set confidence limits on the abnormality of the
+case, something that grows ever more essential for reminding us that all test results
+come with uncertainty. However, it did not prove possible to set confidence
+limits on the estimations from the RSDT since it is only approximately t-distributed.
+This is one of the reasons why @crawford_comparison_2007
+wanted to develop a Bayesian method for estimating abnormality of discrepancy.
+
+The test of deficit is most commonly used one-sided but the
+dissociation tests should in most cases be used two-sided as the direction
+of the effect solely depends on the order of the task scores.
+
+### Bayesian approaches
+
+There is one main difference between Bayesian and frequentist statistical
+inference. In the Bayesian framework parameters (like means and standard
+deviations) are treated as random variables with associated probability
+distributions and if we believe a parameter has a certain distribution we update
+that belief as more data is gathered and thus the parameter values can change.
+Whilst, in the frequentist framework, parameters are treated as fixed attributes
+of a population, estimations of which in a series or frequency (hence the
+name) of trials will converge to the *true* value.
+
+An intuitive way of
+understanding the difference is to note how the two approaches phrase intervals
+around parameters. The frequentist 95% *confidence interval* would cover the
+population parameter 95% of the time. That is, if you estimate a population mean
+from 100 different samples and create a confidence interval around each
+estimation, 95 of these intervals would include the true population mean. The
+Bayesian 95% *credible interval*, however, has a more intuitive interpretation.
+For this interval you say that with a 95% certainty the population mean is
+covered by the interval. That is because you take the values at the 2.5th and 97.5th
+percentile of the parameter distribution to form the interval.
+
+To estimate a parameter distribution Bayesians use prior knowledge of
+that parameter, i.e. they assign probabilities to possible
+values of the parameter depending on this knowledge &#8212; forming what is
+known as a prior distribution, or simply a prior. If no information exists one
+often apply a non-informative prior, the most simple of which assigns equal
+probabilities (uniform) to all possible parameter values. This is then updated
+when new information is obtained. The distribution formed by the updated prior
+is called the posterior distribution. The posterior probability of a hypothesis
+(i.e. a specified value of the parameter) is calculated by using Bayes
+theorem:
+
+\begin{equation}
+\underbrace{\mathbb{P}[H \ |\ E]}_{\text{Posterior}} = \frac{\overbrace{\mathbb{P}[E \ | \ H]}^{\text{Likelihood}} \times \overbrace{\mathbb{P}[H]}^{\text{Prior}}}{\underbrace{\mathbb{P}[E]}_{\text{Marginal likelihood}}}
+(\#eq:bayes)
+\end{equation}
+
+The $H$ stands for hypothesis which may be affected by $E$, evidence, i.e. the data (not used
+to estimate the prior). $\mathbb{P}[E \ | \ H]$ is the probability of observing
+the data, given a hypothesis. $\mathbb{P}[H \ |\ E]$ is the probability of a
+hypothesis given that some data have been observed. Say for example
+that we want to estimate IQ in a population with a sample of $n=3$. By calculating
+the mean, standard deviation and standard error from this sample we can create 
+a sampling distribution of the mean. The marginal
+likelihood, $\mathbb{P}[E]$ will be a constant since it does not contain $H$, we can therefore
+disregard that for now.
+If we assume a uniform prior, i.e. we do not believe that any hypothesis is more
+likely than another, $\mathbb{P}[H]$ will also be a constant, reducing \@ref(eq:bayes) to:
+
+\begin{equation*}
+\mathbb{P}[H \ | \  E] = \mathbb{P}[E \ | \ H]
+\end{equation*}
+
+Say that our sample had IQs of $x_1 = 110, \ x_2= 115, \ x_3 = 120$. The sample
+has a mean of 115, a standard deviation of 5 and a standard error of
+$5/\sqrt{n}$. Our theoretical sampling distribution of the mean (i.e. the
+distribution of means if we draw a sample of $n=3$ an infinite number of times)
+would thus be a normal distribution with mean 115 and standard deviation =
+standard error = $5/\sqrt{n}$. To get the posterior distribution we now
+calculate the probability of observing the data given another hypothesised mean.
+To get the posterior probability for any
+hypothesis, say $\mu = 118$, we thus calculate:
+\begin{align*}
+\begin{split}
+\mathbb{P}[H = 118 \ | \ E = (110, 115, 120)] = &  \mathbb{P}[E = (110, 115, 120) | \ H = 118] = 
+\\ &  \mathbb{P}[E = 110 \ | \ H = 118] \times  \\ & \mathbb{P}[E = 115 \ | \ H = 118] \times \\
+& \mathbb{P}[E = 120 \ | \ H = 118]
+\end{split}
+\end{align*}
+That is, calculating the joint probability of observing $x_1, \ x_2 \ \text{and}
+\ x_3$ given that our observations instead would have come from a distribution
+with a mean of 118. This is then done for all possible hypotheses, i.e. values
+of $\mu$, creating a probability distribution of the parameter. The peak of this
+distribution would in fact be the maximum likelihood estimate of the mean, which
+is used in more classical estimation methods. Hence, using a non-informative prior
+often yields estimations with frequentist properties^[A Bayesian 95% credible interval can
+for example be said to have good frequentist properties if it would cover the
+parameter 95% of the times it is created (as is the case for the frequentist 95%
+confidence interval)].
+
+However, if we for example have on good authority that mean IQ in the sampled
+population is 125 with an SD of 5, we specify our prior as such. This is then
+weighed in when calculating the posterior. That is, we calculate the joint
+probability that we have observed our data given a hypothesis ($\mu$) and the
+probability of observing that $\mu$ in the prior distribution. This is done for
+all possible hypotheses, just as previously shown. Often one wants to use
+non-informative priors as to not arbitrarily bias the results. For an accessible
+and more thorough explanation of Bayesian statistics, see e.g.
+@donovan_bayesian_2019.
+
+The example given here is a special case of Bayesian parameter estimation
+that can be solved analytically.^[The difference between analytic and numerical
+problem solving is that analytic solutions are exact as well as derived and
+presented in (for the mathematician) understandable forms. A numerical solution
+involves "guesswork" and is stopped when a solution is found
+that satisfies the problem. This method only approximates the "true" solution.
+Monte Carlo simulations belong to the latter category.] However, this is in many
+cases not possible. Instead one utilise Markov Chain Monte Carlo (MCMC) methods.
+A Markov Chain describe a series of events where the probability for each of
+them solely depends on the one preceding it. Monte Carlo methods are mathematical
+algorithms that solves problems by random generation of numbers. The idea
+behind this in Bayesian statistics is that one estimates the posterior by drawing a large amount
+of random samples from it. Thus "building" it from scratch. Because the denominator
+in \@ref(eq:bayes) is a constant and we can ignore it, this becomes possible.
+Bayes theorem can then be rewritten as:
+ \begin{equation}
+ posterior \ \propto \ likelihood \times prior
+ \end{equation}
+What this is saying is that the posterior density of a hypothesis 
+is proportional ($\propto$) to the likelihood of the data under
+that hypothesis times the prior density of the hypothesis. The methods
+for drawing these samples differ depending on the type of distribution
+and problem at hand. But in general they are all building on algorithmic
+rules ("recipes") of drawing random numbers based on the likelihood and the prior,
+saving them and after a large number of iterations observing the distribution
+they form. The average of which often is the parameter of interest. 
+
+#### The Bayesian test of deficit
+
+Assume a sample of $n$ controls on which we measure some value x that is
+normally distributed with mean $\mu$ and variance $\sigma^2$. Let $\overline{x}$
+and $s^2$ denote the sample mean and sample variance respectively. The case is
+denoted $x^*$. The prior used is non-informative, see @crawford_comparison_2007
+and @degroot_probability_2012 (p. 495) for the formal specification of the
+prior. The algorithm developed in @crawford_comparison_2007 for obtaining a
+point estimate of a case's abnormality $p$, i.e. a p-value or the proportion of
+controls that would fall below the case and accompanying intervals is as
+follows:
+
+1. Let $\psi$ be a random draw from a $\chi^2$-distribution on $n-1 \ df$.
+Then let $\hat{\sigma}^2 = \frac{(n-1)s^2}{\psi}$ be the estimation of 
+$\sigma^2$ for this iteration.
+
+2. Let $z$ be a random draw from a standard normal distribution. 
+Then let $\hat{\mu}=\overline{x}+z\sqrt{(\hat{\sigma}^2/n)}$ be
+the estimate of $\mu$ for this iteration.
+
+3. With estimates of $\mu$ and $\sigma$, $p$ is calculated conditional
+on these estimates being the correct $\mu$ and $\sigma$ by calculating
+$z^*= \frac{x^* - \hat{\mu}}{\sqrt{\hat{\sigma}^2}}$. Let $\hat{p}_i =\mathbb{P}[Z < z^*]$
+be the estimate of $p$ for this iteration. That is the probability of drawing a
+value less than $z^*$ from a standard normal distribution. 
+
+4. Repeating these steps a large number of times will yield a distribution
+of $\hat{p}$, the average of which is the point estimate of $p$. If repeated
+e.g. 1000 times, the 25th smallest and 25th largest $\hat{p}_i$ ($i$ for iteration) is the lower and
+upper boundaries of the 95% Bayesian credible interval for $p$. 
+
+@crawford_comparison_2007 
+show that this method yields converging results to that of TD \@ref(eq:3).
+As noted, this is often the case when using a non-informative
+prior, however, not always. For example, RSDT and its Bayesian analogue (BSDT)
+do not produce identical results. @crawford_comparison_2007 showed that when
+there was no discrepancy between task A and B, but the case was severely impaired
+on both of them, RSDT exhibited an error rate much larger than the specified
+$\alpha$-level. For example, when the case had a deficit of 8 SD on both task A
+and B but no discrepancy, RSDT gave a false positive (Type I error) in $34.72$%
+of the simulations ($n = 10$). The BSDT on the other
+hand gave a false positive under the same circumstances in $8.29$% of the
+simulations. When there was no deficit on either task BSDT had a Type I error
+rate of $7.32$%. compared to RSDT with an error rate of $4.6$%. It is also
+argued that considering the often large effects of brain damage, this is an
+acceptable tradeoff.
+
+#### The Bayesian standardised difference test
+
+Assume a sample of $n$ controls on which we measure some value x and y from
+task A and B. Let $\overline{x}$ and $\overline{y}$ denote the sample means
+and
+\begin{equation*}
+\pmb{A}=\begin{pmatrix}
+s_{xx} & s_{xy} \\
+s_{xy} & s_{yy} \end{pmatrix}
+\end{equation*}
+the sample covariance matrix (note that $s_{xx}$ is not the same as $s_{x}$ and
+denotes variance instead of standard deviation). It is assumed that the observations
+come from a bivariate normal distribution with mean $\pmb{\mu}$ and variance $\pmb{\Sigma}$,
+note that the parameters are bolded as to represent the vector and matrix:
+
+\begin{equation*}
+\pmb{\mu} = \begin{pmatrix}
+\mu_x \\
+\mu_y \end{pmatrix} \ \text{and} \ \pmb{\Sigma}=\begin{pmatrix}
+\sigma_{xx} & \sigma_{xy} \\
+\sigma_{xy} & \sigma_{yy} \end{pmatrix}
+\end{equation*}
+
+Let the case scores be denoted $x^*$ and $y^*$. Just as for the frequentist
+dissociation tests we want to estimate the proportion $p$ of the control
+population that would exhibit a greater difference $x-y$ than the case's
+$x^*-y^*$. A non-informative prior was again specified, see
+@crawford_comparison_2007 and @jeffreys_theory_1998. The algorithm for
+obtaining $\hat{p}_i$, the $i$th estimation of $p$ in @crawford_comparison_2007 follows below:
+
+1. Let 
+\begin{equation*}
+\pmb{\widehat{\Sigma}}=\begin{pmatrix}
+\hat{\sigma}_{xx} & \hat{\sigma}_{xy} \\
+\hat{\sigma}_{xy} & \hat{\sigma}_{yy} \end{pmatrix}
+\end{equation*}
+be a random draw from an inverse-Wishart distribution (a multivariate generalisation of the $\chi^2$-distribution) on $n$ degrees of freedom with
+scale matrix $\pmb{A}$. And let $\pmb{\widehat{\Sigma}}$ be the
+estimate of $\pmb{\Sigma}$ for this iteration. 
+
+2. Let $z_1$ and $z_2$ be two random draws from a standard normal distribution.
+Perform Cholesky decomposition on $\pmb{\widehat{\Sigma}}$, that is finding the lower triangular matrix $\pmb{T}$
+such that $\pmb{T}\pmb{T'}=\pmb{\widehat{\Sigma}}$. Then 
+\begin{equation*}
+\pmb{\hat{\mu}} = \begin{pmatrix}
+\hat{\mu}_x \\
+\hat{\mu}_y \end{pmatrix} = \begin{pmatrix}
+\overline{x} \\
+\overline{y} \end{pmatrix}+ \pmb{T} \begin{pmatrix}
+z_1 \\
+z_2 \end{pmatrix} \cdot \frac{1}{n}
+\end{equation*}
+is the estimation of $\pmb{\mu}$ for this iteration.
+
+3. With estimations of $\pmb{\mu}$ and $\pmb{\Sigma}$ we can calculate $p$, given that 
+they are the the correct values of $\pmb{\mu}$ and $\pmb{\Sigma}$. If an unstandardised
+test is desirable put:
+\begin{equation*}
+z^* = \frac{(x^* - \hat{\mu}_x) - (y^* - \hat{\mu}_y)}{\sqrt{\hat{\sigma}_{xx}+\hat{\sigma}_{yy}-2\hat{\sigma}_{xy}}}
+\end{equation*}
+If a standardised test is required, put: 
+\begin{equation*}
+z_x = \frac{(x^* - \hat{\mu}_x)}{\sqrt{\hat{\sigma}_{xx}}}, \ z_y = \frac{(x^* - 
+\hat{\mu}_y)}{\sqrt{\hat{\sigma}_{yy}}} \ \text{and} \ \hat{\rho}_{xy} = \frac{\hat{\sigma}_{xy}}{\sqrt{\hat{\sigma}_{xx}\hat{\sigma}_{yy}}}
+\end{equation*}
+and
+\begin{equation*}
+z^* = \frac{z_x - z_y}{\sqrt{2-2\hat{\rho}_{xy}}}
+\end{equation*}
+
+4. Let $\hat{p}_i$ be the tail area of a standard normal distribution
+less or greater than $z^*$ (depending on alternative hypothesis). 
+$\hat{p}_i$ is then the estimate of $p$ for this iteration. Repeating these
+steps a large number of times will yield a distribution of $\hat{p}$, the
+average of which is the point estimate of $p$. If repeated e.g. 1000 times, the
+25th smallest and 25th largest $\hat{p}_i$ is the lower and upper boundaries of the 95%
+Bayesian credible interval for $p$.
+
+#### Bayesian tests allowing for covariates
+
+The need to use matched samples when comparing a single case
+to a control sample has often often led to control
+samples being small. In an attempt to remedy this @crawford_comparing_2011
+followed up the previously described tests by developing methods that allow
+for the case to be assessed on abnormality in the presence of covariates. 
+That is, the tests let you compare the case's score on the task of interest
+conditioned upon the results of the controls having the same score on the
+covariate(s). If a patient has 15 years of education, his/her score on
+the task would be compared to the controls with equal length of education.
+This reduces the need to perfectly match control samples and is thus
+a major contribution to the field.
+
+The procedural details of these tests are soon going to be updated in the
+current vignette, but if used before that one thing is important to note. In
+@crawford_comparing_2011 they change the recommendation of the prior to use,
+when testing for a dissociation. In @berger_objective_2008 it is shown that
+the prior used in @crawford_comparison_2007 has good frequentist properties
+for estimating $\sigma_x$ and $\sigma_y$ but less so for $\rho$ or the
+discrepancy size. Instead they recommend a calibrated prior. The main
+difference being that an accept/reject algorithm is applied after the initial
+draw from the inverse-Wishart distribution. Many Bayesians would argue that
+good frequentist properties are not necessary when conducting a Bayesian
+analysis. If so, one can use the "standard theory" @jeffreys_theory_1998\'s
+prior. In `singcar` both types of priors are implemented for both tests. If
+one wants to compare the results from them, the same prior should be used.
+
+
 # References
-
-Crawford, J., & Garthwaite, P. (2002). Investigation of the single case in
-neuropsychology: Confidence limits on the abnormality of test scores and test
-score differences. Neuropsychologia, 40(8), 1196-1208.
-https://doi.org/10.1016/S0028-3932(01)00224-X
-
-Crawford, J., & Garthwaite, P. (2007). Comparison of a single case to a control
-or normative sample in neuropsychology: Development of a Bayesian approach.
-Cognitive Neuropsychology, 24(4), 343-372.
-https://doi.org/10.1080/02643290701290146
-
-Crawford, J., & Garthwaite, P. (2005). Testing for Suspected Impairments and Dissociations in Single-Case Studies in Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and Revised Tests for Dissociations. Neuropsychology, 19(3), 318-331. https://doi.org/10.1037/0894-4105.19.3.318
-
-Crawford, J., Garthwaite, P., & Ryan, K. (2011). Comparing a single case to a control sample: Testing for neuropsychological deficits and dissociations in the presence of covariates. Cortex, 47(10), 1166-1178. https://doi.org/10.1016/j.cortex.2011.02.017
-
-Crawford, J., & Howell, D. (1998). Comparing an Individual's Test Score Against Norms Derived from Small Samples. The Clinical Neuropsychologist, 12(4), 482-486. https://doi.org/10.1076/clin.12.4.482.7241
-
-Hassan, E. K., Sedda, A., Buckingham, G., & McIntosh, R. D. (2020). The size-weight illusion in visual form agnosic patient DF. Neurocase, 1-8. https://doi.org/10.1080/13554794.2020.1800748
