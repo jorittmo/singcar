@@ -284,7 +284,7 @@ test_that("errors are working for BSDT_power", {
 
 test_that("TD_power and BSDT_power power estimations in the same range when r = 0.5", {
 
-  set.seed(12344)
+  set.seed(123123)
   expect_equal(TD_power(-2, sample_size = 15, alternative = "less"),
                BSDT_power(-2, 0, r_ab = 0.5, sample_size = 15,
                           alternative = "less", nsim = 50, iter = 50), tolerance = 0.06)
