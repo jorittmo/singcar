@@ -1,13 +1,18 @@
 Package: singcar
-Title: Functions for comparing single cases against a normative control group
+Title: Comparing Single Cases to Small Samples
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Jonathan",
-           family = "Rittmo",
-           role = c("aut", "cre"),
-           email = "j.rittmo@gmail.com",
-           comment = c(ORCID = "0000-0001-5075-0166"))
-Description: Contains functions for comparing single cases against a normative control group.
+    c(person(given = "Jonathan",
+             family = "Rittmo",
+             role = c("aut", "cre"),
+             email = "j.rittmo@gmail.com",
+             comment = c(ORCID = "0000-0001-5075-0166")),
+      person(given = "Robert",
+             family = "McIntosh",
+             role = c("aut"),
+             email = "r.d.mcintosh@ed.ac.uk",
+             comment = c(ORCID = "0000-0002-7615-6699")))
+Description: When comparing single cases to control populations and no parameters are known researchers must estimate these with a control sample. This is often done when estimating a case's abnormality on some variable or estimating the discrepancy between two variables. Both frequentist and Bayesian methods for such comparisons have been developed during the last 22 years by, mainly, John Crawford and Paul Garthwaite to provide transparent control over Type I errors and e.g. allow for inclusion of covariates. These methods are, along with respective power calculators, implemented in this package.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -17,10 +22,11 @@ Imports:
     stats,
     CholWishart,
     MASS
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
+    bookdown,
     testthat (>= 2.1.0)
 VignetteBuilder: knitr
-URL: https://github.com/AljosjaK/singcar
-BugReports: https://github.com/AljosjaK/singcar/issues
+URL: https://github.com/jorittmo/singcar
+BugReports: https://github.com/jorittmo/singcar/issues
