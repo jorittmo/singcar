@@ -30,6 +30,11 @@ to a smaller of equal weight (Charpentier, 1891). From this data, one can
 assess DF's ability to get affected by the illusion in both a visual and a
 kinaesthetic task. The measure of the size-weight illusion is a scaled
 measure expressed as the number of grams weight difference perceived per
-cubic cm of volume change (Hassan et al, under review).
+cubic cm of volume change (Hassan et al, 2020).
+}
+\references{
+Hassan, E. K., Sedda, A., Buckingham, G., & McIntosh, R. D. (2020). The
+size-weight illusion in visual form agnosic patient DF. Neurocase, 1-8.
+https://doi.org/10.1080/13554794.2020.1800748
 }
 \keyword{datasets}

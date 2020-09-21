@@ -23,7 +23,7 @@ TD(
 single value, treated as mean.}
 
 \item{sd}{If input of controls is single value, the standard
-deviation of the sample must be gven as well.}
+deviation of the sample must be given as well.}
 
 \item{sample_size}{If input of controls is single value, the size of the
 sample must be gven as well.}
@@ -32,9 +32,9 @@ sample must be gven as well.}
 must be one of \code{"less"} (default), \code{"greater"} or
 \code{"two.sided"}. You can specify just the initial letter.}
 
-\item{conf_int}{Calculate confidence intervals for desired estimate. Uses
-iterative method, set to \code{FALSE} for faster calculation (e.g. for
-simulations).}
+\item{conf_int}{Initiates a search algorithm for finding confidence
+intervals. Defaults to \code{TRUE}, set to \code{FALSE} for faster
+calculation (e.g. for simulations).}
 
 \item{conf_level}{Level of confidence for intervals.}
 
@@ -45,7 +45,7 @@ calculate. Defaults to a specificity of 0.01.}
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
-A list with class \code{"htest"} containing the following components:
+A list of class \code{"htest"} containing the following components:
 \tabular{llll}{
 \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
@@ -59,14 +59,15 @@ and standard deviations of controls as well as sample size and standard error
 used in the t-formula. \cr\cr \code{alternative}     \tab a character string
 describing the alternative hypothesis.\cr\cr \code{method} \tab a character
 string indicating what type of t-test was performed.\cr\cr \code{data.name}
-\tab a character string giving the name(s) of the data as well as sum
+\tab a character string giving the name(s) of the data as well as
 summaries. }
 }
 \description{
 Crawford and Howell's (1998) modified t-test. Takes a single observation and
 compares it to a distribution estimated by a control sample. Calculates
-standardised difference between case and controls or proportions falling
-above or below the case score as well as associated confidence intervals.
+standardised difference between the case score and the mean of the controls
+and proportions falling above or below the case score, as well as associated
+confidence intervals.
 }
 \details{
 Returns the point estimate of the standardised difference

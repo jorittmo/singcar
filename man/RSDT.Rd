@@ -38,18 +38,18 @@ supply the standard deviation of the sample.}
 \item{sd_b}{If single value for task B is given as input you must
 supply the standard deviation of the sample.}
 
-\item{sample_size}{If X or Y is given as mean and SD you must supply the
+\item{sample_size}{If A or B is given as mean and SD you must supply the
 sample size. If controls_a is given as vector and controls_b as mean and
 SD, sample_size must equal the number of observations in controls_a.}
 
-\item{r_ab}{If X or Y is given as mean and SD you must supply the
+\item{r_ab}{If A or B is given as mean and SD you must supply the
 correlation between the tasks.}
 
 \item{alternative}{A character string specifying the alternative hypothesis,
 must be one of \code{"two.sided"} (default), \code{"greater"} or
 \code{"less"}. You can specify just the initial letter. Since the direction
-of the expected effect depends on which task is set as X and which is set
-as Y, be very careful if changing this parameter.}
+of the expected effect depends on which task is set as A and which is set
+as B, be very careful if changing this parameter.}
 
 \item{exact.method}{If set to \code{FALSE} generates an approximate
 t-statistic used to derive the exact. The exact method can only generate an
@@ -73,19 +73,21 @@ A list with class \code{"htest"} containing the following components:
   case scores expressed as z-scores on task A and Y. Standardised effect size
   (Z-DCC) of task difference between case and controls and point estimate of
   the proportion of the control population estimated to show a more extreme
-  task difference. \cr\cr \code{sample.size}   \tab the size of the control
-  sample\cr\cr \code{null.value}   \tab the value of the difference under the
+  task discrepancy. \cr\cr \code{sample.size}   \tab the size of the control
+  sample\cr\cr \code{null.value}   \tab the value of the discrepancy under the
   null hypothesis.\cr\cr  \code{alternative}     \tab a character string
   describing the alternative hypothesis.\cr\cr \code{method} \tab a character
   string indicating what type of test was performed.\cr\cr \code{data.name}
   \tab a character string giving the name(s) of the data}
 }
 \description{
-A test on the difference between two tasks in a single case, by comparison to
-the difference of the same two tasks in a control sample. Calculates a
-standardised effects size of task difference as well as a point estimate of
-the proportion of the control population that would be expected to show a
-more extreme task difference.
+A test on the discrepancy between two tasks in a single case, by comparison
+to the discrepancy of means in the same two tasks in a control sample.
+Standardises task scores as well as task discrepancy, so the tasks do not
+need to be measured on the same scale. Calculates a standardised effects size
+of task discrepancy as well as a point estimate of the proportion of the
+control population that would be expected to show a more extreme discrepancy.
+Developed by Crawford and Garthwaite (2005).
 }
 \examples{
 RSDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,

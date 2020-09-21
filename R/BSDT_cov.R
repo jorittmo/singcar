@@ -1,21 +1,21 @@
 #' Bayesian Standardised Difference Test with Covariates
 #'
-#' Tests whether the standardized difference between a case's scores
-#' on two tasks (A and B) is significantly different from the standardized
-#' differences between these tasks in a control sample, while controlling for
-#' the effects of covariates.  For example, it could be used to test whether a
-#' case's standardized difference between two tasks is significantly greater
-#' than the standardized differences in controls when controlling for a measure
-#' of processing speed.  Under the null hypothesis the case's standardized
-#' difference, conditioned on the covariate(s), is an observation from the
-#' distribution of conditional standardized differences in the control
-#' population. Returns (a) a signficance test, (b) point and
-#' interval estimates of the effect size for the difference between the case and
-#' controls, and (c) point and interval estimates of the abnormality of the
-#' case's standardized difference (i.e., it estimates the percentage of controls
-#' that would exhibit a more extreme standardized difference).
-#'
+#' Takes two single observations from a case on two variables (A and B) and
+#' compares their standardised discrepancy to the discrepancies of the variables
+#' in a control sample, while controlling for the effects of covariates, using
+#' Bayesian methodology. This test is used when assessing a case conditioned on
+#' some other variable, for example, assessing abnormality of discrepancy when
+#' controlling for years of education or sex. Under the null hypothesis the case
+#' is an observation from the distribution of discrepancies between the tasks of interest
+#' coming from observations having the same score as the case on the
+#' covariate(s). Returns a signficance test, point
+#' and interval estimates of difference betwen the case and the mean of the controls
+#' as well as point and interval estimates of abnormality, i.e. an estimation of
+#' the proportion of controls that would exhibit a more extreme conditioned score.
 #' Developed by Crawford, Garthwaite and Ryan (2011).
+#'
+#' Uses random generation of inverse wishart distributions from the
+#' CholWishart package (Geoffrey Thompson, 2019).
 #'
 #' @param case_tasks A vector of length 2. The case scores from the two tasks.
 #' @param case_covar A vector containing the case scores on all covariates
@@ -31,8 +31,8 @@
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
-#'   of the expected effect depends on which task is set as X and which is set
-#'   as Y, be very careful if changing this parameter.
+#'   of the expected effect depends on which task is set as A and which is set
+#'   as B, be very careful if changing this parameter.
 #' @param int.level The probability level on the Bayesian credible intervals.
 #' @param calibrated Whether or not to use the standard theory (Jeffreys) prior
 #'   distribution (if set to \code{FALSE}) or a calibrated prior examined by
@@ -52,7 +52,7 @@
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
 #'   \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
 #'   p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
-#'   case scores expressed as z-scores on task X and Y. Standardised effect size
+#'   case scores expressed as z-scores on task A and B. Standardised effect size
 #'   (Z-DCCC) of task difference between case and controls and point estimate of
 #'   the proportion of the control population estimated to show a more extreme
 #'   task difference. \cr\cr  \code{null.value}   \tab the value of the
@@ -86,11 +86,15 @@
 #' Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing a single
 #' case to a control sample: Testing for neuropsychological deficits and
 #' dissociations in the presence of covariates. \emph{Cortex, 47}(10),
-#' 1166-1178. https://doi.org/10.1016/j.cortex.2011.02.017
+#' 1166-1178. \url{https://doi.org/10.1016/j.cortex.2011.02.017}
+#'
+#' #' Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
+#' Distribution. R package version 1.1.0.
+#' \url{https://CRAN.R-project.org/package=CholWishart}
 
 BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       alternative = c("two.sided", "greater", "less"),
-                      int.level = 0.95, calibrated = TRUE, iter = 1000,
+                      int.level = 0.95, calibrated = TRUE, iter = 10000,
                       use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
@@ -145,7 +149,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
 
-  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast) # This should be multiplied by (1/n - m - 1) but the I get a discrepancy with C&G
+  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast)
 
   if (calibrated == TRUE) {
 
@@ -198,7 +202,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   for(i in 1:iter) B_vec[i, ] <- MASS::mvrnorm(1, mu = B_ast_vec, Lambda[ , , i])
 
   mu_hat <- matrix(ncol = k, nrow = iter)
-  for (i in 1:iter) mu_hat[i, ] <- matrix(B_vec[i, ], ncol = (m + 1), byrow = TRUE) %*% c(1, case_covar) # THIS SEEMS CORRECT NOW
+  for (i in 1:iter) mu_hat[i, ] <- matrix(B_vec[i, ], ncol = (m + 1), byrow = TRUE) %*% c(1, case_covar)
 
   # Each row indicates the conditional expected values
   # of the case on the tests. case_covar = values from the covariates
@@ -233,7 +237,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   p_est <- mean(pval)
 
   p_int <- stats::quantile(pval, c(alpha/2, (1 - alpha/2)))*100
-  if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100 # This seems wrong
+  if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
 

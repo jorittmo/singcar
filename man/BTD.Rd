@@ -11,7 +11,7 @@ BTD(
   sample_size = NULL,
   alternative = c("less", "greater", "two.sided"),
   int_level = 0.95,
-  iter = 1000,
+  iter = 10000,
   na.rm = FALSE
 )
 }
@@ -33,7 +33,8 @@ must be one of \code{"less"} (default), \code{"greater"} or
 
 \item{int_level}{Level of confidence for credible intervals.}
 
-\item{iter}{Number of iterations.}
+\item{iter}{Number of iterations. Set to higher for more accuracy, set to
+lower for faster calculations.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
@@ -51,15 +52,15 @@ credibility level and intervals for both zcc and estimated proportion. \cr\cr
 and standard deviations of controls as well as sample size.
  \cr\cr \code{alternative}     \tab a character string
 describing the alternative hypothesis.\cr\cr \code{method} \tab a character
-string indicating what type of t-test was performed.\cr\cr \code{data.name}
+string indicating what type of test was performed.\cr\cr \code{data.name}
 \tab a character string giving the name(s) of the data as well as sum
 summaries. }
 }
 \description{
-Takes a single observation and
-compares it to a distribution estimated by a control sample. Calculates
-standardised difference between case and controls or proportions falling
-above or below the case score as well as associated credible intervals.
+Takes a single observation and compares it to a distribution estimated by a
+control sample using Bayesian methodology. Calculates standardised difference
+between the case score and the mean of the controls and proportions falling
+above or below the case score, as well as associated credible intervals.
 }
 \details{
 Returns the point estimate of the standardised difference
@@ -69,10 +70,10 @@ expected to obtain a lower or higher score, depending on the alternative
 hypothesis).
 }
 \examples{
-BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
+BTD(case = -2, controls = 0, sd = 1, sample_size = 20, iter = 1000)
 
 BTD(case = size_weight_illusion[1, "V_SWI"],
-    controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
+    controls = size_weight_illusion[-1, "V_SWI"], alternative = "l", iter = 1000)
 
 }
 \references{

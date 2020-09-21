@@ -52,9 +52,9 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 of the expected effect depends on which task is set as A and which is set
 as B, be very careful if changing this parameter.}
 
-\item{conf_int}{Calculate confidence intervals for desired estimate. Uses an
-iterative search algorithm, set to \code{FALSE} for faster calculation (e.g. for
-simulations).}
+\item{conf_int}{Initiates a search algorithm for finding confidence
+intervals. Defaults to \code{TRUE}, set to \code{FALSE} for faster
+calculation (e.g. for simulations).}
 
 \item{conf_level}{Level of confidence for intervals.}
 
@@ -80,9 +80,16 @@ A list with class \code{"htest"} containing the following components:
   giving the name(s) of the data}
 }
 \description{
-A test on the difference between two tasks in a single case, by comparison to
-a control sample. Use only when the two tasks are measured on the \emph{same}
-scale.
+A test on the discrepancy between two tasks in a single case, by comparison
+to the mean of discrepancies of the same two tasks in a control sample. Use
+\emph{only} when the two tasks are measured on the same scale because no
+standardisation is performed on task scores. Calculates however a
+standardised effect size in the same manner as \code{\link{RSDT}()}. This is
+original behaviour from Crawford and Garthwaite (2005) but might not be
+appropriate. So use this standardised effect size with caution. Calculates a
+standardised effect size of task discrepancy as well as a point estimate of
+the proportion of the control population that would be expected to show a
+more extreme discrepancy and respective confidence intervals.
 }
 \examples{
 UDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,

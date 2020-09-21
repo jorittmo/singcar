@@ -1,18 +1,20 @@
 #' Bayesian Test of Deficit with Covariates
 #'
-#' Tests for a deficit on a task of interest in the single case,
-#' controlling for the effects of covariates. For example, it could be used to
-#' test whether a case's score on a task is significantly lower than the scores
-#' of controls when controlling for years of education.  Under the null
-#' hypothesis the case's score, conditioned on the covariate(s), is an
-#' observation from the distribution of conditional scores in the control
-#' population.  Returns (a) a signficance test, (b) point and
-#' interval estimates of the effect size for the difference between the case and
-#' controls, and (c) point and interval estimates of the abnormality of the
-#' case's score (i.e., it estimates the percentage of controls that would
-#' exhibit a more extreme conditional score).
-#'
+#' Takes a single observation
+#' and compares it to a distribution estimated by a control sample, while
+#' controlling for the effect of covariates, using Bayesian methodology. This
+#' test is used when assessing a case conditioned on some other variable, for
+#' example, assessing abnormality when controlling for years of education or
+#' sex. Under the null hypothesis the case is an observation from the distribution
+#' of scores from the task of interest coming from observations having the same
+#' score as the case on the covariate(s). Returns a signficance test, point
+#' and interval estimates of difference betwen the case and the mean of the controls
+#' as well as point and interval estimates of abnormality, i.e. an estimation of
+#' the proportion of controls that would exhibit a more extreme conditioned score.
 #' Developed by Crawford, Garthwaite and Ryan (2011).
+#'
+#' Uses random generation of inverse wishart distributions from the
+#' CholWishart package (Geoffrey Thompson, 2019).
 #'
 #' @param case_task The case score from the task of interest. Can only be of
 #'   length 1.
@@ -30,7 +32,7 @@
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'   \code{"less"}. You can specify just the initial letter.
-#' @param int.level The probability level on the Bayesian credible intervals.
+#' @param int_level The probability level on the Bayesian credible intervals.
 #' @param iter Number of iterations to be performed. Greater number gives better
 #'   estimation but takes longer to calculate.
 #' @param use_sumstats If set to \code{TRUE}, \code{control_tasks} and
@@ -72,16 +74,20 @@
 #'   a single case to a control sample: Testing for neuropsychological deficits
 #'   and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
 #'   1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
+#'
+#' Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
+#' Distribution. R package version 1.1.0.
+#' \url{https://CRAN.R-project.org/package=CholWishart}
 
 BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      alternative = c("less", "two.sided", "greater"),
-                     int.level = 0.95, iter = 1000,
+                     int_level = 0.95, iter = 1000,
                      use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
 
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
-  if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
+  if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_task) != 1) stop("case_task should be single value")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
   if (!is.null(cor_mat) | !is.null(sample_size)) if (use_sumstats == FALSE) stop("If input is summary data, set use_sumstats = TRUE")
@@ -102,7 +108,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   }
 
-  alpha <- 1 - int.level
+  alpha <- 1 - int_level
 
   n <- length(control_task)
 
@@ -186,7 +192,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   if (alternative == "two.sided") estimate <- c(zccc, (p_est/2)*100)
 
   zccc.name <- paste0("Std. case score (Z-CCC), ",
-                     100*int.level, "% credible interval [",
+                     100*int_level, "% credible interval [",
                      format(round(zccc_int[1], 2), nsmall = 2),", ",
                      format(round(zccc_int[2], 2), nsmall = 2),"]")
 
@@ -203,7 +209,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int.level, "% credible interval [",
+                   100*int_level, "% credible interval [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
@@ -222,7 +228,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      SD = apply(cbind(control_task, control_covar), 2, stats::sd),
                      Case_score = c(case_task, case_covar))
 
-  typ.int <- 100*int.level
+  typ.int <- 100*int_level
   names(typ.int) <- "Interval level (%)"
   interval <- c(typ.int, zccc_int, p_int)
 

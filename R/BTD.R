@@ -1,9 +1,9 @@
 #' Bayesian Test of Deficit
 #'
-#' Takes a single observation and
-#' compares it to a distribution estimated by a control sample. Calculates
-#' standardised difference between case and controls or proportions falling
-#' above or below the case score as well as associated credible intervals.
+#' Takes a single observation and compares it to a distribution estimated by a
+#' control sample using Bayesian methodology. Calculates standardised difference
+#' between the case score and the mean of the controls and proportions falling
+#' above or below the case score, as well as associated credible intervals.
 #'
 #' Returns the point estimate of the standardised difference
 #' between the case score and the mean of the controls and the point estimate
@@ -23,7 +23,8 @@
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
 #' @param int_level Level of confidence for credible intervals.
-#' @param iter Number of iterations.
+#' @param iter Number of iterations. Set to higher for more accuracy, set to
+#'   lower for faster calculations.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
@@ -39,17 +40,17 @@
 #' and standard deviations of controls as well as sample size.
 #'  \cr\cr \code{alternative}     \tab a character string
 #' describing the alternative hypothesis.\cr\cr \code{method} \tab a character
-#' string indicating what type of t-test was performed.\cr\cr \code{data.name}
+#' string indicating what type of test was performed.\cr\cr \code{data.name}
 #' \tab a character string giving the name(s) of the data as well as sum
 #' summaries. }
 #'
 #' @export
 #'
 #' @examples
-#' BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
+#' BTD(case = -2, controls = 0, sd = 1, sample_size = 20, iter = 1000)
 #'
 #' BTD(case = size_weight_illusion[1, "V_SWI"],
-#'     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
+#'     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l", iter = 1000)
 #'
 #' @references
 #' Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
@@ -63,7 +64,7 @@
 
 BTD <- function (case, controls, sd = NULL, sample_size = NULL,
                 alternative = c("less", "greater", "two.sided"),
-                int_level = 0.95, iter = 1000, na.rm = FALSE) {
+                int_level = 0.95, iter = 10000, na.rm = FALSE) {
 
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(sd) == TRUE) {

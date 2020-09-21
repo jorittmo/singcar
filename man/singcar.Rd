@@ -3,14 +3,83 @@
 \docType{package}
 \name{singcar}
 \alias{singcar}
-\title{singcar: A package for analysing case comparisons to normative controls}
+\title{singcar: Comparing Single Cases to Small Samples}
 \description{
-The singcar package provides functions for analysing single case data, mostly based on the work by Crawford and Garthwaite.
+The aim of \pkg{singcar} is to provide and encourage usage of appropriate
+statistical methods for comparing a case against a control sample. For
+instance, they may commonly be done in a neuropsychological context, in which
+an individual has incurred a specific brain injury and we wish to test
+whether this damage has led to an impairment of some cognitive function and
+whether two different functions are dissociable. For many cognitive functions
+there is normed data available which the patient can be compared against
+directly. However, when this is not possible a control sample estimating the
+population, against which we wish to compare the patient, must be used. Both
+frequentist and Bayesian methods have been developed to do this, first and
+foremost by John Crawford and Paul Garthwaite (Crawford et al., 2011;
+Crawford & Garthwaite, 2002, 2007, 2005; Crawford & Howell, 1998). It is
+these methods that \pkg{singcar} implements. Power calculators for each respective
+test are also provided. Although the canonical applications for these tests
+are in Cognitive Neuropsychology or Clinical Neuropsychology, they are
+potentially applicable to any circumstance in which a measure taken from a
+single individual is to be compared against data from a normative sample
+(i.e. a control group). It should be noted that these statistical methods
+could also be applied as a general method of outlier detection in small
+samples.
 }
 \section{singcar functions}{
 
-\code{\link{TD}}
-\code{\link{RSDT}}
-\code{\link{UDT}}
+\code{\link{TD}()}
+
+\code{\link{BTD}()}
+
+\code{\link{BTD_cov}()}
+
+\code{\link{RSDT}()}
+
+\code{\link{UDT}()}
+
+\code{\link{BSDT}()}
+
+\code{\link{BSDT_cov}()}
+
+\code{\link{TD_power}()}
+
+\code{\link{BTD_power}()}
+
+\code{\link{BTD_cov_power}()}
+
+\code{\link{RSDT_power}()}
+
+\code{\link{UDT_power}()}
+
+\code{\link{BSDT_power}()}
+
+\code{\link{BSDT_cov_power}()}
 }
 
+\references{
+Crawford, J., & Garthwaite, P. (2002). Investigation of the single case in
+neuropsychology: Confidence limits on the abnormality of test scores and test
+score differences. Neuropsychologia, 40(8), 1196-1208.
+https://doi.org/10.1016/S0028-3932(01)00224-X
+
+Crawford, J., & Garthwaite, P. (2007). Comparison of a single case to a
+control or normative sample in neuropsychology: Development of a Bayesian
+approach. Cognitive Neuropsychology, 24(4), 343-372.
+https://doi.org/10.1080/02643290701290146
+
+Crawford, J., & Garthwaite, P. (2005). Testing for Suspected Impairments and
+Dissociations in Single-Case Studies in Neuropsychology: Evaluation of
+Alternatives Using Monte Carlo Simulations and Revised Tests for
+Dissociations. Neuropsychology, 19(3), 318-331.
+https://doi.org/10.1037/0894-4105.19.3.318
+
+Crawford, J., Garthwaite, P., & Ryan, K. (2011). Comparing a single case to a
+control sample: Testing for neuropsychological deficits and dissociations in
+the presence of covariates. Cortex, 47(10), 1166-1178.
+https://doi.org/10.1016/j.cortex.2011.02.017
+
+Crawford, J., & Howell, D. (1998). Comparing an Individual's Test Score
+Against Norms Derived from Small Samples. The Clinical Neuropsychologist,
+12(4), 482-486. https://doi.org/10.1076/clin.12.4.482.7241
+}

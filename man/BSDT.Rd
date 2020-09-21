@@ -15,7 +15,7 @@ BSDT(
   r_ab = NULL,
   alternative = c("two.sided", "greater", "less"),
   int_level = 0.95,
-  iter = 1000,
+  iter = 10000,
   unstandardised = FALSE,
   calibrated = FALSE,
   na.rm = FALSE
@@ -61,7 +61,8 @@ estimation but takes longer to calculate.}
 \item{unstandardised}{Estimate z-value based on standardised or
 unstandardised task scores.}
 
-\item{calibrated}{set to \code{TRUE} to use a calibrated prior distribution.}
+\item{calibrated}{set to \code{TRUE} to use a calibrated prior distribution.
+See Crawford, Garthwaite and Ryan (2011) for more details.}
 
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
@@ -80,18 +81,25 @@ A list with class \code{"htest"} containing the following components:
   \code{data.name} \tab a character string giving the name(s) of the data}
 }
 \description{
-A test on the difference between two tasks in a single case, by comparison to
-the difference of the same two tasks in a control sample. Calculates a
-standardised effects size of task difference as well as a point estimate of
-the proportion of the control population that would be expected to show a
-more extreme task difference.
+A test on the discrepancy between two tasks in a single case, by comparison
+to the discrepancy of means in the same two tasks in a control sample. Can
+take both tasks measured on the same scale as tasks measured on different by
+setting \code{unstandardised} to \code{TRUE} or \code{FALSE} (default).
+Calculates a standardised effects size of task discrepancy as well as a point
+estimate of the proportion of the control population that would be expected
+to show a more extreme discrepancy as well as relevant credible intervals.
+Developed by Crawford and Garthwaite (2007).
+}
+\details{
+Uses random generation of inverse wishart distributions from the
+CholWishart package (Geoffrey Thompson, 2019).
 }
 \examples{
 BSDT(-3.857, -1.875, controls_a = 0, controls_b = 0, sd_a = 1,
-sd_b = 1, sample_size = 20, r_ab = 0.68)
+sd_b = 1, sample_size = 20, r_ab = 0.68, iter = 100)
 
 BSDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1, "K_SWI"],
- controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"])
+ controls_a = size_weight_illusion[-1, "V_SWI"], controls_b = size_weight_illusion[-1, "K_SWI"], iter = 100)
 
 }
 \references{
@@ -99,4 +107,13 @@ Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
 control or normative sample in neuropsychology: Development of a Bayesian
 approach. \emph{Cognitive Neuropsychology, 24}(4), 343–372.
 \url{https://doi.org/10.1080/02643290701290146}
+
+#' Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing a single
+case to a control sample: Testing for neuropsychological deficits and
+dissociations in the presence of covariates. \emph{Cortex, 47}(10),
+1166-1178. \url{https://doi.org/10.1016/j.cortex.2011.02.017}
+
+Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
+Distribution. R package version 1.1.0.
+\url{https://CRAN.R-project.org/package=CholWishart}
 }

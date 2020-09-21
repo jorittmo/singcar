@@ -1,8 +1,15 @@
 #' Unstandardised Difference Test
 #'
-#' A test on the difference between two tasks in a single case, by comparison to
-#' a control sample. Use only when the two tasks are measured on the \emph{same}
-#' scale.
+#' A test on the discrepancy between two tasks in a single case, by comparison
+#' to the mean of discrepancies of the same two tasks in a control sample. Use
+#' \emph{only} when the two tasks are measured on the same scale because no
+#' standardisation is performed on task scores. Calculates however a
+#' standardised effect size in the same manner as \code{\link{RSDT}()}. This is
+#' original behaviour from Crawford and Garthwaite (2005) but might not be
+#' appropriate. So use this standardised effect size with caution. Calculates a
+#' standardised effect size of task discrepancy as well as a point estimate of
+#' the proportion of the control population that would be expected to show a
+#' more extreme discrepancy and respective confidence intervals.
 #'
 #' @param case_a Case's score on task A.
 #' @param case_b Case's score on task B.
@@ -26,9 +33,9 @@
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
 #'   of the expected effect depends on which task is set as A and which is set
 #'   as B, be very careful if changing this parameter.
-#' @param conf_int Calculate confidence intervals for desired estimate. Uses an
-#'   iterative search algorithm, set to \code{FALSE} for faster calculation (e.g. for
-#'   simulations).
+#' @param conf_int Initiates a search algorithm for finding confidence
+#'   intervals. Defaults to \code{TRUE}, set to \code{FALSE} for faster
+#'   calculation (e.g. for simulations).
 #' @param conf_level Level of confidence for intervals.
 #' @param conf_int_spec The size of iterative steps for calculating confidence
 #'   intervals. Smaller values gives more precise intervals but takes longer to

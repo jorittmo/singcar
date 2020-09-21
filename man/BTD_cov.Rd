@@ -10,7 +10,7 @@ BTD_cov(
   control_task,
   control_covar,
   alternative = c("less", "two.sided", "greater"),
-  int.level = 0.95,
+  int_level = 0.95,
   iter = 1000,
   use_sumstats = FALSE,
   cor_mat = NULL,
@@ -39,7 +39,7 @@ and the second column represents the standard deviation.}
 must be one of \code{"two.sided"} (default), \code{"greater"} or
 \code{"less"}. You can specify just the initial letter.}
 
-\item{int.level}{The probability level on the Bayesian credible intervals.}
+\item{int_level}{The probability level on the Bayesian credible intervals.}
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
 estimation but takes longer to calculate.}
@@ -75,20 +75,22 @@ A list with class \code{"htest"} containing the following components:
   \code{data.name} \tab a character string giving the name(s) of the data}
 }
 \description{
-Tests for a deficit on a task of interest in the single case,
-controlling for the effects of covariates. For example, it could be used to
-test whether a case's score on a task is significantly lower than the scores
-of controls when controlling for years of education.  Under the null
-hypothesis the case's score, conditioned on the covariate(s), is an
-observation from the distribution of conditional scores in the control
-population.  Returns (a) a signficance test, (b) point and
-interval estimates of the effect size for the difference between the case and
-controls, and (c) point and interval estimates of the abnormality of the
-case's score (i.e., it estimates the percentage of controls that would
-exhibit a more extreme conditional score).
+Takes a single observation
+and compares it to a distribution estimated by a control sample, while
+controlling for the effect of covariates, using Bayesian methodology. This
+test is used when assessing a case conditioned on some other variable, for
+example, assessing abnormality when controlling for years of education or
+sex. Under the null hypothesis the case is an observation from the distribution
+of scores from the task of interest coming from observations having the same
+score as the case on the covariate(s). Returns a signficance test, point
+and interval estimates of difference betwen the case and the mean of the controls
+as well as point and interval estimates of abnormality, i.e. an estimation of
+the proportion of controls that would exhibit a more extreme conditioned score.
+Developed by Crawford, Garthwaite and Ryan (2011).
 }
 \details{
-Developed by Crawford, Garthwaite and Ryan (2011).
+Uses random generation of inverse wishart distributions from the
+CholWishart package (Geoffrey Thompson, 2019).
 }
 \examples{
 
@@ -103,4 +105,8 @@ Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
   a single case to a control sample: Testing for neuropsychological deficits
   and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
   1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
+
+Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
+Distribution. R package version 1.1.0.
+\url{https://CRAN.R-project.org/package=CholWishart}
 }
