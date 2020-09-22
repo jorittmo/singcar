@@ -12,12 +12,7 @@ Authors@R:
              role = c("aut"),
              email = "r.d.mcintosh@ed.ac.uk",
              comment = c(ORCID = "0000-0002-7615-6699")))
-Description: When comparing single cases to control populations and no parameters
-    are known researchers must estimate these with a control sample. This is often
-    done when testing a case's abnormality on some variable or testing the discrepancy
-    between two variables. The hitherto most appropriate methods for controlling Type I
-    errors for such tests are implemented in this package, along with respective power 
-    calculators as well as methods allowing for the inclusion of covariates.
+Description: When comparing single cases to control populations and no parameters are known researchers must estimate these with a control sample. This is often done when testing a case's abnormality on some variable or testing the discrepancy between two variables. The hitherto most appropriate methods for controlling Type I errors for such tests are implemented in this package, along with respective power calculators as well as methods allowing for the inclusion of covariates.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
