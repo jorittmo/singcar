@@ -44,7 +44,7 @@ how the sample size affects power.}
 \item{alternative}{The alternative hypothesis. A string of either "two.sided"
 (default) or "one.sided".}
 
-\item{alpha}{The specified Type I error rate. This can also be varied, with
+\item{alpha}{The specified Type I error rate. This can be varied, with
 effects on power. Defaults to 0.05.}
 
 \item{nsim}{The number of simulations to run. Higher number gives better
@@ -61,10 +61,10 @@ Returns a single value approximating the power of the test for the
 \description{
 Calculates approximate power, given sample size, using Monte Carlo
 simulation, for specified case scores, means and standard deviations for the
-control sample. The means and standard deviations defaults to 0 and 1
+control sample. The means and standard deviations default to 0 and 1
 respectively, so if no other values are given the case scores are interpreted
 as deviations from the mean in standard deviations. Hence, the effect size of
-the dissociation (zdcc) would in that case be the difference between the two
+the dissociation (Z-DCC) would in that case be the difference between the two
 case scores. Is computationally heavy and might therefore take a few seconds.
 }
 \examples{

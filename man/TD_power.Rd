@@ -41,9 +41,9 @@ input the function will utilise a search algorithm to find the sample size
 needed to reach the desired power. However, if the power specified is
 greater than what is actually possible to achieve the algorithm could
 search forever. Hence, when power does not increase substantially for
-any additional participant in the sample, the algorthm stops.
+any additional participant in the sample, the algorithm stops.
 By default the algorithm stops when power does not increase more
-than 0.5% for any added participant, but by varying \code{spec},
+than 0.5\% for any added participant, but by varying \code{spec},
 this specificity can be changed.}
 }
 \value{

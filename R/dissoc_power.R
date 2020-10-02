@@ -199,7 +199,7 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #' control sample. The means and standard deviations defaults to 0 and 1
 #' respectively, so if no other values are given the case scores are interpreted
 #' as deviations from the mean in standard deviations. Hence, the effect size of
-#' the dissociation (zdcc) would in that case be the difference between the two
+#' the dissociation (Z-DCC) would in that case be the difference between the two
 #' case scores.
 #'
 #' @param case_a A single value from the expected case observation on task A.
@@ -287,10 +287,10 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'
 #' Calculates approximate power, given sample size, using Monte Carlo
 #' simulation, for specified case scores, means and standard deviations for the
-#' control sample. The means and standard deviations defaults to 0 and 1
+#' control sample. The means and standard deviations default to 0 and 1
 #' respectively, so if no other values are given the case scores are interpreted
 #' as deviations from the mean in standard deviations. Hence, the effect size of
-#' the dissociation (zdcc) would in that case be the difference between the two
+#' the dissociation (Z-DCC) would in that case be the difference between the two
 #' case scores. Is computationally heavy and might therefore take a few seconds.
 #'
 #' @param case_a A single value from the expected case observation on task A.
@@ -308,7 +308,7 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'   how the sample size affects power.
 #' @param alternative The alternative hypothesis. A string of either "two.sided"
 #'   (default) or "one.sided".
-#' @param alpha The specified Type I error rate. This can also be varied, with
+#' @param alpha The specified Type I error rate. This can be varied, with
 #'   effects on power. Defaults to 0.05.
 #' @param nsim The number of simulations to run. Higher number gives better
 #'   accuracy, but low numbers such as 10000 or even 1000 are usually sufficient
@@ -385,7 +385,7 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #' for specified (expected) case score, means and standard deviations for the
 #' control sample on the task of interest and included covariates. The number of
 #' covariates defaults to 1, means and standard deviations for the tasks and
-#' covariate defaults to 0 and 1, so if no other values are given the case scores
+#' covariate default to 0 and 1, so if no other values are given the case scores
 #' is interpreted as deviation from the mean in standard deviations for both tasks
 #' and covariates.
 #'
@@ -402,15 +402,17 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #' @param cor_mat A correlation matrix containing the correlations of the tasks
 #'   of interest and the coviariate(s). The first two variables are treated as
 #'   the tasks of interest. Defaults to no correlation between any.
-#' @param sample_size Single value of the size of the sample for which you wish
+#' @param sample_size Single value giving the size of the control sample for which you wish
 #'   to calculate power.
 #' @param alternative The alternative hypothesis. A string of either "less",
 #'   "greater" or "two.sided" (default).
-#' @param alpha The specified Type I error rate. This can also be varied, with
-#'   effects on power.
+#' @param alpha The specified Type I error rate, default is 0.05. This can be
+#'   varied, with effects on power.
 #' @param nsim The number of simulations for the power calculation. Defaults to
-#'   1000 due to BTD already being computationally intense. Defaults to 1000.
-#' @param iter The number of simulations used by the BTD_cov.
+#'   1000 due to BSDT already being computationally intense. Increase for better
+#'   accuracy.
+#' @param iter The number of simulations used by the BSDT_cov, defaults to 1000.
+#'   Increase for better accuracy.
 #' @param calibrated Whether or not to use the standard theory (Jeffreys) prior
 #'   distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
 #'   et al. (2011) for further information. Calibrated prior is recommended.

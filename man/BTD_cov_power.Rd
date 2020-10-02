@@ -31,7 +31,7 @@ deviation of the task of interest. In that order.}
 column) and standard deviations (in the 2nd column) of the included
 covariates.}
 
-\item{cor_mat}{A correlation matrix containing the correlations of the the
+\item{cor_mat}{A correlation matrix containing the correlations of the
 task of interest and the coviariate(s). The first variable is treated as
 the task of interest. Defaults to no correlation between any.}
 
@@ -45,9 +45,9 @@ to calculate power.}
 effects on power.}
 
 \item{nsim}{The number of simulations for the power calculation. Defaults to
-1000 due to BTD already being computationally intense. Defaults to 1000.}
+1000 due to BTD_cov already being computationally intense.}
 
-\item{iter}{The number of simulations used by the BTD_cov.}
+\item{iter}{The number of simulations used by the BTD_cov. Defaults to 1000.}
 }
 \value{
 Returns a single value approximating the power of the test for the

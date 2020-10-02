@@ -14,8 +14,8 @@ test_that("we get approx same results as C&G on BTD_cov", {
   set.seed(1234597)
   sc_ot <- BTD_cov(78, 13, x[ , 1], x[ , 2], iter = 10000)
   sc_ot <- c(sc_ot[["p.value"]],
-             sc_ot[["interval"]][["Lower zccc CI"]],
-             sc_ot[["interval"]][["Upper zccc CI"]],
+             sc_ot[["interval"]][["Lower Z-CCC CI"]],
+             sc_ot[["interval"]][["Upper Z-CCC CI"]],
              sc_ot[["interval"]][["Lower p CI"]],
              sc_ot[["interval"]][["Upper p CI"]])
 

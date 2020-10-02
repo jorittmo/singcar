@@ -3,7 +3,9 @@
 #' Takes a single observation and compares it to a distribution estimated by a
 #' control sample using Bayesian methodology. Calculates standardised difference
 #' between the case score and the mean of the controls and proportions falling
-#' above or below the case score, as well as associated credible intervals.
+#' above or below the case score, as well as associated credible intervals. This
+#' approach was developed by Crawford and Garthwaite (2007) but converge to the
+#' results of \code{\link{TD}()}, which is faster.
 #'
 #' Returns the point estimate of the standardised difference
 #' between the case score and the mean of the controls and the point estimate
@@ -22,27 +24,27 @@
 #' @param alternative A character string specifying the alternative hypothesis,
 #'   must be one of \code{"less"} (default), \code{"greater"} or
 #'   \code{"two.sided"}. You can specify just the initial letter.
-#' @param int_level Level of confidence for credible intervals.
+#' @param int_level Level of confidence for credible intervals, defaults to 95\%.
 #' @param iter Number of iterations. Set to higher for more accuracy, set to
 #'   lower for faster calculations.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #' \tabular{llll}{
-#' \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
-#' \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
-#' the p-value for the test.\cr\cr \code{estimate}    \tab estimated
-#' standardised difference (zcc) and point estimate of p-value. \cr\cr
-#' \code{null.value}   \tab the value of the difference under the null
-#' hypothesis.\cr\cr \code{interval}     \tab named numerical vector containing
-#' credibility level and intervals for both zcc and estimated proportion. \cr\cr
-#' \code{desc}     \tab named numerical containing descriptive statistics: mean
-#' and standard deviations of controls as well as sample size.
-#'  \cr\cr \code{alternative}     \tab a character string
-#' describing the alternative hypothesis.\cr\cr \code{method} \tab a character
-#' string indicating what type of test was performed.\cr\cr \code{data.name}
-#' \tab a character string giving the name(s) of the data as well as sum
-#' summaries. }
+#' \code{statistic}   \tab the mean z-value over \code{iter} number of
+#' iterations \cr\cr  \code{parameter} \tab the degrees of freedom used to
+#' specify the posterior distribution. \cr\cr \code{p.value}    \tab the mean p-value
+#' for all simulated Z-scores.\cr\cr \code{estimate}    \tab estimated standardised difference
+#' (Z-CC) and point estimate of p-value. \cr\cr \code{null.value}   \tab the
+#' value of the difference under the null hypothesis.\cr\cr \code{interval}
+#' \tab named numerical vector containing credibility level and intervals for
+#' both Z-CC and estimated proportion. \cr\cr \code{desc}     \tab named
+#' numerical containing descriptive statistics: mean and standard deviations of
+#' controls as well as sample size. \cr\cr \code{alternative}     \tab a
+#' character string describing the alternative hypothesis.\cr\cr \code{method}
+#' \tab a character string indicating what type of test was performed.\cr\cr
+#' \code{data.name} \tab a character string giving the name(s) of the data as
+#' well as summaries. }
 #'
 #' @export
 #'
@@ -123,7 +125,7 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   z_ast_est <- mean(z_ast)
 
   zcc_int <- stats::quantile(z_ast, c(alpha/2, (1 - alpha/2)))
-  names(zcc_int) <- c("Lower zcc CI", "Upper zcc CI")
+  names(zcc_int) <- c("Lower Z-CC CI", "Upper Z-CC CI")
 
   p_est <- mean(pval)
 

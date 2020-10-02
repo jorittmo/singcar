@@ -37,19 +37,21 @@ of covariates. Defaults to one covariate with mean 0 and sd = 1.}
 of interest and the coviariate(s). The first two variables are treated as
 the tasks of interest. Defaults to no correlation between any.}
 
-\item{sample_size}{Single value of the size of the sample for which you wish
+\item{sample_size}{Single value giving the size of the control sample for which you wish
 to calculate power.}
 
 \item{alternative}{The alternative hypothesis. A string of either "less",
 "greater" or "two.sided" (default).}
 
-\item{alpha}{The specified Type I error rate. This can also be varied, with
-effects on power.}
+\item{alpha}{The specified Type I error rate, default is 0.05. This can be
+varied, with effects on power.}
 
 \item{nsim}{The number of simulations for the power calculation. Defaults to
-1000 due to BTD already being computationally intense. Defaults to 1000.}
+1000 due to BSDT already being computationally intense. Increase for better
+accuracy.}
 
-\item{iter}{The number of simulations used by the BTD_cov.}
+\item{iter}{The number of simulations used by the BSDT_cov, defaults to 1000.
+Increase for better accuracy.}
 
 \item{calibrated}{Whether or not to use the standard theory (Jeffreys) prior
 distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
@@ -66,7 +68,7 @@ using Monte Carlo simulation for BSDT with covariates
 for specified (expected) case score, means and standard deviations for the
 control sample on the task of interest and included covariates. The number of
 covariates defaults to 1, means and standard deviations for the tasks and
-covariate defaults to 0 and 1, so if no other values are given the case scores
+covariate default to 0 and 1, so if no other values are given the case scores
 is interpreted as deviation from the mean in standard deviations for both tasks
 and covariates.
 }

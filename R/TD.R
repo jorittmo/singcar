@@ -33,7 +33,7 @@
 #' @param conf_int Initiates a search algorithm for finding confidence
 #'   intervals. Defaults to \code{TRUE}, set to \code{FALSE} for faster
 #'   calculation (e.g. for simulations).
-#' @param conf_level Level of confidence for intervals.
+#' @param conf_level Level of confidence for intervals, defaults to 95\%.
 #' @param conf_int_spec The size of iterative steps for calculating confidence
 #'   intervals. Smaller values gives more precise intervals but takes longer to
 #'   calculate. Defaults to a specificity of 0.01.
@@ -44,10 +44,10 @@
 #' \code{statistic}   \tab the value of the t-statistic.\cr\cr  \code{parameter}
 #' \tab the degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab
 #' the p-value for the test.\cr\cr \code{estimate}    \tab estimated
-#' standardised difference (zcc) and point estimate of p-value. \cr\cr
+#' standardised difference (Z-CC) and point estimate of p-value. \cr\cr
 #' \code{null.value}   \tab the value of the difference under the null
 #' hypothesis.\cr\cr \code{interval}     \tab named numerical vector containing
-#' level of confidence and confidence intervals for both zcc and p-value. \cr\cr
+#' level of confidence and confidence intervals for both Z-CC and p-value. \cr\cr
 #' \code{desc}     \tab named numerical containing descriptive statistics: mean
 #' and standard deviations of controls as well as sample size and standard error
 #' used in the t-formula. \cr\cr \code{alternative}     \tab a character string
@@ -59,7 +59,7 @@
 #' @export
 #'
 #' @examples
-#' BTD(case = -2, controls = 0, sd = 1, sample_size = 20)
+#' TD(case = -2, controls = 0, sd = 1, sample_size = 20)
 #'
 #' TD(case = size_weight_illusion[1, "V_SWI"],
 #'    controls = size_weight_illusion[-1, "V_SWI"], alternative = "l")
@@ -238,7 +238,7 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
       }
 
 
-    names(cint_zcc) <- c("Lower zcc CI", "Upper zcc CI")
+    names(cint_zcc) <- c("Lower Z-CC CI", "Upper Z-CC CI")
     names(cint_p) <- c("Lower p CI", "Upper p CI")
 
     typ.int <- 100*conf_level

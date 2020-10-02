@@ -43,7 +43,7 @@ test_that("check that BSDT produces same as C and G", {
 
   CandGPval <- 0.27849
 
-  expect_equal(p_nsum, CandGPval, tol = 0.01)
+  expect_equal(p_nsum, CandGPval, tol = 0.05)
 
 })
 

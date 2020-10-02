@@ -3,10 +3,10 @@
 #' A test on the discrepancy between two tasks in a single case, by comparison
 #' to the discrepancy of means in the same two tasks in a control sample.
 #' Standardises task scores as well as task discrepancy, so the tasks do not
-#' need to be measured on the same scale. Calculates a standardised effects size
-#' of task discrepancy as well as a point estimate of the proportion of the
-#' control population that would be expected to show a more extreme discrepancy.
-#' Developed by Crawford and Garthwaite (2005).
+#' need to be measured on the same scale. Calculates a standardised effect size
+#' (Z-DCC) of task discrepancy as well as a point estimate of the proportion of
+#' the control population that would be expected to show a more extreme
+#' discrepancy. Developed by Crawford and Garthwaite (2005).
 #'
 #' @param case_a Case's score on task A.
 #' @param case_b Case's score on task B.
@@ -31,9 +31,10 @@
 #'   of the expected effect depends on which task is set as A and which is set
 #'   as B, be very careful if changing this parameter.
 #' @param exact.method If set to \code{FALSE} generates an approximate
-#'   t-statistic used to derive the exact. The exact method can only generate an
-#'   absolute t-statistic. The approximate method also requires a pre-set
-#'   alpha-value, see Crawford and Garthwate (2005) for more information.
+#'   test-statistic used to derive the exact statistic. The exact method can
+#'   only generate an absolute t-statistic. The approximate method also requires
+#'   a pre-set alpha-value, see Crawford and Garthwate (2005) for more
+#'   information.
 #' @param alpha Chosen risk of Type I errors. This is only relevant if setting
 #'   \code{exact.method = FALSE} due to the test statistic depending on the
 #'   critical value chosen.
@@ -76,7 +77,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
                   sd_a = NULL, sd_b = NULL,
                   sample_size = NULL, r_ab = NULL,
                   alternative = c("two.sided", "greater", "less"),
-                  exact.method = T, alpha = 0.05, na.rm = FALSE) {
+                  exact.method = TRUE, alpha = 0.05, na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
 

@@ -24,9 +24,9 @@
 #'   needed to reach the desired power. However, if the power specified is
 #'   greater than what is actually possible to achieve the algorithm could
 #'   search forever. Hence, when power does not increase substantially for
-#'   any additional participant in the sample, the algorthm stops.
+#'   any additional participant in the sample, the algorithm stops.
 #'   By default the algorithm stops when power does not increase more
-#'   than 0.5% for any added participant, but by varying \code{spec},
+#'   than 0.5\% for any added participant, but by varying \code{spec},
 #'   this specificity can be changed.
 #'
 #' @return Either a single value of the exact power, if sample size is given. Or
@@ -194,8 +194,8 @@ TD_power <- function(case, mean = 0, sd = 1,
 #' @param alpha The specified Type I error rate. This can also be varied, with
 #'   effects on power.
 #' @param nsim The number of simulations for the power calculation. Defaults to
-#'   1000 due to BTD already being computationally intense. Defaults to 1000.
-#' @param iter The number of simulations used by the BTD.
+#'   1000 due to BTD already being computationally intense.
+#' @param iter The number of simulations used by the BTD. Defaults to 1000.
 #'
 #' @return Returns a single value approximating the power of the test for the
 #'   given parameters.
@@ -269,7 +269,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 #' @param control_covar A matrix with 2 columns containing expected means (in the 1st
 #'   column) and standard deviations (in the 2nd column) of the included
 #'   covariates.
-#' @param cor_mat A correlation matrix containing the correlations of the the
+#' @param cor_mat A correlation matrix containing the correlations of the
 #'   task of interest and the coviariate(s). The first variable is treated as
 #'   the task of interest. Defaults to no correlation between any.
 #' @param sample_size Single value of the size of the sample for which you wish
@@ -279,8 +279,8 @@ BTD_power <- function(case, mean = 0, sd = 1,
 #' @param alpha The specified Type I error rate. This can also be varied, with
 #'   effects on power.
 #' @param nsim The number of simulations for the power calculation. Defaults to
-#'   1000 due to BTD already being computationally intense. Defaults to 1000.
-#' @param iter The number of simulations used by the BTD_cov.
+#'   1000 due to BTD_cov already being computationally intense.
+#' @param iter The number of simulations used by the BTD_cov. Defaults to 1000.
 #'
 #' @return Returns a single value approximating the power of the test for the
 #'   given parameters.

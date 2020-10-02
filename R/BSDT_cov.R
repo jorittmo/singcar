@@ -21,11 +21,13 @@
 #' @param case_covar A vector containing the case scores on all covariates
 #'   included.
 #' @param control_tasks A matrix or dataframe with 2 columns and n rows
-#'   containing the control scores for the two tasks. Or a 2x2 matrix or dataframe
+#'   containing the control scores for the two tasks. Or if \code{use_sumstats}
+#'   is set to \code{TRUE} a 2x2 matrix or dataframe
 #'   containing summary statistics where the first column represents the means
 #'   for each task and the second column represents the standard deviation.
-#' @param control_covar A matrix or dataframe cointaining the control scores on
-#'   the covariates included. Or a matrix or dataframe containing summary
+#' @param control_covar A matrix or dataframe containing the control scores on
+#'   the covariates included. Or if \code{use_sumstats}
+#'   is set to \code{TRUE} a matrix or dataframe containing summary
 #'   statistics where the first column represents the means for each covariate
 #'   and the second column represents the standard deviation.
 #' @param alternative A character string specifying the alternative hypothesis,
@@ -33,41 +35,45 @@
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
 #'   of the expected effect depends on which task is set as A and which is set
 #'   as B, be very careful if changing this parameter.
-#' @param int.level The probability level on the Bayesian credible intervals.
+#' @param int_level The probability level on the Bayesian credible intervals, defaults to 95\%.
 #' @param calibrated Whether or not to use the standard theory (Jeffreys) prior
 #'   distribution (if set to \code{FALSE}) or a calibrated prior examined by
-#'   Berger and Sun (2008) and sample size treated as n - 1. See Crawford et al.
-#'   (2011) for further information. Calibrated prior is recommended.
+#'   Berger and Sun (2008). The sample estimation of the covariance matrix is based on
+#'   the sample size being n - 1 when the calibrated prior is used. See Crawford
+#'   et al. (2011) for further information. Calibrated prior is recommended.
 #' @param iter Number of iterations to be performed. Greater number gives better
-#'   estimation but takes longer to calculate.
+#'   estimation but takes longer to calculate. Defaults to 10000.
 #' @param use_sumstats If set to \code{TRUE}, \code{control_tasks} and
 #'   \code{control_covar} are treated as matrices with summary statistics. Where
 #'   the first column represents the means for each variable and the second
 #'   column represents the standard deviation.
 #' @param cor_mat A correlation matrix of all variables included. NOTE: the two
-#'   first variables should be the tasks of interest.
+#'   first variables should be the tasks of interest. Only needed if \code{use_sumstats}
+#'   is set to \code{TRUE}.
 #' @param sample_size An integer specifying the sample size of the controls.
+#'   Only needed if \code{use_sumstats}
+#'   is set to \code{TRUE}.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
 #'   \tabular{llll}{ \code{statistic}   \tab the average z-value over
-#'   \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
-#'   p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
-#'   case scores expressed as z-scores on task A and B. Standardised effect size
-#'   (Z-DCCC) of task difference between case and controls and point estimate of
-#'   the proportion of the control population estimated to show a more extreme
-#'   task difference. \cr\cr  \code{null.value}   \tab the value of the
-#'   difference between tasks under the null hypothesis.\cr\cr \code{interval}
-#'   \tab named numerical vector containing level of confidence and confidence
-#'   intervals for both effect size and p-value.\cr\cr \code{desc}     \tab data
-#'   frame containing means and standard deviations for controls as well as case
-#'   scores. \cr\cr \code{cor.mat} \tab matrix giving the correlations between
-#'   the tasks of interest and the covariates included. \cr\cr
-#'   \code{sample.size}     \tab number of controls. Remember, if
-#'   \code{calibrated} left as default (i.e. \code{TRUE}) sample size is treated
-#'   as n - 1.\cr\cr \code{alternative}     \tab a character string describing
-#'   the alternative hypothesis.\cr\cr \code{method} \tab a character string
-#'   indicating what type of test was performed.\cr\cr \code{data.name} \tab a
-#'   character string giving the name(s) of the data}
+#'   \code{iter} number of iterations. \cr\cr \code{parameter} \tab the degrees
+#'   of freedom used to specify the posterior distribution. \cr\cr
+#'   \code{p.value}    \tab the average p-value over \code{iter} number of
+#'   iterations. \cr\cr \code{estimate} \tab case scores expressed as z-scores
+#'   on task A and B. Standardised effect size (Z-DCCC) of task difference
+#'   between case and controls and point estimate of the proportion of the
+#'   control population estimated to show a more extreme task difference. \cr\cr
+#'   \code{null.value}   \tab the value of the difference between tasks under
+#'   the null hypothesis.\cr\cr \code{interval} \tab named numerical vector
+#'   containing level of confidence and confidence intervals for both effect
+#'   size and p-value.\cr\cr \code{desc}     \tab data frame containing means
+#'   and standard deviations for controls as well as case scores. \cr\cr
+#'   \code{cor.mat} \tab matrix giving the correlations between the tasks of
+#'   interest and the covariates included. \cr\cr \code{sample.size}     \tab
+#'   number of controls. \cr\cr \code{alternative} \tab a character string
+#'   describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+#'   string indicating what type of test was performed.\cr\cr \code{data.name}
+#'   \tab a character string giving the name(s) of the data}
 #' @export
 #'
 #' @examples
@@ -94,7 +100,7 @@
 
 BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       alternative = c("two.sided", "greater", "less"),
-                      int.level = 0.95, calibrated = TRUE, iter = 10000,
+                      int_level = 0.95, calibrated = TRUE, iter = 10000,
                       use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
@@ -102,7 +108,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   # ERRORS BELOW
 
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
-  if (int.level < 0 | int.level > 1) stop("Interval level must be between 0 and 1")
+  if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_tasks) != 2) stop("case_task should have length 2")
   if (ncol(control_tasks) != 2) stop("columns in control_tasks should be 2")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
@@ -158,6 +164,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
     ## ACCEPT/REJECT STEP Berger and Sun (2008)
 
     A_ast <- ((n - m - 2)*Sigma_ast) / (n - m - 1)
+    df <- (n - m - 2)
 
     step_it <- iter
     Sigma_hat_acc_save <- array(dim = c(2, 2, 1))
@@ -185,7 +192,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
 
   } else {
-
+    df <- (n - m + k - 2)
     Sigma_hat <- CholWishart::rInvWishart(iter, df = (n - m + k - 2), Sigma_ast)
 
   }
@@ -226,13 +233,13 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
     pval <- stats::pnorm(z_hat_dccc, lower.tail = TRUE)
   }
 
-  alpha <- 1 - int.level
+  alpha <- 1 - int_level
 
   z_ast_est <- mean(z_hat_dccc)
   names(z_ast_est) <- "ave. z"
 
   zdccc_int <- stats::quantile(z_hat_dccc, c(alpha/2, (1 - alpha/2)))
-  names(zdccc_int) <- c("Lower zdccc CI", "Upper zdccc CI")
+  names(zdccc_int) <- c("Lower Z-DCCC CI", "Upper Z-DCCC CI")
 
   p_est <- mean(pval)
 
@@ -268,12 +275,12 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int.level, "% credible interval [",
+                   100*int_level, "% credible interval [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
   zdccc.name <- paste0("Standardised task discrepancy (Z-DCCC), ",
-                      100*int.level, "% credible interval [",
+                      100*int_level, "% credible interval [",
                       format(round(zdccc_int[1], 2), nsmall = 2),", ",
                       format(round(zdccc_int[2], 2), nsmall = 2),"]")
 
@@ -284,7 +291,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
 
 
-  typ.int <- 100*int.level
+  typ.int <- 100*int_level
   names(typ.int) <- "Interval level (%)"
   interval <- c(typ.int, zdccc_int, p_int)
 
@@ -302,7 +309,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
 
 
-  # names(df) <- "df"
+  names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
   dname <- paste0("Case score A: ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
@@ -312,7 +319,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = z_ast_est,
-                 #parameter = df,
+                 parameter = df,
                  p.value = p_est,
                  estimate = estimate,
                  null.value = null.value,

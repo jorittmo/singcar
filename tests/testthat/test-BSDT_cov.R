@@ -17,8 +17,8 @@ test_that("we get approx same results as C&G on BSDT_cov", {
   sc_c <- BSDT_cov(c(70, 78), 30, x[ , 1:2], x[ , 3],
                           calibrated = T, iter = 10000)
   sc_calib_tt <- c(sc_c[["p.value"]],
-                   sc_c[["interval"]][["Lower zdccc CI"]],
-                   sc_c[["interval"]][["Upper zdccc CI"]],
+                   sc_c[["interval"]][["Lower Z-DCCC CI"]],
+                   sc_c[["interval"]][["Upper Z-DCCC CI"]],
                    sc_c[["interval"]][["Lower p CI"]],
                    sc_c[["interval"]][["Upper p CI"]])
 
@@ -29,8 +29,8 @@ test_that("we get approx same results as C&G on BSDT_cov", {
                          calibrated = F, iter = 10000)
 
   sc_jeff_tt <- c(sc_j[["p.value"]],
-                  sc_j[["interval"]][["Lower zdccc CI"]],
-                  sc_j[["interval"]][["Upper zdccc CI"]],
+                  sc_j[["interval"]][["Lower Z-DCCC CI"]],
+                  sc_j[["interval"]][["Upper Z-DCCC CI"]],
                   sc_j[["interval"]][["Lower p CI"]],
                   sc_j[["interval"]][["Upper p CI"]])
 

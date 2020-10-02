@@ -18,8 +18,8 @@ BTD_cov(
 )
 }
 \arguments{
-\item{case_task}{The case score from the task of interest. Can only be of
-length 1.}
+\item{case_task}{The case score from the task of interest. Must be a single
+value.}
 
 \item{case_covar}{A vector containing the case scores on all covariates
 included. Can be of any length except 0, in that case use
@@ -39,7 +39,7 @@ and the second column represents the standard deviation.}
 must be one of \code{"two.sided"} (default), \code{"greater"} or
 \code{"less"}. You can specify just the initial letter.}
 
-\item{int_level}{The probability level on the Bayesian credible intervals.}
+\item{int_level}{The probability level on the Bayesian credible intervals, defaults to 95\%.}
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
 estimation but takes longer to calculate.}
@@ -49,30 +49,32 @@ estimation but takes longer to calculate.}
 the first column represents the means for each variable and the second
 column represents the standard deviation.}
 
-\item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
-first variables should be the tasks of interest.}
+\item{cor_mat}{A correlation matrix of all variables included. NOTE: the
+first variable should be the task of interest.}
 
 \item{sample_size}{An integer specifying the sample size of the controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
   \tabular{llll}{ \code{statistic}   \tab the average z-value over
-  \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
-  p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
-  case scores expressed as z-scores on task X and Y. Standardised effect size
-  (Z-CCC) of task difference between case and controls and point estimate of
-  the proportion of the control population estimated to show a more extreme
-  task difference. \cr\cr  \code{null.value}   \tab the value of the
-  difference between tasks under the null hypothesis.\cr\cr \code{interval}
-  \tab named numerical vector containing level of confidence and confidence
-  intervals for both effect size and p-value.\cr\cr \code{desc}     \tab data
-  frame containing means and standard deviations for controls as well as case
-  scores. \cr\cr \code{cor.mat} \tab matrix giving the correlations between
-  the task of interest and the covariates included. \cr\cr \code{sample.size}
-  \tab number of controls..\cr\cr \code{alternative}     \tab a character
-  string describing the alternative hypothesis.\cr\cr \code{method} \tab a
-  character string indicating what type of test was performed.\cr\cr
-  \code{data.name} \tab a character string giving the name(s) of the data}
+  \code{iter} number of iterations. \cr\cr \code{parameter} \tab the degrees
+  of freedom used to specify the posterior distribution. \cr\cr
+  \code{p.value}    \tab the average p-value over \code{iter} number of
+  iterations. \cr\cr \code{estimate} \tab case scores expressed as z-scores
+  on task X and Y. Standardised effect size (Z-CCC) of task difference
+  between case and controls and point estimate of the proportion of the
+  control population estimated to show a more extreme task difference. \cr\cr
+  \code{null.value}   \tab the value of the difference between tasks under
+  the null hypothesis.\cr\cr \code{interval} \tab named numerical vector
+  containing level of confidence and confidence intervals for both effect
+  size and p-value.\cr\cr \code{desc}     \tab data frame containing means
+  and standard deviations for controls as well as case scores. \cr\cr
+  \code{cor.mat} \tab matrix giving the correlations between the task of
+  interest and the covariates included. \cr\cr \code{sample.size} \tab number
+  of controls..\cr\cr \code{alternative}     \tab a character string
+  describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+  string indicating what type of test was performed.\cr\cr \code{data.name}
+  \tab a character string giving the name(s) of the data}
 }
 \description{
 Takes a single observation

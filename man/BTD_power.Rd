@@ -32,9 +32,9 @@ how the sample size affects power.}
 effects on power.}
 
 \item{nsim}{The number of simulations for the power calculation. Defaults to
-1000 due to BTD already being computationally intense. Defaults to 1000.}
+1000 due to BTD already being computationally intense.}
 
-\item{iter}{The number of simulations used by the BTD.}
+\item{iter}{The number of simulations used by the BTD. Defaults to 1000.}
 }
 \value{
 Returns a single value approximating the power of the test for the

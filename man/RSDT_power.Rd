@@ -60,7 +60,7 @@ simulation, for specified case scores, means and standard deviations for the
 control sample. The means and standard deviations defaults to 0 and 1
 respectively, so if no other values are given the case scores are interpreted
 as deviations from the mean in standard deviations. Hence, the effect size of
-the dissociation (zdcc) would in that case be the difference between the two
+the dissociation (Z-DCC) would in that case be the difference between the two
 case scores.
 }
 \examples{

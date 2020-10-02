@@ -10,7 +10,7 @@ BSDT_cov(
   control_tasks,
   control_covar,
   alternative = c("two.sided", "greater", "less"),
-  int.level = 0.95,
+  int_level = 0.95,
   calibrated = TRUE,
   iter = 10000,
   use_sumstats = FALSE,
@@ -25,12 +25,14 @@ BSDT_cov(
 included.}
 
 \item{control_tasks}{A matrix or dataframe with 2 columns and n rows
-containing the control scores for the two tasks. Or a 2x2 matrix or dataframe
+containing the control scores for the two tasks. Or if \code{use_sumstats}
+is set to \code{TRUE} a 2x2 matrix or dataframe
 containing summary statistics where the first column represents the means
 for each task and the second column represents the standard deviation.}
 
-\item{control_covar}{A matrix or dataframe cointaining the control scores on
-the covariates included. Or a matrix or dataframe containing summary
+\item{control_covar}{A matrix or dataframe containing the control scores on
+the covariates included. Or if \code{use_sumstats}
+is set to \code{TRUE} a matrix or dataframe containing summary
 statistics where the first column represents the means for each covariate
 and the second column represents the standard deviation.}
 
@@ -40,15 +42,16 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 of the expected effect depends on which task is set as A and which is set
 as B, be very careful if changing this parameter.}
 
-\item{int.level}{The probability level on the Bayesian credible intervals.}
+\item{int_level}{The probability level on the Bayesian credible intervals, defaults to 95\%.}
 
 \item{calibrated}{Whether or not to use the standard theory (Jeffreys) prior
 distribution (if set to \code{FALSE}) or a calibrated prior examined by
-Berger and Sun (2008) and sample size treated as n - 1. See Crawford et al.
-(2011) for further information. Calibrated prior is recommended.}
+Berger and Sun (2008). The sample estimation of the covariance matrix is based on
+the sample size being n - 1 when the calibrated prior is used. See Crawford
+et al. (2011) for further information. Calibrated prior is recommended.}
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
-estimation but takes longer to calculate.}
+estimation but takes longer to calculate. Defaults to 10000.}
 
 \item{use_sumstats}{If set to \code{TRUE}, \code{control_tasks} and
 \code{control_covar} are treated as matrices with summary statistics. Where
@@ -56,31 +59,34 @@ the first column represents the means for each variable and the second
 column represents the standard deviation.}
 
 \item{cor_mat}{A correlation matrix of all variables included. NOTE: the two
-first variables should be the tasks of interest.}
+first variables should be the tasks of interest. Only needed if \code{use_sumstats}
+is set to \code{TRUE}.}
 
-\item{sample_size}{An integer specifying the sample size of the controls.}
+\item{sample_size}{An integer specifying the sample size of the controls.
+Only needed if \code{use_sumstats}
+is set to \code{TRUE}.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
   \tabular{llll}{ \code{statistic}   \tab the average z-value over
-  \code{iter} number of iterations. \cr\cr \code{p.value}    \tab the average
-  p-value over \code{iter} number of iterations. \cr\cr \code{estimate} \tab
-  case scores expressed as z-scores on task A and B. Standardised effect size
-  (Z-DCCC) of task difference between case and controls and point estimate of
-  the proportion of the control population estimated to show a more extreme
-  task difference. \cr\cr  \code{null.value}   \tab the value of the
-  difference between tasks under the null hypothesis.\cr\cr \code{interval}
-  \tab named numerical vector containing level of confidence and confidence
-  intervals for both effect size and p-value.\cr\cr \code{desc}     \tab data
-  frame containing means and standard deviations for controls as well as case
-  scores. \cr\cr \code{cor.mat} \tab matrix giving the correlations between
-  the tasks of interest and the covariates included. \cr\cr
-  \code{sample.size}     \tab number of controls. Remember, if
-  \code{calibrated} left as default (i.e. \code{TRUE}) sample size is treated
-  as n - 1.\cr\cr \code{alternative}     \tab a character string describing
-  the alternative hypothesis.\cr\cr \code{method} \tab a character string
-  indicating what type of test was performed.\cr\cr \code{data.name} \tab a
-  character string giving the name(s) of the data}
+  \code{iter} number of iterations. \cr\cr \code{parameter} \tab the degrees
+  of freedom used to specify the posterior distribution. \cr\cr
+  \code{p.value}    \tab the average p-value over \code{iter} number of
+  iterations. \cr\cr \code{estimate} \tab case scores expressed as z-scores
+  on task A and B. Standardised effect size (Z-DCCC) of task difference
+  between case and controls and point estimate of the proportion of the
+  control population estimated to show a more extreme task difference. \cr\cr
+  \code{null.value}   \tab the value of the difference between tasks under
+  the null hypothesis.\cr\cr \code{interval} \tab named numerical vector
+  containing level of confidence and confidence intervals for both effect
+  size and p-value.\cr\cr \code{desc}     \tab data frame containing means
+  and standard deviations for controls as well as case scores. \cr\cr
+  \code{cor.mat} \tab matrix giving the correlations between the tasks of
+  interest and the covariates included. \cr\cr \code{sample.size}     \tab
+  number of controls. \cr\cr \code{alternative} \tab a character string
+  describing the alternative hypothesis.\cr\cr \code{method} \tab a character
+  string indicating what type of test was performed.\cr\cr \code{data.name}
+  \tab a character string giving the name(s) of the data}
 }
 \description{
 Takes two single observations from a case on two variables (A and B) and
