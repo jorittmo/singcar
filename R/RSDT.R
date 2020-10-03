@@ -30,29 +30,20 @@
 #'   \code{"less"}. You can specify just the initial letter. Since the direction
 #'   of the expected effect depends on which task is set as A and which is set
 #'   as B, be very careful if changing this parameter.
-#' @param exact.method If set to \code{FALSE} generates an approximate
-#'   test-statistic used to derive the exact statistic. The exact method can
-#'   only generate an absolute t-statistic. The approximate method also requires
-#'   a pre-set alpha-value, see Crawford and Garthwate (2005) for more
-#'   information.
-#' @param alpha Chosen risk of Type I errors. This is only relevant if setting
-#'   \code{exact.method = FALSE} due to the test statistic depending on the
-#'   critical value chosen.
 #' @param na.rm Remove \code{NA}s from controls.
 #'
 #' @return A list with class \code{"htest"} containing the following components:
-#'   \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
-#'   returns the value of an exact t-statistic, however, because of the
-#'   underlying equation, it cannot be negative. Set exact.method to
-#'   \code{FALSE} for an approximate t-value with correct sign. \cr\cr
-#'   \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
-#'   \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
-#'   case scores expressed as z-scores on task A and Y. Standardised effect size
-#'   (Z-DCC) of task difference between case and controls and point estimate of
-#'   the proportion of the control population estimated to show a more extreme
-#'   task discrepancy. \cr\cr \code{sample.size}   \tab the size of the control
-#'   sample\cr\cr \code{null.value}   \tab the value of the discrepancy under the
-#'   null hypothesis.\cr\cr  \code{alternative}     \tab a character string
+#'   \tabular{llll}{ \code{statistic}   \tab Returns the value of a approximate
+#'   t-statistic, however, because of the underlying equation, it cannot be
+#'   negative. See effect direction from Z-DCC. \cr\cr \code{parameter} \tab the
+#'   degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab the
+#'   p-value for the test.\cr\cr \code{estimate} \tab case scores expressed as
+#'   z-scores on task A and Y. Standardised effect size (Z-DCC) of task
+#'   difference between case and controls and point estimate of the proportion
+#'   of the control population estimated to show a more extreme task
+#'   discrepancy. \cr\cr \code{sample.size}   \tab the size of the control
+#'   sample\cr\cr \code{null.value}   \tab the value of the discrepancy under
+#'   the null hypothesis.\cr\cr  \code{alternative}     \tab a character string
 #'   describing the alternative hypothesis.\cr\cr \code{method} \tab a character
 #'   string indicating what type of test was performed.\cr\cr \code{data.name}
 #'   \tab a character string giving the name(s) of the data}
@@ -77,7 +68,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
                   sd_a = NULL, sd_b = NULL,
                   sample_size = NULL, r_ab = NULL,
                   alternative = c("two.sided", "greater", "less"),
-                  exact.method = TRUE, alpha = 0.05, na.rm = FALSE) {
+                  na.rm = FALSE) {
 
   alternative <- match.arg(alternative)
 
@@ -174,7 +165,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
 
   zdcc <- (std_a - std_b) / sqrt(2 - 2*r) # Estimated effect size
 
-  if (exact.method == T) {
+  # if (exact.method == T) {
 
     # Exact probability - point estimate
 
@@ -222,46 +213,47 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
 
     }
 
-  } else {
-
-    # Method from which the above is derived
-
-    if (alternative == "two.sided") {
-      t.crit <- abs(stats::qt(alpha/2, df= df))
-    } else if (alternative == "greater") {
-      t.crit <- stats::qt(alpha, df= df, lower.tail = FALSE)
-    } else {
-      t.crit <- stats::qt(alpha, df= df)
-    }
-
-    denom <- sqrt(
-      ((n + 1)/n) *
-        (
-          (2 - 2*r) + (
-            2*(1 - r^2)/(n - 1)
-          ) + (
-            ((5 + t.crit^2) * (1 - r^2))/(2*(n - 1)^2)
-          ) + (
-            (r*(1 + t.crit^2)*(1 - r^2))/((2*(n - 1)^2))
-          )
-        )
-    )
-
-    psi <- (std_a - std_b)/denom
-
-    tstat <- psi
-
-    names(tstat) <- "approx. t"
-
-    if (alternative == "two.sided") {
-      pval <- 2 * stats::pt(abs(psi), df = df, lower.tail = FALSE)
-    } else if (alternative == "greater") {
-      pval <- stats::pt(psi, df = df, lower.tail = FALSE)
-    } else { # I.e. if alternative == "less"
-      pval <- stats::pt(psi, df = df, lower.tail = TRUE)
-    }
-
-  }
+  # } else {
+  #
+  #   # Method from which the above is derived
+  #   # Not included as functionality for now.
+  #
+  #   if (alternative == "two.sided") {
+  #     t.crit <- abs(stats::qt(alpha/2, df= df))
+  #   } else if (alternative == "greater") {
+  #     t.crit <- stats::qt(alpha, df= df, lower.tail = FALSE)
+  #   } else {
+  #     t.crit <- stats::qt(alpha, df= df)
+  #   }
+  #
+  #   denom <- sqrt(
+  #     ((n + 1)/n) *
+  #       (
+  #         (2 - 2*r) + (
+  #           2*(1 - r^2)/(n - 1)
+  #         ) + (
+  #           ((5 + t.crit^2) * (1 - r^2))/(2*(n - 1)^2)
+  #         ) + (
+  #           (r*(1 + t.crit^2)*(1 - r^2))/((2*(n - 1)^2))
+  #         )
+  #       )
+  #   )
+  #
+  #   psi <- (std_a - std_b)/denom
+  #
+  #   tstat <- psi
+  #
+  #   names(tstat) <- "approx. t"
+  #
+  #   if (alternative == "two.sided") {
+  #     pval <- 2 * stats::pt(abs(psi), df = df, lower.tail = FALSE)
+  #   } else if (alternative == "greater") {
+  #     pval <- stats::pt(psi, df = df, lower.tail = FALSE)
+  #   } else { # I.e. if alternative == "less"
+  #     pval <- stats::pt(psi, df = df, lower.tail = TRUE)
+  #   }
+  #
+  # }
 
 
 

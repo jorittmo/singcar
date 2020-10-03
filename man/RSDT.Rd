@@ -14,8 +14,6 @@ RSDT(
   sample_size = NULL,
   r_ab = NULL,
   alternative = c("two.sided", "greater", "less"),
-  exact.method = TRUE,
-  alpha = 0.05,
   na.rm = FALSE
 )
 }
@@ -51,32 +49,21 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 of the expected effect depends on which task is set as A and which is set
 as B, be very careful if changing this parameter.}
 
-\item{exact.method}{If set to \code{FALSE} generates an approximate
-test-statistic used to derive the exact statistic. The exact method can
-only generate an absolute t-statistic. The approximate method also requires
-a pre-set alpha-value, see Crawford and Garthwate (2005) for more
-information.}
-
-\item{alpha}{Chosen risk of Type I errors. This is only relevant if setting
-\code{exact.method = FALSE} due to the test statistic depending on the
-critical value chosen.}
-
 \item{na.rm}{Remove \code{NA}s from controls.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
-  \tabular{llll}{ \code{statistic}   \tab if exact.method set to \code{TRUE},
-  returns the value of an exact t-statistic, however, because of the
-  underlying equation, it cannot be negative. Set exact.method to
-  \code{FALSE} for an approximate t-value with correct sign. \cr\cr
-  \code{parameter} \tab the degrees of freedom for the t-statistic.\cr\cr
-  \code{p.value}    \tab the p-value for the test.\cr\cr \code{estimate} \tab
-  case scores expressed as z-scores on task A and Y. Standardised effect size
-  (Z-DCC) of task difference between case and controls and point estimate of
-  the proportion of the control population estimated to show a more extreme
-  task discrepancy. \cr\cr \code{sample.size}   \tab the size of the control
-  sample\cr\cr \code{null.value}   \tab the value of the discrepancy under the
-  null hypothesis.\cr\cr  \code{alternative}     \tab a character string
+  \tabular{llll}{ \code{statistic}   \tab Returns the value of a approximate
+  t-statistic, however, because of the underlying equation, it cannot be
+  negative. See effect direction from Z-DCC. \cr\cr \code{parameter} \tab the
+  degrees of freedom for the t-statistic.\cr\cr \code{p.value}    \tab the
+  p-value for the test.\cr\cr \code{estimate} \tab case scores expressed as
+  z-scores on task A and Y. Standardised effect size (Z-DCC) of task
+  difference between case and controls and point estimate of the proportion
+  of the control population estimated to show a more extreme task
+  discrepancy. \cr\cr \code{sample.size}   \tab the size of the control
+  sample\cr\cr \code{null.value}   \tab the value of the discrepancy under
+  the null hypothesis.\cr\cr  \code{alternative}     \tab a character string
   describing the alternative hypothesis.\cr\cr \code{method} \tab a character
   string indicating what type of test was performed.\cr\cr \code{data.name}
   \tab a character string giving the name(s) of the data}
