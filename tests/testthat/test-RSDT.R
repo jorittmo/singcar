@@ -3,6 +3,42 @@ test_that("output is correct class", {
   expect_is(outp, "htest")
 })
 
+test_that("all RSDT functionality works", {
+  conx <- rnorm(15)
+  cony <- rnorm(15)
+  expect_error(
+    RSDT(-2, 0, conx, cony, alternative = "g"),
+    NA
+  )
+  expect_error(
+    RSDT(-2, 0, conx, cony, alternative = "l"),
+    NA
+  )
+  cony[1] <- NA
+  expect_warning(
+    RSDT(-2, 0, conx, cony, alternative = "t", na.rm = TRUE),
+    "Removal of NAs on controls_b resulted in removal of non-NAs on controls_a"
+  )
+
+})
+
+test_that("summary input gives same result as raw", {
+  x <- MASS::mvrnorm(20, mu = c(100, 80),
+                     Sigma = matrix(c(15^2, 108,
+                                      108, 10^2),
+                                    nrow = 2, byrow = T),
+                     empirical = TRUE)
+
+  expect_equal(
+    RSDT(70, 80, 100, 80, sd_a = 15, sd_b = 10, sample_size = 20,
+        r_ab = 0.72, alternative = "t"),
+    RSDT(70, 80, x[ , 1], x[ , 2],  alternative = "t")
+  )
+
+})
+
+
+
 
 test_that("errors and warnings are occuring as they should for RSDT", {
 

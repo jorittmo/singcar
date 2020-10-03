@@ -125,3 +125,37 @@ test_that("errors and warnings are occuring as they should for BSDT", {
 
 })
 
+test_that("choice of prior works", {
+  expect_error(
+    BSDT(-2, 0, 0, 0, 1, 1, 20, 0.5, iter = 20, calibrated = FALSE),
+    NA)
+  expect_error(
+    BSDT(-2, 0, 0, 0, 1, 1, 20, 0.5, iter = 20, calibrated = TRUE),
+    NA)
+})
+
+test_that("alternative hypotheses direction", {
+
+  set.seed(123456)
+  x <- MASS::mvrnorm(20, mu = c(0, 0),
+                     Sigma = matrix(c(1, 0.5,
+                                      0.5, 1),
+                                    nrow = 2, byrow = T),
+                     empirical = TRUE)
+
+  pos_z <- BSDT(0, -2, x[ , 1], x[ , 2],
+                    calibrated = T, iter = 1000, alternative = "less")[["p.value"]]
+  expect_equal(pos_z > 0.5, TRUE)
+  pos_z <- BSDT(0, -2,  x[ , 1], x[ , 2],
+                    calibrated = T, iter = 1000, alternative = "greater")[["p.value"]]
+  expect_equal(pos_z < 0.5, TRUE)
+
+  neg_z <- BSDT(-2, 0, x[ , 1], x[ , 2],
+                    calibrated = T, iter = 1000, alternative = "less")[["p.value"]]
+  expect_equal(neg_z < 0.5, TRUE)
+  neg_z <- BSDT(-2, 0, x[ , 1], x[ , 2],
+                    calibrated = T, iter = 1000, alternative = "greater")[["p.value"]]
+  expect_equal(neg_z > 0.5, TRUE)
+
+})
+

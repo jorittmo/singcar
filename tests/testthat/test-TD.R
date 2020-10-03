@@ -5,6 +5,37 @@ test_that("output is correct class", {
 })
 
 
+test_that("all TD functionality works", {
+
+  controls <- rnorm(20)
+
+  expect_error(
+    TD(-2, controls, alternative = "g"),
+    NA
+  )
+  expect_error(
+    TD(-2, controls, alternative = "l"),
+    NA
+  )
+  expect_error(
+    TD(-2, controls, alternative = "t"),
+    NA
+  )
+
+  controls[1] <- NA
+  expect_error(
+    TD(-2, controls, na.rm = TRUE),
+    NA
+  )
+  expect_error(
+    TD(-2, controls, conf_int = FALSE, na.rm = TRUE),
+    NA
+  )
+
+})
+
+
+
 test_that("errors are occuring as they should", {
 
   controls <- rnorm(15)

@@ -4,6 +4,18 @@ test_that("output is correct class", {
   expect_is(outp, "htest")
 })
 
+test_that("summary input yields same result as raw", {
+  x <- MASS::mvrnorm(18, mu = 100, Sigma = 15^2,
+                     empirical = TRUE)
+  set.seed(123456)
+  sumstats <- BTD(-2, 100,  sd = 15,
+                      sample_size = 18)[["p.value"]]
+  set.seed(123456)
+  raw <- BTD(-2, x)[["p.value"]]
+  expect_equal(sumstats, raw, tol = 0.01)
+
+})
+
 
 test_that("errors are occuring as they should", {
 

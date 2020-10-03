@@ -5,6 +5,26 @@
 
 ###########################################
 
+test_that("all TD_power functionality works", {
+  expect_error(
+    TD_power(-2, power = 0.25),
+    NA)
+  expect_error(
+    TD_power(-2, sample_size =  10),
+    NA)
+  expect_error(
+    TD_power(-2, sample_size =  10, alternative = "l"),
+    NA)
+  expect_error(
+    TD_power(-2, sample_size =  10, alternative = "g"),
+    NA)
+  expect_error(
+    TD_power(-2, sample_size =  10, alternative = "t"),
+    NA)
+
+})
+
+
 test_that("errors are working for TD_power", {
   expect_error(TD_power(-2),
                "Must supply either sample size or desired power")
@@ -102,6 +122,20 @@ test_that("when n is high, produce same power a z-test", {
 
 ###########################################
 
+test_that("alt functionality works", {
+
+  expect_error(
+    BTD_power(-2, sample_size =  10, alternative = "l", iter = 20, nsim = 20),
+    NA)
+  expect_error(
+    BTD_power(-2, sample_size =  10, alternative = "g", iter = 20, nsim = 20),
+    NA)
+  expect_error(
+    BTD_power(-2, sample_size =  10, alternative = "t", iter = 20, nsim = 20),
+    NA)
+
+})
+
 test_that("TD_power and BTD_power produce approx equal output", {
 
   set.seed(12345)
@@ -133,6 +167,20 @@ test_that("errors are working for BTD_power", {
 # BTD_cov_power
 
 ###########################################
+
+test_that("alt functionality works", {
+
+  expect_error(
+    BTD_cov_power(-2, 0, sample_size =  10, alternative = "l", iter = 20, nsim = 20),
+    NA)
+  expect_error(
+    BTD_cov_power(-2, 0, sample_size =  10, alternative = "g", iter = 20, nsim = 20),
+    NA)
+  expect_error(
+    BTD_cov_power(-2, 0, sample_size =  10, alternative = "t", iter = 20, nsim = 20),
+    NA)
+
+})
 
 test_that("TD_power and BTD_cov_power produce approx equal output", {
 
@@ -172,6 +220,20 @@ test_that("errors are working for BTD_cov_power", {
 
 ###########################################
 
+
+test_that("alt functionality works", {
+
+  expect_error(
+    UDT_power(-2, -1, sample_size =  20, alternative = "l"),
+    NA)
+  expect_error(
+    UDT_power(-2, -1, sample_size =  20, alternative = "g"),
+    NA)
+  expect_error(
+    UDT_power(-2, -1, sample_size =  20, alternative = "t"),
+    NA)
+
+})
 
 test_that("Output is dataframe when power is given and int when n is given, UDT_power", {
 
@@ -227,6 +289,22 @@ test_that("errors are working for UDT_power", {
 
 ###########################################
 
+
+
+test_that("alt functionality works", {
+
+  expect_error(
+    RSDT_power(-2, -1, sample_size =  20, alternative = "l", nsim = 20),
+    NA)
+  expect_error(
+    RSDT_power(-2, -1, sample_size =  20, alternative = "g", nsim = 20),
+    NA)
+  expect_error(
+    RSDT_power(-2, -1, sample_size =  20, alternative = "t", nsim = 20),
+    NA)
+
+})
+
 test_that("errors are working for RSDT_power", {
 
   expect_error(RSDT_power(-2, 0, sample_size = 1),
@@ -268,6 +346,33 @@ test_that("TD_power and RSDR_power power estimations in the same range when r = 
 
 ###########################################
 
+test_that("alt functionality works", {
+
+  expect_error(
+    BSDT_power(-2, -1, sample_size =  20, alternative = "l", nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_power(-2, -1, sample_size =  20, alternative = "g", nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_power(-2, -1, sample_size =  20, alternative = "t", nsim = 20, iter = 20),
+    NA)
+
+})
+
+test_that("choice of prior functionality works", {
+
+  expect_error(
+    BSDT_power(-2, -1, sample_size =  20,
+               calibrated = TRUE, nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_power(-2, -1, sample_size =  20,
+               calibrated = FALSE, nsim = 20, iter = 20),
+    NA)
+
+})
+
 test_that("errors are working for BSDT_power", {
 
   expect_error(BSDT_power(-2, 0, sample_size = 1),
@@ -306,6 +411,32 @@ test_that("TD_power and BSDT_power power estimations in the same range when r = 
 # BSDT_cov_power
 
 ###########################################
+
+test_that("alt functionality works", {
+
+  expect_error(
+    BSDT_cov_power(c(-2, -2), -1, sample_size =  20, alternative = "l", nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_cov_power(c(-2, -2), -1, sample_size =  20, alternative = "g", nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_cov_power(c(-2, -2), -1, sample_size =  20, alternative = "t", nsim = 20, iter = 20),
+    NA)
+})
+
+test_that("choice of prior functionality works", {
+
+  expect_error(
+    BSDT_cov_power(c(-2, -2), -1, sample_size =  20,
+                    calibrated = TRUE, nsim = 20, iter = 20),
+    NA)
+  expect_error(
+    BSDT_cov_power(c(-2, -2), -1, sample_size =  20,
+                    calibrated = FALSE, nsim = 20, iter = 20),
+    NA)
+
+})
 
 test_that("UDT_power and BTD_cov_power produce approx equal output", {
 
