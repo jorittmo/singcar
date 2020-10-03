@@ -314,7 +314,10 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 #'   accuracy, but low numbers such as 10000 or even 1000 are usually sufficient
 #'   for the purposes of this calculator. Defaults to 1000 due to the
 #'   computationally intense \code{BSTD}.
-#' @param iter The number simulations used by \code{BSTD}. Defaults to 1000
+#' @param iter The number simulations used by \code{BSTD}. Defaults to 1000.
+#' @param calibrated Whether or not to use the standard theory (Jeffreys) prior
+#'   distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
+#'   et al. (2011) for further information. Calibrated prior is recommended.
 #'
 #' @return Returns a single value approximating the power of the test for the
 #'   given parameters.
@@ -329,7 +332,8 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                        sd_a = 1, sd_b = 1, r_ab = 0.5,
                        sample_size,
                        alternative = c("two.sided", "greater", "less"),
-                       alpha = 0.05, nsim = 1000, iter = 1000) {
+                       alpha = 0.05, nsim = 1000, iter = 1000,
+                       calibrated = TRUE) {
 
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
@@ -354,7 +358,8 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     pval <- singcar::BSDT(case_a_gen, case_b_gen,
                           controls[ , 1], controls[, 2],
-                          alternative = alternative, iter = iter)[["p.value"]]
+                          alternative = alternative, iter = iter,
+                          calibrated = calibrated)[["p.value"]]
 
     pval
   }

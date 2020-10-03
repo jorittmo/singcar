@@ -16,7 +16,8 @@ BSDT_power(
   alternative = c("two.sided", "greater", "less"),
   alpha = 0.05,
   nsim = 1000,
-  iter = 1000
+  iter = 1000,
+  calibrated = TRUE
 )
 }
 \arguments{
@@ -52,7 +53,11 @@ accuracy, but low numbers such as 10000 or even 1000 are usually sufficient
 for the purposes of this calculator. Defaults to 1000 due to the
 computationally intense \code{BSTD}.}
 
-\item{iter}{The number simulations used by \code{BSTD}. Defaults to 1000}
+\item{iter}{The number simulations used by \code{BSTD}. Defaults to 1000.}
+
+\item{calibrated}{Whether or not to use the standard theory (Jeffreys) prior
+distribution (if set to \code{FALSE}) or a calibrated prior. See Crawford
+et al. (2011) for further information. Calibrated prior is recommended.}
 }
 \value{
 Returns a single value approximating the power of the test for the
