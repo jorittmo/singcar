@@ -44,7 +44,7 @@ dataset from an investigation of the size-weight illusion in DF, a patient with
 visual form agnosia following following bilateral lesions to the lateral
 occipital complex (Hassan et al., 2020). It was investigated whether
 DF experienced visual size-weight illusion to the same extent as controls (n = 28)
-and whether visual and kinesthetic size-weight illusion could be dissociable.
+and whether visual and kinaesthetic size-weight illusion could be dissociable.
 Below follows examples of how to analyse this dataset using the tests provided
 in `singcar`.
 
@@ -72,7 +72,7 @@ TD(case = DF_V_SWI, controls = CON_V_SWI, conf_int = TRUE)
 ##                                             -1.754857                                              4.804003 
 
 ```
-This can similarily be tested with a Bayesian version of the same test,
+This can similarly be tested with a Bayesian version of the same test,
 yielding approximately (since this test is based on MCMC methods) the same output (Crawford & Garthwaite, 2007).
 
 ``` r
@@ -131,7 +131,7 @@ the t-distribution if the tasks are measured on the same scale and is called the
 unstandardised difference test (UDT: Crawford & Garthwaite, 2005). In the
 `size_weight_illusion` dataset it is possible to use this test to whether
 patient DF exhibits a dissociation between visual size-weight illusion and
-kinesthetic size-weight illusion because the visual and kinaesthetic conditions
+kinaesthetic size-weight illusion because the visual and kinaesthetic conditions
 are parallel versions of the same task, with different sensory cues. This would
 be done as shown below:
 
@@ -141,7 +141,7 @@ library(singcar)
 DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
 CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
 
-# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+# Extracting scores from the kinaesthetic size-weight illusion from size_weight_illusion 
 DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
 CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
 
@@ -165,7 +165,7 @@ discrepancy on tasks that are not comparable. So otherwise, that
 is if the scores must be standardised to be comparable, a statistic that
 approximates the t-distribution has been developed and should be used (the
 revised standardised difference test RSDT: Crawford & Garthwaite, 2005). 
-The visual and kinesthetic size-weight illusion will be used for illustrative
+The visual and kinaesthetic size-weight illusion will be used for illustrative
 purposes here as well:
 
 ``` r
@@ -173,7 +173,7 @@ purposes here as well:
 DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
 CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
 
-# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+# Extracting scores from the kinaesthetic size-weight illusion from size_weight_illusion 
 DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
 CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
 
@@ -207,7 +207,7 @@ quite computationally intensive, depending on the number of iterations you choos
 DF_V_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "V_SWI"] # Patient
 CON_V_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "V_SWI"] # Controls
 
-# Extracting scores from the kinesthetic size-weight illusion from size_weight_illusion 
+# Extracting scores from the kinaesthetic size-weight illusion from size_weight_illusion 
 DF_K_SWI <- size_weight_illusion[size_weight_illusion$PPT == "DF", "K_SWI"] # Patient
 CON_K_SWI <- size_weight_illusion[size_weight_illusion$PPT != "DF", "K_SWI"] # Controls
 
@@ -309,14 +309,14 @@ BTD_cov_power(case = -2, case_cov = 0, control_task = c(0, 1),
 
 # References
 
-Crawford, J., & Garthwaite, P. (2002). Investigation of the single case in neuropsychology: Confidence limits on the abnormality of test scores and test score differences. Neuropsychologia, 40(8), 1196â€“1208. https://doi.org/10.1016/S0028-3932(01)00224-X
+Crawford, J., & Garthwaite, P. (2002). Investigation of the single case in neuropsychology: Confidence limits on the abnormality of test scores and test score differences. Neuropsychologia, 40(8), 1196-1208. https://doi.org/10.1016/S0028-3932(01)00224-X
 
-Crawford, J., & Garthwaite, P. (2007). Comparison of a single case to a control or normative sample in neuropsychology: Development of a Bayesian approach. Cognitive Neuropsychology, 24(4), 343â€“372. https://doi.org/10.1080/02643290701290146
+Crawford, J., & Garthwaite, P. (2007). Comparison of a single case to a control or normative sample in neuropsychology: Development of a Bayesian approach. Cognitive Neuropsychology, 24(4), 343-372. https://doi.org/10.1080/02643290701290146
 
-Crawford, J., & Garthwaite, P. (2005). Testing for Suspected Impairments and Dissociations in Single-Case Studies in Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and Revised Tests for Dissociations. Neuropsychology, 19(3), 318â€“331. https://doi.org/10.1037/0894-4105.19.3.318
+Crawford, J., & Garthwaite, P. (2005). Testing for Suspected Impairments and Dissociations in Single-Case Studies in Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and Revised Tests for Dissociations. Neuropsychology, 19(3), 318-331. https://doi.org/10.1037/0894-4105.19.3.318
 
-Crawford, J., Garthwaite, P., & Ryan, K. (2011). Comparing a single case to a control sample: Testing for neuropsychological deficits and dissociations in the presence of covariates. Cortex, 47(10), 1166â€“1178. https://doi.org/10.1016/j.cortex.2011.02.017
+Crawford, J., Garthwaite, P., & Ryan, K. (2011). Comparing a single case to a control sample: Testing for neuropsychological deficits and dissociations in the presence of covariates. Cortex, 47(10), 1166-1178. https://doi.org/10.1016/j.cortex.2011.02.017
 
-Crawford, J., & Howell, D. (1998). Comparing an Individualâ€™s Test Score Against Norms Derived from Small Samples. The Clinical Neuropsychologist, 12(4), 482â€“486. https://doi.org/10.1076/clin.12.4.482.7241
+Crawford, J., & Howell, D. (1998). Comparing an Individual's Test Score Against Norms Derived from Small Samples. The Clinical Neuropsychologist, 12(4), 482-486. https://doi.org/10.1076/clin.12.4.482.7241
 
-Hassan, E. K., Sedda, A., Buckingham, G., & McIntosh, R. D. (2020). The size-weight illusion in visual form agnosic patient DF. Neurocase, 1â€“8. https://doi.org/10.1080/13554794.2020.1800748
+Hassan, E. K., Sedda, A., Buckingham, G., & McIntosh, R. D. (2020). The size-weight illusion in visual form agnosic patient DF. Neurocase, 1-8. https://doi.org/10.1080/13554794.2020.1800748

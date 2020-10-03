@@ -3,7 +3,7 @@
 #' Calculates exact power given sample size or sample size given power, using
 #' analytical methods for the frequentist test of deficit for a specified case
 #' scores, means and standard deviations for the control sample. The means and
-#' standard deviations defaults to 0 and 1 respecitvely, so if no other values
+#' standard deviations defaults to 0 and 1 respectively, so if no other values
 #' are given, the case scores are interpreted as deviations from the mean in
 #' standard deviations. The returned value will approximate the power for the
 #' given parameters.
@@ -34,7 +34,7 @@
 #'   needed to reach the desired power. However, if the power specified is
 #'   greater than what is actually possible to achieve the algorithm could
 #'   search forever. Hence, when power does not increase substantially for any
-#'   additional participant in the sample, the algorthm stops. By default the
+#'   additional participant in the sample, the algorithm stops. By default the
 #'   algorithm stops when power does not increase more than 0.5% for any added
 #'   participant, but by varying \code{spec}, this specificity can be changed.
 #'

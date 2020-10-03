@@ -8,8 +8,8 @@
 #' controlling for years of education or sex. Under the null hypothesis the case
 #' is an observation from the distribution of discrepancies between the tasks of interest
 #' coming from observations having the same score as the case on the
-#' covariate(s). Returns a signficance test, point
-#' and interval estimates of difference betwen the case and the mean of the controls
+#' covariate(s). Returns a significance test, point
+#' and interval estimates of difference between the case and the mean of the controls
 #' as well as point and interval estimates of abnormality, i.e. an estimation of
 #' the proportion of controls that would exhibit a more extreme conditioned score.
 #' Developed by Crawford, Garthwaite and Ryan (2011).

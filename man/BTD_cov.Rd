@@ -29,7 +29,7 @@ included. Can be of any length except 0, in that case use
 task of interest. Or a vector of length 2 containing the mean and standard
 deviation of the task. In that order.}
 
-\item{control_covar}{A vector, matrix or dataframe cointaining the control
+\item{control_covar}{A vector, matrix or dataframe containing the control
 scores on the covariates included. If matrix or dataframe each column
 represents a covariate. Or a matrix or dataframe containing summary
 statistics where the first column represents the means for each covariate
@@ -84,8 +84,8 @@ test is used when assessing a case conditioned on some other variable, for
 example, assessing abnormality when controlling for years of education or
 sex. Under the null hypothesis the case is an observation from the distribution
 of scores from the task of interest coming from observations having the same
-score as the case on the covariate(s). Returns a signficance test, point
-and interval estimates of difference betwen the case and the mean of the controls
+score as the case on the covariate(s). Returns a significance test, point
+and interval estimates of difference between the case and the mean of the controls
 as well as point and interval estimates of abnormality, i.e. an estimation of
 the proportion of controls that would exhibit a more extreme conditioned score.
 Developed by Crawford, Garthwaite and Ryan (2011).

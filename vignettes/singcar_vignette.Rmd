@@ -40,7 +40,7 @@ appropriate statistical methods for comparing a case against a control sample.
 For instance, they may commonly be done in a neuropsychological context, in
 which an individual has incurred a specific brain injury and we wish to test
 whether this damage has led to an impairment of some cognitive function and
-whether two different functions are dissocia ble. For many functions there is
+whether two different functions are dissociable. For many functions there is
 normed data available which the patient can be compared against directly.
 However, when this is not possible a control sample estimating the population,
 against which we wish to compare the patient, must be used. Both frequentist and
@@ -95,7 +95,7 @@ TD(case = DF_V_SWI, controls = CON_V_SWI, conf_int = TRUE)
 ```
 
 
-This can similarily be tested with a Bayesian version of the same test,
+This can similarly be tested with a Bayesian version of the same test,
 yielding approximately (since this test is based on MCMC methods) the same output [@crawford_comparison_2007].
 
 ```{r BTD}
