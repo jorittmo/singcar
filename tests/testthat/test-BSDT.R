@@ -39,37 +39,15 @@ test_that("check that BSDT produces same as C and G", {
             2.06553374, -0.10455893,  0.33921656, -0.05297144)
 
   set.seed(123)
-  p_nsum <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony, iter = 10000)[["p.value"]]
+  p_nsum <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony,
+                 iter = 10000, calibrated = FALSE)[["p.value"]]
 
   CandGPval <- 0.27849
 
-  expect_equal(p_nsum, CandGPval, tol = 0.05)
+  expect_equal(p_nsum, CandGPval, tol = 0.01)
 
 })
 
-test_that("check that BSDT produce roughly same output for chol_sim", {
-
-  conx <- c(-0.49094434, -1.25947544, -0.40339230, -0.12673867,
-            0.43919457, -0.11994170,  0.68001403, -1.12678679,
-            -0.91987671,  0.49401765, 1.07773774,  0.09122404,
-            -0.12151505, -0.76224593, -1.44645118,  1.05976883,
-            2.59665103,  1.27920207, -0.75500952, -0.18543234)
-
-  cony <- c(-0.23357273, -2.09724146, -2.13526191,  0.89081394,
-            0.76778599,  0.61269488,  0.54535923, -1.30459451,
-            -0.25811271,  0.64790674, 0.52118776, -0.33601990,
-            -0.37181171, -0.31255830, -0.03610260,  0.85230736,
-            2.06553374, -0.10455893,  0.33921656, -0.05297144)
-
-  set.seed(123)
-  p_cholsim <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony, iter = 10000, chol_sim = TRUE)[["p.value"]]
-  set.seed(123)
-  p_loopchol <- BSDT(case_a = -2, case_b = -3, controls_a = conx, controls_b = cony, iter = 10000, chol_sim = FALSE)[["p.value"]]
-
-
-  expect_equal(p_cholsim, p_loopchol, tol = 0.01)
-
-})
 
 
 test_that("errors and warnings are occuring as they should for BSDT", {
@@ -131,6 +109,15 @@ test_that("choice of prior works", {
     NA)
   expect_error(
     BSDT(-2, 0, 0, 0, 1, 1, 20, 0.5, iter = 20, calibrated = TRUE),
+    NA)
+})
+
+test_that("standardistation/unstandardisation works", {
+  expect_error(
+    BSDT(-2, 0, 0, 0, 1, 1, 20, 0.5, iter = 20, unstandardised = TRUE),
+    NA)
+  expect_error(
+    BSDT(-2, 0, 0, 0, 1, 1, 20, 0.5, iter = 20, unstandardised = FALSE),
     NA)
 })
 
