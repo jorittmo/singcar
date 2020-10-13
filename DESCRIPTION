@@ -12,7 +12,7 @@ Authors@R:
              role = c("aut"),
              email = "r.d.mcintosh@ed.ac.uk",
              comment = c(ORCID = "0000-0002-7615-6699")))
-Description: When comparing single cases to control populations and no parameters are known researchers must estimate these with a control sample. This is often done when testing a case's abnormality on some variable or testing the discrepancy between two variables. The hitherto most appropriate methods for controlling Type I errors for such tests are implemented in this package, along with respective power calculators as well as methods allowing for the inclusion of covariates.
+Description: When comparing single cases to control populations and no parameters are known researchers and clinicians must estimate these with a control sample. This is often done when testing a case's abnormality on some variable or testing abnormality of the discrepancy between two variables. Appropriate frequentist and Bayesian methods for doing this are here implemented, including tests allowing for the inclusion of covariates. These have been developed first and foremost by John Crawford and Paul Garthwaite, e.g. in Crawford and Howell (1998) <doi:10.1076/clin.12.4.482.7241>, Crawford and Garthwaite (2005) <doi:10.1037/0894-4105.19.3.318>, Crawford and Garthwaite (2007) <doi:10.1080/02643290701290146> and Crawford, Garthwaite and Ryan (2011) <doi:10.1016/j.cortex.2011.02.017>. The package is also equipped with power calculators for each method. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,7 +21,8 @@ Depends: R (>= 2.10)
 Imports: 
     stats,
     CholWishart,
-    MASS
+    MASS,
+    withr
 Suggests:
     knitr,
     rmarkdown,
