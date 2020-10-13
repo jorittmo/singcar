@@ -69,5 +69,5 @@ cor_mat = matrix(c(1, 0.2, 0.3, 0.2, 1, 0.4, 0.3, 0.4, 1), ncol = 3)
 
 BTD_cov_power(case = -2, case_cov = c(105, 30), control_task = c(0, 1),
 control_covar = matrix(c(100, 40, 15, 10), ncol = 2), sample_size = 15,
-cor_mat = cor_mat, iter = 100, nsim = 100)
+cor_mat = cor_mat, iter = 20, nsim = 20)
 }

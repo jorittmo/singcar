@@ -1,17 +1,22 @@
 #' Bayesian Test of Deficit with Covariates
 #'
-#' Takes a single observation
-#' and compares it to a distribution estimated by a control sample, while
-#' controlling for the effect of covariates, using Bayesian methodology. This
-#' test is used when assessing a case conditioned on some other variable, for
-#' example, assessing abnormality when controlling for years of education or
-#' sex. Under the null hypothesis the case is an observation from the distribution
-#' of scores from the task of interest coming from observations having the same
-#' score as the case on the covariate(s). Returns a significance test, point
-#' and interval estimates of difference between the case and the mean of the controls
-#' as well as point and interval estimates of abnormality, i.e. an estimation of
-#' the proportion of controls that would exhibit a more extreme conditioned score.
-#' Developed by Crawford, Garthwaite and Ryan (2011).
+#' Takes a single observation and compares it to a distribution estimated by a
+#' control sample, while controlling for the effect of covariates, using
+#' Bayesian methodology. This test is used when assessing a case conditioned on
+#' some other variable, for example, assessing abnormality when controlling for
+#' years of education or sex. Under the null hypothesis the case is an
+#' observation from the distribution of scores from the task of interest coming
+#' from observations having the same score as the case on the covariate(s).
+#' Returns a significance test, point and interval estimates of difference
+#' between the case and the mean of the controls as well as point and interval
+#' estimates of abnormality, i.e. an estimation of the proportion of controls
+#' that would exhibit a more extreme conditioned score. This test is based on
+#' random number generation which means that results may vary between runs. This
+#' is by design and the reason for not using \code{set.seed()} to reproduce
+#' results inside the function is to emphasise the randomness of the test. To
+#' get more accurate and stable results please increase the number of iterations
+#' by increasing \code{iter} whenever feasible. Developed by Crawford,
+#' Garthwaite and Ryan (2011).
 #'
 #' Uses random generation of inverse wishart distributions from the
 #' CholWishart package (Geoffrey Thompson, 2019).
@@ -34,7 +39,7 @@
 #'   \code{"less"}. You can specify just the initial letter.
 #' @param int_level The probability level on the Bayesian credible intervals, defaults to 95\%.
 #' @param iter Number of iterations to be performed. Greater number gives better
-#'   estimation but takes longer to calculate.
+#'   estimation but takes longer to calculate. Defaults to 10000.
 #' @param use_sumstats If set to \code{TRUE}, \code{control_tasks} and
 #'   \code{control_covar} are treated as matrices with summary statistics. Where
 #'   the first column represents the means for each variable and the second
@@ -83,7 +88,7 @@
 
 BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      alternative = c("less", "two.sided", "greater"),
-                     int_level = 0.95, iter = 1000,
+                     int_level = 0.95, iter = 10000,
                      use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
   alternative <- match.arg(alternative)
@@ -93,6 +98,8 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   if (length(case_task) != 1) stop("case_task should be single value")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
   if (!is.null(cor_mat) | !is.null(sample_size)) if (use_sumstats == FALSE) stop("If input is summary data, set use_sumstats = TRUE")
+
+  if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
 
   if (use_sumstats) {
 

@@ -6,13 +6,18 @@
 #' Bayesian methodology. This test is used when assessing a case conditioned on
 #' some other variable, for example, assessing abnormality of discrepancy when
 #' controlling for years of education or sex. Under the null hypothesis the case
-#' is an observation from the distribution of discrepancies between the tasks of interest
-#' coming from observations having the same score as the case on the
-#' covariate(s). Returns a significance test, point
-#' and interval estimates of difference between the case and the mean of the controls
-#' as well as point and interval estimates of abnormality, i.e. an estimation of
-#' the proportion of controls that would exhibit a more extreme conditioned score.
-#' Developed by Crawford, Garthwaite and Ryan (2011).
+#' is an observation from the distribution of discrepancies between the tasks of
+#' interest coming from observations having the same score as the case on the
+#' covariate(s). Returns a significance test, point and interval estimates of
+#' difference between the case and the mean of the controls as well as point and
+#' interval estimates of abnormality, i.e. an estimation of the proportion of
+#' controls that would exhibit a more extreme conditioned score. This test is
+#' based on random number generation which means that results may vary between
+#' runs. This is by design and the reason for not using \code{set.seed()} to
+#' reproduce results inside the function is to emphasise the randomness of the
+#' test. To get more accurate and stable results please increase the number of
+#' iterations by increasing \code{iter} whenever feasible. Developed by
+#' Crawford, Garthwaite and Ryan (2011).
 #'
 #' Uses random generation of inverse wishart distributions from the
 #' CholWishart package (Geoffrey Thompson, 2019).
@@ -117,12 +122,13 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   if (sum(is.na(control_covar)) > 0) stop("control_covar contains NA")
 
   if (use_sumstats == FALSE){
-    cov_obs <- ifelse(is.array(control_covar), nrow(control_covar), length(control_covar))
+    cov_obs <- ifelse(is.vector(control_covar), length(control_covar), nrow(control_covar))
     if (nrow(control_tasks) != cov_obs) stop("Must supply equal number of observations for tasks and covariates")
     rm(cov_obs)
   }
 
-
+  if (is.data.frame(control_tasks)) control_tasks <- as.matrix(control_tasks)
+  if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
 
   if (use_sumstats) {
 

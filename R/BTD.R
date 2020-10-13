@@ -5,13 +5,16 @@
 #' between the case score and the mean of the controls and proportions falling
 #' above or below the case score, as well as associated credible intervals. This
 #' approach was developed by Crawford and Garthwaite (2007) but converge to the
-#' results of \code{\link{TD}()}, which is faster.
-#'
-#' Returns the point estimate of the standardised difference
-#' between the case score and the mean of the controls and the point estimate
-#' of the p-value (i.e. the percentage of the population that would be
-#' expected to obtain a lower or higher score, depending on the alternative
-#' hypothesis).
+#' results of \code{\link{TD}()}, which is faster. Returns the point estimate of
+#' the standardised difference between the case score and the mean of the
+#' controls and the point estimate of the p-value (i.e. the percentage of the
+#' population that would be expected to obtain a lower or higher score,
+#' depending on the alternative hypothesis). This test is based on random number
+#' generation which means that results may vary between runs. This is by design
+#' and the reason for not using \code{set.seed()} to reproduce results inside
+#' the function is to emphasise the randomness of the test. To get more accurate
+#' and stable results please increase the number of iterations by increasing
+#' \code{iter} whenever feasible.
 #'
 #'
 #' @param case Case observation, can only be a single value.

@@ -291,7 +291,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 #'
 #' BTD_cov_power(case = -2, case_cov = c(105, 30), control_task = c(0, 1),
 #' control_covar = matrix(c(100, 40, 15, 10), ncol = 2), sample_size = 15,
-#' cor_mat = cor_mat, iter = 100, nsim = 100)
+#' cor_mat = cor_mat, iter = 20, nsim = 20)
 
 BTD_cov_power <- function(case, case_cov, control_task = c(0, 1), control_covar = c(0, 1),
                           cor_mat = diag(2),

@@ -11,7 +11,7 @@ BTD_cov(
   control_covar,
   alternative = c("less", "two.sided", "greater"),
   int_level = 0.95,
-  iter = 1000,
+  iter = 10000,
   use_sumstats = FALSE,
   cor_mat = NULL,
   sample_size = NULL
@@ -42,7 +42,7 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 \item{int_level}{The probability level on the Bayesian credible intervals, defaults to 95\%.}
 
 \item{iter}{Number of iterations to be performed. Greater number gives better
-estimation but takes longer to calculate.}
+estimation but takes longer to calculate. Defaults to 10000.}
 
 \item{use_sumstats}{If set to \code{TRUE}, \code{control_tasks} and
 \code{control_covar} are treated as matrices with summary statistics. Where
@@ -77,18 +77,23 @@ A list with class \code{"htest"} containing the following components:
   \tab a character string giving the name(s) of the data}
 }
 \description{
-Takes a single observation
-and compares it to a distribution estimated by a control sample, while
-controlling for the effect of covariates, using Bayesian methodology. This
-test is used when assessing a case conditioned on some other variable, for
-example, assessing abnormality when controlling for years of education or
-sex. Under the null hypothesis the case is an observation from the distribution
-of scores from the task of interest coming from observations having the same
-score as the case on the covariate(s). Returns a significance test, point
-and interval estimates of difference between the case and the mean of the controls
-as well as point and interval estimates of abnormality, i.e. an estimation of
-the proportion of controls that would exhibit a more extreme conditioned score.
-Developed by Crawford, Garthwaite and Ryan (2011).
+Takes a single observation and compares it to a distribution estimated by a
+control sample, while controlling for the effect of covariates, using
+Bayesian methodology. This test is used when assessing a case conditioned on
+some other variable, for example, assessing abnormality when controlling for
+years of education or sex. Under the null hypothesis the case is an
+observation from the distribution of scores from the task of interest coming
+from observations having the same score as the case on the covariate(s).
+Returns a significance test, point and interval estimates of difference
+between the case and the mean of the controls as well as point and interval
+estimates of abnormality, i.e. an estimation of the proportion of controls
+that would exhibit a more extreme conditioned score. This test is based on
+random number generation which means that results may vary between runs. This
+is by design and the reason for not using \code{set.seed()} to reproduce
+results inside the function is to emphasise the randomness of the test. To
+get more accurate and stable results please increase the number of iterations
+by increasing \code{iter} whenever feasible. Developed by Crawford,
+Garthwaite and Ryan (2011).
 }
 \details{
 Uses random generation of inverse wishart distributions from the
