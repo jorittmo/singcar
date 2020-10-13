@@ -17,6 +17,25 @@ test_that("choice of prior works", {
     NA)
 })
 
+test_that("input of control_covar can be both dataframe and matrix", {
+  #First, I dummy code SEX to a new numeric binary variable MF01
+
+  size_weight_illusion$MF01 <- as.numeric(size_weight_illusion$SEX == "Female")
+  set.seed(123)
+  df <- BSDT_cov(case_task = unlist(size_weight_illusion[1, c("V_SWI", "K_SWI")]),
+                 case_covar = unlist(size_weight_illusion[1, c("YRS", "MF01")]),
+                 control_task = size_weight_illusion[-1, c("V_SWI", "K_SWI")],
+                 control_covar = size_weight_illusion[-1, c("YRS", "MF01")], iter = 100)
+  set.seed(123)
+  mat <- BSDT_cov(case_task = unlist(size_weight_illusion[1, c("V_SWI", "K_SWI")]),
+                  case_covar = unlist(size_weight_illusion[1, c("YRS", "MF01")]),
+                  control_task = as.matrix(size_weight_illusion[-1, c("V_SWI", "K_SWI")]),
+                  control_covar = as.matrix(size_weight_illusion[-1, c("YRS", "MF01")]), iter = 100)
+  expect_equal(df, mat)
+})
+
+
+
 test_that("we get approx same results as C&G on BSDT_cov", {
 
   set.seed(123456)

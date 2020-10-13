@@ -16,6 +16,24 @@ test_that("summary input yields same result as raw", {
 })
 
 
+test_that("input of control_covar can be both dataframe and matrix", {
+
+  size_weight_illusion$MF01 <- as.numeric(size_weight_illusion$SEX == "Female")
+  set.seed(123)
+  df <- BTD_cov(case_task = size_weight_illusion[1, "V_SWI"],
+                case_covar = unlist(size_weight_illusion[1, c("YRS", "MF01")]),
+                control_task = size_weight_illusion[-1, "V_SWI"],
+                control_covar = size_weight_illusion[-1, c("YRS", "MF01")], iter = 100)
+  set.seed(123)
+  mat <- BTD_cov(case_task = size_weight_illusion[1, "V_SWI"],
+                 case_covar = unlist(size_weight_illusion[1, c("YRS", "MF01")]),
+                 control_task = size_weight_illusion[-1, "V_SWI"],
+                 control_covar = as.matrix(size_weight_illusion[-1, c("YRS", "MF01")]), iter = 100)
+  expect_equal(df, mat)
+})
+
+
+
 test_that("we get approx same results as C&G on BTD_cov", {
   x <- MASS::mvrnorm(18, mu = c(100, 13),
                      Sigma = matrix(c(15^2, 0.65*15*3,
