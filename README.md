@@ -2,6 +2,9 @@
 # singcar
 
 <!-- badges: start -->
+[![CRAN](https://www.r-pkg.org/badges/version/singcar)](https://CRAN.R-project.org/package=singcar)
+[![CRAN downloads total](http://cranlogs.r-pkg.org/badges/grand-total/singcar)](https://CRAN.R-project.org/package=singcar)
+[![CRAN downloads month](https://cranlogs.r-pkg.org/badges/singcar)](https://CRAN.R-project.org/package=singcar)
 [![Travis build status](https://travis-ci.org/jorittmo/singcar.svg?branch=master)](https://travis-ci.org/jorittmo/singcar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
@@ -27,6 +30,13 @@ statistical methods could also be applied as a general method of outlier
 detection in small samples. 
 
 ## Installation
+
+`singcar` is now available on CRAN! To get this stable version run:
+
+```R
+install.packages("singcar")
+library("singcar")
+```
 
 You can install the unstable(!) developmental version of `singcar` by running the following:
 
