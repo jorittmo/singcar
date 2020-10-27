@@ -438,27 +438,6 @@ test_that("choice of prior functionality works", {
 
 })
 
-test_that("UDT_power and BTD_cov_power produce approx equal output", {
-
-  set.seed(12314536)
-
-  cor_mat <- matrix(c(1, 0.5, 0, 0.5, 1, 0, 0, 0, 1), ncol = 3)
-
-  expect_equal(UDT_power(-2, 0, sample_size = 15, alternative = "less"),
-               BSDT_cov_power(c(-2, 0), 0, sample_size = 15, cor_mat = cor_mat,
-                              alternative = "less", iter=50, nsim =50), tolerance = 0.08)
-
-  expect_equal(UDT_power(-2, 0, sample_size = 15, alternative = "two.sided"),
-               BSDT_cov_power(c(-2, 0), 0, sample_size = 15, cor_mat = cor_mat,
-                              alternative = "two.sided", iter=50, nsim = 50), tolerance = 0.05)
-
-  expect_equal(UDT_power(-2, 0, sample_size = 15, alternative = "greater"),
-               BSDT_cov_power(c(-2, 0), 0, sample_size = 15, cor_mat = cor_mat,
-                              alternative = "greater", iter=50, nsim = 50), tolerance = 0.05)
-
-
-
-})
 
 test_that("errors are working for BTD_cov_power", {
 

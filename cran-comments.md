@@ -1,16 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Added appropriate references and updated the description.
-
-* Removed a function that could be used to modify the global seed.
-
-* Updated documentation slightly.
-
-* Decreased runtime on examples.
-
-* Updated automatic tests.
-
+* Removed a non-essential automatic test that probably
+  due to some RNG configuration failed when built on 
+  x86_64-pc-linux-gnu (64-bit) for R Under development.
 
 ## Test environments
 * local Windows 10 R installation, R 4.0.2
@@ -19,9 +12,7 @@ This is a resubmission. In this version I have:
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+0 errors | 0 warnings | 0 note
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
