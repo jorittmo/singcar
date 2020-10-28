@@ -4,6 +4,8 @@ This is a resubmission. In this version I have:
 * Removed a non-essential automatic test that probably
   due to some RNG configuration failed when built on 
   x86_64-pc-linux-gnu (64-bit) for R Under development.
+* Appropriately updated version number.
+* Added NEWS.md to keep track of changes to the package.
 
 ## Test environments
 * local Windows 10 R installation, R 4.0.2
