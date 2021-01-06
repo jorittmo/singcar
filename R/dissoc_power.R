@@ -174,7 +174,7 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
         if (abs(prev_search_pwr - search_pwr) < spec) {
           keep_going = FALSE
           message(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
-                       " for any additional participant over n = ", n))
+                         " per participant for n > ", n))
         }
 
         prev_search_pwr = search_pwr
@@ -255,8 +255,8 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     controls <- MASS::mvrnorm(n + 1, mu = c(mean_a, mean_b), Sigma = cov_mat)
 
-    case_a_gen <- controls[1, 1] + case_a
-    case_b_gen <- controls[1, 2] + case_b
+    case_a_gen <- controls[1, 1] + (case_a - mean_a)
+    case_b_gen <- controls[1, 2] + (case_b - mean_b)
 
     controls <- controls[-1, ]
 
@@ -351,8 +351,8 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
 
     controls <- MASS::mvrnorm(n + 1, mu = c(mean_a, mean_b), Sigma = cov_mat)
 
-    case_a_gen <- controls[1, 1] + case_a
-    case_b_gen <- controls[1, 2] + case_b
+    case_a_gen <- controls[1, 1] + (case_a - mean_a)
+    case_b_gen <- controls[1, 2] + (case_b - mean_b)
 
     controls <- controls[-1, ]
 
@@ -463,7 +463,7 @@ BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 
     case_score_emp <- vector(length = length(case_scores))
 
     for (i in 1:length(case_scores)) {
-      case_score_emp[i] <- con[1, i] + case_scores[i]
+      case_score_emp[i] <- con[1, i] + (case_scores[i] - mu[i])
     }
 
     con <- con [-1, ]

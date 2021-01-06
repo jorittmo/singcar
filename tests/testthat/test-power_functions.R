@@ -116,6 +116,25 @@ test_that("when n is high, produce same power a z-test", {
 
 })
 
+test_that("standardised and non-std scores give equal results TD", {
+
+  expect_equal(TD_power(case = 70,
+                        mean = 100,
+                        sd = 15,
+                        sample_size = 15,
+                        alternative = "less",
+                        alpha = 0.05),
+               TD_power(case = -2,
+                        mean = 0,
+                        sd = 1,
+                        sample_size = 15,
+                        alternative = "less",
+                        alpha = 0.05),
+               tolerance = 0.0001)
+
+
+})
+
 ###########################################
 
 # BTD_power
@@ -158,6 +177,29 @@ test_that("errors are working for BTD_power", {
                "Sample size must be greater than 1")
   expect_error(BTD_power(-2, sample_size = 10, alpha = 2),
                "Type I error rate must be between 0 and 1")
+
+})
+
+test_that("standardised and non-std scores give equal results BTW_pow", {
+
+  expect_equal(BTD_power(case = 70,
+                        mean = 100,
+                        sd = 15,
+                        sample_size = 15,
+                        alternative = "less",
+                        alpha = 0.05,
+                        iter = 500,
+                        nsim = 500),
+               BTD_power(case = -2,
+                        mean = 0,
+                        sd = 1,
+                        sample_size = 15,
+                        alternative = "less",
+                        alpha = 0.05,
+                        iter = 500,
+                        nsim = 500),
+               tolerance = 0.1)
+
 
 })
 
@@ -212,6 +254,31 @@ test_that("errors are working for BTD_cov_power", {
                "Number of variables and number of correlations do not match")
 
 
+})
+
+test_that("standardised and non-std scores give equal results BTD_pow_cov", {
+
+  expect_equal(BTD_cov_power(case = 70,
+                             case_cov = 70,
+                             control_task = c(100, 15),
+                             control_covar = c(100, 15),
+                             cor_mat = diag(2),
+                             sample_size = 15,
+                             alternative = "less",
+                             alpha = 0.05,
+                             nsim = 50,
+                             iter = 50),
+               BTD_cov_power(case = -2,
+                             case_cov = -2,
+                             control_task = c(0, 1),
+                             control_covar = c(0, 1),
+                             cor_mat = diag(2),
+                             sample_size = 15,
+                             alternative = c("less", "greater", "two.sided"),
+                             alpha = 0.05,
+                             nsim = 50,
+                             iter = 50),
+               tolerance = 0.2)
 })
 
 ###########################################
@@ -338,7 +405,34 @@ test_that("TD_power and RSDR_power power estimations in the same range when r = 
 
 })
 
+test_that("standardised and non-std scores give equal results RSDT_pow", {
 
+  expect_equal(RSDT_power(case_a = 70,
+                          case_b = 100,
+                          mean_a = 100,
+                          mean_b = 100,
+                          sd_a = 15,
+                          sd_b = 15,
+                          r_ab = 0.5,
+                          sample_size = 15,
+                          alternative = "t",
+                          alpha = 0.05,
+                          nsim = 1000),
+               RSDT_power(case_a = -2,
+                          case_b = 0,
+                          mean_a = 0,
+                          mean_b = 0,
+                          sd_a = 1,
+                          sd_b = 1,
+                          r_ab = 0.5,
+                          sample_size = 15,
+                          alternative = "t",
+                          alpha = 0.05,
+                          nsim = 1000),
+               tolerance = 0.1)
+
+
+})
 
 ###########################################
 
@@ -406,6 +500,33 @@ test_that("TD_power and BSDT_power power estimations in the same range when r = 
 
 })
 
+test_that("standardised and non-std scores give equal results BSDT_pow", {
+
+  expect_equal(BSDT_power(case_a = 70,
+                          case_b = 100,
+                          mean_a = 100,
+                          mean_b = 100,
+                          sd_a = 15,
+                          sd_b = 15,
+                          r_ab = 0.5,
+                          sample_size = 15,
+                          alternative = "t",
+                          alpha = 0.05,
+                          nsim = 50),
+               BSDT_power(case_a = -2,
+                          case_b = 0,
+                          mean_a = 0,
+                          mean_b = 0,
+                          sd_a = 1,
+                          sd_b = 1,
+                          r_ab = 0.5,
+                          sample_size = 15,
+                          alternative = "t",
+                          alpha = 0.05,
+                          nsim = 50),
+               tolerance = 0.2)
+})
+
 ###########################################
 
 # BSDT_cov_power
@@ -455,5 +576,32 @@ test_that("errors are working for BTD_cov_power", {
                               sample_size = 10, cor_mat = diag(4), iter = 50, nsim = 50),
                "case_tasks should be of length 2")
 
+})
 
+test_that("standardised and non-std scores give equal results BSDT_cov_pow", {
+
+  expect_equal(
+    BSDT_cov_power(case_tasks = c(70, 100),
+                   case_cov = 100,
+                   control_tasks = matrix(c(100, 100, 15, 15), ncol = 2),
+                   control_covar = c(100, 15),
+                   cor_mat = diag(3),
+                   sample_size = 15,
+                   alternative = c("two.sided", "greater", "less"),
+                   alpha = 0.05,
+                   nsim = 100,
+                   iter = 100,
+                   calibrated = TRUE),
+    BSDT_cov_power(case_tasks = c(-2, 0),
+                   case_cov = 0,
+                   control_tasks = matrix(c(0, 0, 1, 1), ncol = 2),
+                   control_covar = c(0, 1),
+                   cor_mat = diag(3),
+                   sample_size = 15,
+                   alternative = c("two.sided", "greater", "less"),
+                   alpha = 0.05,
+                   nsim = 100,
+                   iter = 100,
+                   calibrated = TRUE),
+    tolerance = 0.2)
 })

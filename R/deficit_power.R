@@ -156,8 +156,8 @@ TD_power <- function(case, mean = 0, sd = 1,
 
       if (abs(prev_search_pwr - search_pwr) < spec) {
         keep_going = FALSE
-        message(paste0("Power (", format(round(search_pwr, 5), nsmall = 5), ") will not increase more than ", spec*100, "%",
-                     " for any additional participant over n = ", n))
+        message(paste0("Power (", format(round(search_pwr, 3), nsmall = 3), ") will not increase more than ", spec*100, "%",
+                     " per participant for n > ", n))
       }
 
       prev_search_pwr = search_pwr
@@ -224,7 +224,7 @@ BTD_power <- function(case, mean = 0, sd = 1,
 
     con <- stats::rnorm(n, mean = mean, sd = sd)
 
-    case <- stats::rnorm(1, mean = mean, sd = sd) + case
+    case <- stats::rnorm(1, mean = mean, sd = sd) + (case - mean)
 
     pval <- singcar::BTD(case, con, iter = iter, alternative = alternative)[["p.value"]]
 
@@ -321,11 +321,12 @@ BTD_cov_power <- function(case, case_cov, control_task = c(0, 1), control_covar 
 
     con <- MASS::mvrnorm(n+1, mu = mu, Sigma = Sigma)
 
+
     case_scores <- c(case, case_cov)
     case_score_emp <- vector(length = length(case_scores))
 
     for (i in 1:length(case_scores)) {
-      case_score_emp[i] <- con[1, i] + case_scores[i]
+      case_score_emp[i] <- con[1, i] + (case_scores[i] - mu[i])
     }
 
     con <- con [-1, ]
