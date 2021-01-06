@@ -203,7 +203,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   if (alternative == "two.sided") estimate <- c(zccc, (p_est/2)*100)
 
   zccc.name <- paste0("Std. case score (Z-CCC), ",
-                     100*int_level, "% credible interval [",
+                     100*int_level, "% CI [",
                      format(round(zccc_int[1], 2), nsmall = 2),", ",
                      format(round(zccc_int[2], 2), nsmall = 2),"]")
 
@@ -220,7 +220,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int_level, "% credible interval [",
+                   100*int_level, "% CI [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 

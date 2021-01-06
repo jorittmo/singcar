@@ -249,7 +249,7 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     ci_up_zdcc <- ncp_up/sqrt(n)
     cint_zdcc <- c(ci_lo_zdcc, ci_up_zdcc)
 
-    zdcc.name <- paste0("Standardised task discrepancy (Z-DCC), ",
+    zdcc.name <- paste0("Std. task discrepancy (Z-DCC), ",
                        100*conf_level, "% CI [",
                        format(round(cint_zdcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zdcc[2], 2), nsmall = 2),"]")
@@ -316,8 +316,8 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
     interval <- c(typ.int, cint_zdcc, cint_p)
 
-    names(estimate) <- c("Standardised case score, task A (Z-CC)",
-                         "Standardised case score, task B (Z-CC)",
+    names(estimate) <- c("Std. case score, task A (Z-CC)",
+                         "Std. case score, task B (Z-CC)",
                          zdcc.name,
                          p.name)
 
@@ -327,17 +327,17 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     interval <- NULL
 
     if (alternative == "two.sided") {
-      p.name <- paste("Proportion of controls", ifelse(tstat < 0, "below", "above"), "case (%)")
+      p.name <- paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)")
     } else if (alternative == "greater") {
-      p.name <- "Proportion of controls above case (%)"
+      p.name <- "Proportion above case (%)"
     } else {
-      p.name <- "Proportion of controls below case (%)"
+      p.name <- "Proportion below case (%)"
     }
 
 
-    names(estimate) <- c("Standardised case score, task A (Z-CC)",
-                         "Standardised case score, task B (Z-CC)",
-                         "Standardised task discrepancy (Z-DCC)",
+    names(estimate) <- c("Std. case score, task A (Z-CC)",
+                         "Std. case score, task B (Z-CC)",
+                         "Std. discrepancy (Z-DCC)",
                          p.name)
 
   }

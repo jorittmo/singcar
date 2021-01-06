@@ -191,6 +191,15 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
 
     if (alternative == "two.sided") {
       pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = FALSE)
+
+      if (zdcc < 0) {
+        p.name <- "Proportion below case (%)"
+      } else {
+        p.name <- "Proportion above case (%)"
+      }
+
+
+
     } else if (alternative == "greater") {
       # Since equation (7) from Crawford and Garthwaite (the exact method)
       # cannot return a negative t-value we have to use zdcc to see
@@ -200,7 +209,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
       } else {
         pval <- stats::pt(-tstat, df = df, lower.tail = FALSE)
       }
-
+      p.name <- "Proportion above case (%)"
     }
 
      else { # I.e. if alternative == "less"
@@ -210,7 +219,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
       } else {
         pval <- stats::pt(tstat, df = df, lower.tail = TRUE)
       }
-
+       p.name <- "Proportion below case (%)"
     }
 
   # } else {
@@ -255,23 +264,12 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
   #
   # }
 
-
-
   estimate <- c(std_a, std_b, zdcc, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
 
-  if (alternative == "two.sided") {
-    p.name <- "Proportion of control population with more extreme task difference"
-  } else if (alternative == "greater") {
-    p.name <- "Proportion of control population with more positive task difference"
-  } else {
-    p.name <- "Proportion of control population with more negative task difference"
-  }
-
-
   # Set names for objects in output
-  names(estimate) <- c("Standardised case score, task A (Z-CC)",
-                       "Standardised case score, task B (Z-CC)",
-                       "Standardised task discrepancy (Z-DCC)",
+  names(estimate) <- c("Std. case score, task A (Z-CC)",
+                       "Std. case score, task B (Z-CC)",
+                       "Std. task discrepancy (Z-DCC)",
                        p.name)
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0

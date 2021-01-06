@@ -179,7 +179,7 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
     ci_up_zcc <- ncp_up/sqrt(n)
     cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
-    zcc.name <- paste0("Standardised case score (Z-CC), ",
+    zcc.name <- paste0("Std. case score (Z-CC), ",
                        100*conf_level, "% CI [",
                        format(round(cint_zcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zcc[2], 2), nsmall = 2),"]")

@@ -324,31 +324,35 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
   estimate <- c(std_a, std_b, zdcc, ifelse(alternative == "two.sided", (p_est/2*100), p_est*100))
 
   if (alternative == "two.sided") {
-    alt.p.name <- "Proportion of control population with more extreme task difference, "
+    if (zdcc < 0) {
+      alt.p.name <- "Proportion below case (%), "
+    } else {
+      alt.p.name <- "Proportion above case (%), "
+    }
   } else if (alternative == "greater") {
-    alt.p.name <- "Proportion of control population with more positive task difference, "
+    alt.p.name <- "Proportion above case (%), "
   } else {
-    alt.p.name <- "Proportion of control population with more negative task difference, "
+    alt.p.name <- "Proportion below case (%), "
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int_level, "% credible interval [",
+                   100*int_level, "% CI [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
-  zdcc.name <- paste0("Standardised task discrepancy (Z-DCC), ",
-                     100*int_level, "% credible interval [",
+  zdcc.name <- paste0("Std. discrepancy (Z-DCC), ",
+                     100*int_level, "% CI [",
                      format(round(zdcc_int[1], 2), nsmall = 2),", ",
                      format(round(zdcc_int[2], 2), nsmall = 2),"]")
 
-  names(estimate) <- c("Standardised case score, task A (Z-CC)",
-                       "Standardised case score, task B (Z-CC)",
+  names(estimate) <- c("Std. case score, task A (Z-CC)",
+                       "Std. case score, task B (Z-CC)",
                        zdcc.name,
                        p.name)
 
 
   typ.int <- 100*int_level
-  names(typ.int) <- "Interval level (%)"
+  names(typ.int) <- "Credible (%)"
   interval <- c(typ.int, zdcc_int, p_int)
 
 

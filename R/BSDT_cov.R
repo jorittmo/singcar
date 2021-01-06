@@ -260,7 +260,7 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   mu_ast <- t(B_ast) %*% c(1, case_covar)
 
-  cov_ast <- Sigma_ast/(n - 1) # This is aligns witht the program but in the paper it should be (n - m - 1)
+  cov_ast <- Sigma_ast/(n - 1)
 
   rho_ast <- cov_ast[1, 2]/sqrt(cov_ast[1, 1] * cov_ast[2, 2])
 
@@ -273,32 +273,36 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   estimate <- round(c(z.y1, z.y2, zdccc, prop), 6)
 
   if (alternative == "two.sided") {
-    alt.p.name <- "Proportion of control population with more extreme task difference, "
+    if (zdccc < 0) {
+      alt.p.name <- "Proportion below case (%), "
+    } else {
+      alt.p.name <- "Proportion above case (%), "
+    }
   } else if (alternative == "greater") {
-    alt.p.name <- "Proportion of control population with more positive task difference, "
+    alt.p.name <- "Proportion above case (%), "
   } else {
-    alt.p.name <- "Proportion of control population with more negative task difference, "
+    alt.p.name <- "Proportion below case (%), "
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int_level, "% credible interval [",
+                   100*int_level, "% CI [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
-  zdccc.name <- paste0("Standardised task discrepancy (Z-DCCC), ",
-                      100*int_level, "% credible interval [",
+  zdccc.name <- paste0("Std. discrepancy (Z-DCCC), ",
+                      100*int_level, "% CI [",
                       format(round(zdccc_int[1], 2), nsmall = 2),", ",
                       format(round(zdccc_int[2], 2), nsmall = 2),"]")
 
-  names(estimate) <- c("Standardised case score, task A (Z-CC)",
-                       "Standardised case score, task B (Z-CC)",
+  names(estimate) <- c("Std. case score, task A (Z-CC)",
+                       "Std. case score, task B (Z-CC)",
                        zdccc.name,
                        p.name)
 
 
 
   typ.int <- 100*int_level
-  names(typ.int) <- "Interval level (%)"
+  names(typ.int) <- "Credible (%)"
   interval <- c(typ.int, zdccc_int, p_int)
 
 

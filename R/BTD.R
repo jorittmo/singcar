@@ -140,7 +140,7 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   if (alternative == "two.sided") estimate <- c(zcc, (p_est/2)*100)
 
   zcc.name <- paste0("Std. case score (Z-CC), ",
-                     100*int_level, "% credible interval [",
+                     100*int_level, "% CI [",
                      format(round(zcc_int[1], 2), nsmall = 2),", ",
                      format(round(zcc_int[2], 2), nsmall = 2),"]")
 
@@ -157,7 +157,7 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   }
 
   p.name <- paste0(alt.p.name,
-                   100*int_level, "% credible interval [",
+                   100*int_level, "% CI [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
                    format(round(p_int[2], 2), nsmall = 2),"]")
 
