@@ -349,10 +349,10 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score A: ", format(round(case_a, 2), nsmall = 2), ", ",
-                  "Case score B: ", format(round(case_b, 2), nsmall = 2), ", ",
-                  "Controls A (mean, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
-                  "Controls B (mean, sd): (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
+  dname <- paste0("Case A: ", format(round(case_a, 2), nsmall = 2), ", ",
+                  "B: ", format(round(case_b, 2), nsmall = 2), ", ",
+                  "Ctrl. A (m, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
+                  "B: (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
 
 
   names(con_m_a) <- "Mean A"
@@ -362,18 +362,6 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   names(n) <- "Sample size"
   control.desc <- c(con_m_a, con_m_b, con_sd_a, con_sd_b, n)
 
-
-
-  # output <- list(statistic = tstat, parameter = df, p.value = pval,
-  #                estimate = estimate, null.value = null.value,
-  #                interval = interval,
-  #                desc = c(con_m, con_sd, n, stderr),
-  #                alternative = alternative,
-  #                method = paste("Crawford-Howell (1998) t-test"),
-  #                data.name = paste0("case = ", format(round(case, 2), nsmall = 2),
-  #                                   " and controls (M = ", format(round(con_m, 2), nsmall = 2),
-  #                                   ", SD = ", format(round(con_sd, 2), nsmall = 2),
-  #                                   ", N = ", n, ")"))
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
   output <- list(statistic = tstat,

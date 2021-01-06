@@ -254,13 +254,13 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
     interval <- NULL
 
     if (alternative == "less") {
-      names(estimate) <- c("Standardised case score (Z-CC)",
+      names(estimate) <- c("Std. case score (Z-CC)",
                            "Proportion below case (%)")
     } else if (alternative == "greater") {
-      names(estimate) <- c("Standardised case score (Z-CC)",
+      names(estimate) <- c("Std. case score (Z-CC)",
                            "Proportion above case (%)")
     } else {
-      names(estimate) <- c("Standardised case score (Z-CC)",
+      names(estimate) <- c("Std. case score (Z-CC)",
                            paste("Proportion", ifelse(tstat < 0, "below", "above"), "case (%)"))
     }
 
@@ -283,11 +283,11 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
                  interval = interval,
                  desc = c(con_m, con_sd, n, stderr),
                  alternative = alternative,
-                 method = paste("Crawford-Howell (1998) t-test"),
-                 data.name = paste0("case = ", format(round(case, 2), nsmall = 2),
-                                    " and controls (M = ", format(round(con_m, 2), nsmall = 2),
-                                    ", SD = ", format(round(con_sd, 2), nsmall = 2),
-                                    ", N = ", n, ")"))
+                 method = paste("Test of Deficit"),
+                 data.name = paste0("Case = ", format(round(case, 2), nsmall = 2),
+                                    ", Controls (m = ", format(round(con_m, 2), nsmall = 2),
+                                    ", sd = ", format(round(con_sd, 2), nsmall = 2),
+                                    ", n = ", n, ")"))
 
   class(output) <- "htest"
   output

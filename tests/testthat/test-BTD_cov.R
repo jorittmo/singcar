@@ -5,11 +5,11 @@ test_that("summary input yields same result as raw", {
                                     nrow = 2, byrow = T),
                      empirical = TRUE)
   set.seed(123456)
-  sumstats <- BTD_cov(-2, 0, c(100, 15), c(13, 3), use_sumstats = TRUE,
+  sumstats <- BTD_cov(70, 13, c(100, 15), c(13, 3), use_sumstats = TRUE,
                       cor_mat = matrix(c(1, 0.65, 0.65, 1), nrow=2),
                       sample_size = 18)[["p.value"]]
   set.seed(123456)
-  raw <- BTD_cov(-2, 0, x[ , 1], x[ , 2])[["p.value"]]
+  raw <- BTD_cov(70, 13, x[ , 1], x[ , 2])[["p.value"]]
   expect_equal(sumstats, raw, tol = 0.01)
 
 

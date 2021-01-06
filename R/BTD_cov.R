@@ -160,7 +160,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
 
   mu_hat <- vector(length = iter)
-  for (i in 1:iter) mu_hat[i] <- matrix(B_vec[i, ], ncol = (m+1), byrow = TRUE) %*% c(1, case_covar) # THIS SEEMS CORRECT NOW
+  for (i in 1:iter) mu_hat[i] <- matrix(B_vec[i, ], ncol = (m+1), byrow = TRUE) %*% c(1, case_covar)
 
 
   z_hat_ccc <- (case_task - mu_hat) / sqrt(Sigma_hat)
@@ -185,10 +185,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   var_ast <- Sigma_ast/(n - 1)
 
-  ## BELOW DOES NOT ALIGN WITH C&G 0.3 diff
   zccc <- (case_task - mu_ast) / sqrt(var_ast) # Calculate point estimate based on conditional sample means and sd
-
-  z_ast_est <- mean(z_hat_ccc)
 
   zccc_int <- stats::quantile(z_hat_ccc, c(alpha/2, (1 - alpha/2)))
   names(zccc_int) <- c("Lower Z-CCC CI", "Upper Z-CCC CI")
@@ -243,7 +240,6 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   names(typ.int) <- "Interval level (%)"
   interval <- c(typ.int, zccc_int, p_int)
 
-  names(z_ast_est) <- "est. z"
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between case and controls"
@@ -251,8 +247,7 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
-  output <- list(statistic = z_ast_est,
-                 parameter = df,
+  output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,
                  null.value = null.value,
@@ -261,11 +256,11 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                  cor.mat = cor.mat,
                  sample.size = n,
                  alternative = alternative,
-                 method = paste("Bayesian Test of deficit with Covariates"),
-                 data.name = paste0("case = ", format(round(case_task, 2), nsmall = 2),
-                                    " and controls (M = ", format(round(m_ct, 2), nsmall = 2),
-                                    ", SD = ", format(round(sd_ct, 2), nsmall = 2),
-                                    ", N = ", n, ")"))
+                 method = paste("Bayesian Test of Deficit with Covariates"),
+                 data.name = paste0("Case = ", format(round(case_task, 2), nsmall = 2),
+                                    ", Controls (m = ", format(round(m_ct, 2), nsmall = 2),
+                                    ", sd = ", format(round(sd_ct, 2), nsmall = 2),
+                                    ", n = ", n, ")"))
 
   class(output) <- "htest"
   output

@@ -304,9 +304,6 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
   alpha <- 1 - int_level
 
-  z_ast_est <- mean(z_ast)
-  names(z_ast_est) <- "est. z"
-
   zdcc_int <- stats::quantile(z_ast, c(alpha/2, (1 - alpha/2)))
   names(zdcc_int) <- c("Lower Z-DCC CI", "Upper Z-DCC CI")
 
@@ -364,14 +361,13 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
   names(con_m_b) <- "Mean (controls)"
   names(con_sd_b) <- "SD (controls)"
   names(n) <- "Sample size"
-  dname <- paste0("Case score A: ", format(round(case_a, 2), nsmall = 2), ", ",
-                  "Case score B: ", format(round(case_b, 2), nsmall = 2), ", ",
-                  "Controls A (mean, sd): (", format(round(con_m_a, 2), nsmall = 2), ", ",format(round(con_sd_a, 2), nsmall = 2), "), ",
-                  "Controls B (mean, sd): (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
+  dname <- paste0("Case A: ", format(round(case_a, 2), nsmall = 2), ", ",
+                  "B: ", format(round(case_b, 2), nsmall = 2), ", ",
+                  "Ctrl. A (m, sd): (", format(round(con_m_a, 2), nsmall = 2), ",",format(round(con_sd_a, 2), nsmall = 2), "), ",
+                  "B: (", format(round(con_m_b, 2), nsmall = 2), ",",format(round(con_sd_b, 2), nsmall = 2), ")")
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
-  output <- list(statistic = z_ast_est,
-                 parameter = df,
+  output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,
                  null.value = null.value,

@@ -241,9 +241,6 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   alpha <- 1 - int_level
 
-  z_ast_est <- mean(z_hat_dccc)
-  names(z_ast_est) <- "ave. z"
-
   zdccc_int <- stats::quantile(z_hat_dccc, c(alpha/2, (1 - alpha/2)))
   names(zdccc_int) <- c("Lower Z-DCCC CI", "Upper Z-DCCC CI")
 
@@ -322,14 +319,13 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
-  dname <- paste0("Case score A: ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
-                  "Case score B: ", format(round(case_tasks[2], 2), nsmall = 2), ", ",
-                  "Controls score A: ", format(round(m_ct[1], 2), nsmall = 2), ", ",
-                  "Controls score B: ", format(round(m_ct[2], 2), nsmall = 2))
+  dname <- paste0("Case A = ", format(round(case_tasks[1], 2), nsmall = 2), ", ",
+                  "B = ", format(round(case_tasks[2], 2), nsmall = 2), ", ",
+                  "Ctrl. (m, sd) A: (", format(round(m_ct[1], 2), nsmall = 2),",", format(round(sd_ct[1], 2), nsmall = 2) , "), ",
+                  "B: (", format(round(m_ct[2], 2), nsmall = 2),",", format(round(sd_ct[2], 2), nsmall = 2) , ")")
 
   # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
-  output <- list(statistic = z_ast_est,
-                 parameter = df,
+  output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,
                  null.value = null.value,
