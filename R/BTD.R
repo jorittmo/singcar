@@ -58,10 +58,11 @@
 #'     controls = size_weight_illusion[-1, "V_SWI"], alternative = "l", iter = 1000)
 #'
 #' @references
+#'
 #' Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
 #' control or normative sample in neuropsychology: Development of a Bayesian
-#' approach. \emph{Cognitive Neuropsychology, 24}(4), 343–372.
-#' https://doi.org/10.1080/02643290701290146
+#' approach. \emph{Cognitive Neuropsychology, 24}(4), 343-372.
+#' \doi{10.1080/02643290701290146}
 
 
 

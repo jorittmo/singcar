@@ -1,6 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
+* Exchanged URLs for DOI-links in references as requested.
 * Made print output more compact.
 * Removed confusing statistics without interpretative value.
 * Removed `type = cairo` from vignette (as requested) since Cairo-based devices are not always available.
@@ -9,6 +10,7 @@ This is a resubmission. In this version I have:
 ## Test environments
 * local Windows 10 R installation, R 4.0.3
 * ubuntu 16.04 (on travis-ci), R 4.0.3
+* win-builder (devel)
 
 ## R CMD check results
 

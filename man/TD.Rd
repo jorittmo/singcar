@@ -94,12 +94,12 @@ TD(case = size_weight_illusion[1, "V_SWI"],
 
 }
 \references{
-Crawford, J. R., & Howell, D. C. (1998). Comparing an Individual’s Test Score
+Crawford, J. R., & Howell, D. C. (1998). Comparing an Individual's Test Score
 Against Norms Derived from Small Samples. \emph{The Clinical Neuropsychologist,
-12}(4), 482–486. https://doi.org/10.1076/clin.12.4.482.7241
+12}(4), 482 - 486. \doi{10.1076/clin.12.4.482.7241}
 
 Crawford, J. R., & Garthwaite, P. H. (2002). Investigation of the single case
 in neuropsychology: Confidence limits on the abnormality of test scores and
-test score differences. \emph{Neuropsychologia, 40}(8), 1196–1208.
-https://doi.org/10.1016/S0028-3932(01)00224-X
+test score differences. \emph{Neuropsychologia, 40}(8), 1196-1208.
+\doi{10.1016/S0028-3932(01)00224-X}
 }

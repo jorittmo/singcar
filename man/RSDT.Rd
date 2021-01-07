@@ -86,9 +86,9 @@ RSDT(case_a = size_weight_illusion[1, "V_SWI"], case_b = size_weight_illusion[1,
 
 }
 \references{
-{Crawford, J. R., & Garthwaite, P. H. (2005). Testing for
+Crawford, J. R., & Garthwaite, P. H. (2005). Testing for
 Suspected Impairments and Dissociations in Single-Case Studies in
 Neuropsychology: Evaluation of Alternatives Using Monte Carlo Simulations and
 Revised Tests for Dissociations. \emph{Neuropsychology, 19}(3), 318 - 331.
-\url{https://doi.org/10.1037/0894-4105.19.3.318}}
+\doi{10.1037/0894-4105.19.3.318}
 }

@@ -122,13 +122,13 @@ Model. \emph{The Annals of Statistics, 36}(2), 963-982. JSTOR.
 
 Crawford, J. R., & Garthwaite, P. H. (2007). Comparison of a single case to a
 control or normative sample in neuropsychology: Development of a Bayesian
-approach. \emph{Cognitive Neuropsychology, 24}(4), 343–372.
-\url{https://doi.org/10.1080/02643290701290146}
+approach. \emph{Cognitive Neuropsychology, 24}(4), 343-372.
+\doi{10.1080/02643290701290146}
 
 Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing a single
 case to a control sample: Testing for neuropsychological deficits and
 dissociations in the presence of covariates. \emph{Cortex, 47}(10),
-1166-1178. \url{https://doi.org/10.1016/j.cortex.2011.02.017}
+1166-1178. \doi{10.1016/j.cortex.2011.02.017}
 
 Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
 Distribution. R package version 1.1.0.

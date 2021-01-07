@@ -19,3 +19,4 @@
 * Confusing statistics without interpretative value have been removed from the output.
 * `type = cairo` removed from vignette since Cairo-based devices are not always available.
 * Fixed bug that made power calculators for tests of deficits behave unexpectedly.
+* Exchanged URLs for DOI-links in documentation references.

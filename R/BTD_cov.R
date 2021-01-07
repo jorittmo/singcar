@@ -77,10 +77,12 @@
 #'          control_task = size_weight_illusion[-1, "V_SWI"],
 #'          control_covar = size_weight_illusion[-1, "YRS"], iter = 100)
 #'
-#' @references Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
-#'   a single case to a control sample: Testing for neuropsychological deficits
-#'   and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
-#'   1166–1178. https://doi.org/10.1016/j.cortex.2011.02.017
+#' @references
+#'
+#' Crawford, J. R., Garthwaite, P. H., & Ryan, K. (2011). Comparing
+#' a single case to a control sample: Testing for neuropsychological deficits
+#' and dissociations in the presence of covariates. \emph{Cortex, 47}(10),
+#' 1166-1178. \doi{10.1016/j.cortex.2011.02.017}
 #'
 #' Geoffrey Thompson (2019). CholWishart: Cholesky Decomposition of the Wishart
 #' Distribution. R package version 1.1.0.
