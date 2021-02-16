@@ -110,7 +110,9 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
                   calibrated = TRUE,
                   na.rm = FALSE) {
 
-  alternative <- match.arg(alternative)
+  ###
+  # Set up of error and warning messages
+  ###
 
   if (length(case_a) > 1 | length(case_b) > 1) stop("Case scores should be single value")
   if (length(controls_a) > 1 & length(controls_b) > 1) {
@@ -168,6 +170,12 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
     if (length(controls_a) != length(controls_b)) stop("Sample sizes must be equal")
   }
 
+  ###
+  # Extract relevant statistics and set up further errors
+  ###
+
+  alternative <- match.arg(alternative)
+
   con_m_a <- mean(controls_a) # Mean of the control sample on task x
   con_m_b <- mean(controls_b) # Mean of the control sample on task y
 
@@ -215,10 +223,20 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
     A <- matrix(c(saa, sab, sab, sbb), nrow = 2)
   }
 
+  ###
+  # Below follows sampling for the "standard theory" prior
+  ###
+
   if (calibrated == FALSE) {
     df <- n
 
+    # Drawing a random seed that will be used to generate (inverse) Wishart
+    # draws and cholesky decomposed (inverse) Wishart draws (i.e. so the
+    # draws are the same but Cholesky decomp has been applied)
     seed <- stats::runif(5)
+
+    # The CholWishart package is used for C++ implemented sampling
+    # from the (inverse) Wishart distribution
 
     withr::with_seed(seed, Sigma_hat <- CholWishart::rInvWishart(iter, n, A))
     # So that both the inverse wishart draws and the cholesky decomp on them are the same
@@ -228,15 +246,17 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
     Tchol <- aperm(Tchol, perm = c(2, 1, 3)) # Transposes each matrix to lower triangual instead of upper
 
+    # Get distributions of means
     Mu_hat <- matrix(nrow = iter, ncol = 2)
     for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m_a, con_m_b) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
 
 
-    ## For those that thinks apply() gives more readability, but it slows the code
-    # Mu_hat <- t(apply(tc, 2, function(x) as.numeric((c(con_m_a, con_m_b) +
-    #                                                   matrix(x, nrow = 2)%*%stats::rnorm(2))/sqrt(n))))
-
   } else { # i.e if calibrated == TRUE
+
+    ###
+    # Below follows the rejection sampling of Sigma
+    # for the "calibrated" prior detailed in the vignette
+    ###
 
     A_ast <- ((n - 2)*A) / (n - 1)
     df <- n-2
@@ -262,20 +282,25 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
     }
 
-    Sigma_hat <- Sigma_hat_acc_save[ , , -1] # Remove the first matrix that is fild with NA
-    rm(Sigma_hat_acc_save, step_it, u, Sigma_hat_acc, rho_hat_pass) # Remove all variables not needed
+    Sigma_hat <- Sigma_hat_acc_save[ , , -1] # Remove the first matrix that is filled with NA
+    rm(Sigma_hat_acc_save, step_it, u, Sigma_hat_acc, rho_hat_pass) # Flush all variables not needed
 
+    # Perform Cholesky decomposition on the accepted Covariance matrices
     Tchol <- array(dim = c(2, 2, iter))
     for (i in 1:iter) Tchol[ , , i] <- t(chol(Sigma_hat[ , , i]))
 
+    # Get distributions of means
     Mu_hat <- matrix(nrow = iter, ncol = 2)
     for (i in 1:iter) Mu_hat[i , ] <-  as.numeric(c(con_m_a, con_m_b) + (Tchol[ , , i]%*%stats::rnorm(2))/sqrt(n))
 
   }
 
 
-
   if (unstandardised == FALSE) {
+
+    ###
+    # Get standardised effect measures distribution
+    ###
 
     zx <- (case_a - Mu_hat[ , 1]) / sqrt(Sigma_hat[1, 1, ])
     zy <- (case_b - Mu_hat[ , 2]) / sqrt(Sigma_hat[2, 2, ])
@@ -286,12 +311,19 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
 
   } else {
 
+    ###
+    # Get unstandardised effects distribution
+    ###
+
     std.err <- sqrt(Sigma_hat[1, 1, ] + Sigma_hat[2, 2, ] - 2*Sigma_hat[1, 2, ])
 
     z_ast <- ((case_a - Mu_hat[ , 1]) - (case_b - Mu_hat[ , 2])) / std.err
 
   }
 
+  ###
+  # Get distribution of p-values
+  ###
 
   if (alternative == "two.sided") {
     pval <- 2 * stats::pnorm(abs(z_ast), lower.tail = FALSE)
@@ -301,7 +333,9 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
     pval <- stats::pnorm(z_ast, lower.tail = TRUE)
   }
 
-
+  ###
+  # Get credible intervals for effect and p-estimate
+  ###
   alpha <- 1 - int_level
 
   zdcc_int <- stats::quantile(z_ast, c(alpha/2, (1 - alpha/2)))
@@ -313,12 +347,20 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
   if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
+  ###
+  # Get point estimates of effects
+  ###
+
   std_a <- (case_a - con_m_a)/con_sd_a
   std_b <- (case_b - con_m_b)/con_sd_b
 
   zdcc <- (std_a - std_b) / sqrt(2 - 2*r) # Estimated effect size
 
   estimate <- c(std_a, std_b, zdcc, ifelse(alternative == "two.sided", (p_est/2*100), p_est*100))
+
+  ###
+  # Set names for the estimates
+  ###
 
   if (alternative == "two.sided") {
     if (zdcc < 0) {
@@ -347,11 +389,17 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
                        zdcc.name,
                        p.name)
 
+  ###
+  # Set names for the interval stored in the output object
+  ###
 
   typ.int <- 100*int_level
   names(typ.int) <- "Credible (%)"
   interval <- c(typ.int, zdcc_int, p_int)
 
+  ###
+  # Set names for objects in output
+  ###
 
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
@@ -366,7 +414,8 @@ BSDT <- function (case_a, case_b, controls_a, controls_b,
                   "Ctrl. A (m, sd): (", format(round(con_m_a, 2), nsmall = 2), ",",format(round(con_sd_a, 2), nsmall = 2), "), ",
                   "B: (", format(round(con_m_b, 2), nsmall = 2), ",",format(round(con_sd_b, 2), nsmall = 2), ")")
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
   output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,

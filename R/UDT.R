@@ -89,7 +89,10 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
                  conf_int_spec = 0.01,
                  na.rm = FALSE) {
 
-  alternative <- match.arg(alternative)
+
+  ###
+  # Set up of error and warning messages
+  ###
 
   if (length(case_a) > 1 | length(case_b) > 1) stop("Case scores should be single value")
   if (length(controls_a) > 1 & length(controls_b) > 1) {
@@ -102,7 +105,7 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   if (length(controls_b) > 1 & is.null(sd_b) == FALSE) message("Value on sd_b will be ignored")
   if (length(controls_a) == 1 & is.null(sd_a) == TRUE) stop("Please give sd and n on task A if controls_a is to be treated as mean")
   if (length(controls_b) == 1 & is.null(sd_b) == TRUE) stop("Please give sd and n on task B if controls_b is to be treated as mean")
-  if (conf_int == TRUE & (conf_level < 0 | conf_level > 0.9999999)) stop("Confident level must be between 0 and 0.9999999")
+  if (conf_int == TRUE & (conf_level < 0 | conf_level >= 1)) stop("Confident level must be between 0 and < 1")
 
 
 
@@ -148,6 +151,13 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     if (length(controls_a) != length(controls_b)) stop("Sample sizes must be equal")
   }
 
+
+  ###
+  # Extract relevant statistics and set up further errors
+  ###
+
+  alternative <- match.arg(alternative)
+
   con_m_a <- mean(controls_a) # Mean of the control sample on task x
   con_m_b <- mean(controls_b) # Mean of the control sample on task y
 
@@ -190,8 +200,12 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   )
 
 
-  tstat <- dif/std.er
+  tstat <- dif/std.er # t statistic for the difference
   names(tstat) <- "t"
+
+  ###
+  # Get p-value
+  ###
 
   if (alternative == "two.sided") {
     pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = FALSE)
@@ -201,6 +215,9 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     pval <- stats::pt(tstat, df = df, lower.tail = TRUE)
   }
 
+  ###
+  # Calculate standardised effect sizes
+  ###
 
   z_a <- (case_a - con_m_a)/con_sd_a
   z_b <- (case_b - con_m_b)/con_sd_b
@@ -209,7 +226,16 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
   estimate <- c(def_a, def_b, zdcc, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
 
+  ###
+  # Find the confidence boundaries
+  ###
+
   if (conf_int == T) {
+
+    # Below is a search algorithm to find the non-centrality parameter of two non-central t-distributions
+    # which have their alpha/2 and 1-alpha/2 percentile at the std effect size * sqrt(n), respectively.
+    # These non-centrality paramters / sqrt(n) are then taken as the limits of the CIs.
+    # Method described in Crawford and Garthwaite (2002).
 
     alph <- 1 - conf_level
 
@@ -251,10 +277,18 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
     ci_up_zdcc <- ncp_up/sqrt(n)
     cint_zdcc <- c(ci_lo_zdcc, ci_up_zdcc)
 
+    ###
+    # Set the name of the zcc estimate so that the CI is shown for print()
+    ###
+
     zdcc.name <- paste0("Std. task discrepancy (Z-DCC), ",
                        100*conf_level, "% CI [",
                        format(round(cint_zdcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zdcc[2], 2), nsmall = 2),"]")
+
+    ###
+    # Get CIs for p-estimates, and set the names
+    ###
 
     if (alternative == "less") {
 
@@ -309,6 +343,9 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
       }
     }
 
+    ###
+    # Set names for the CI stored in the output
+    ###
 
     names(cint_zdcc) <- c("Lower Z-DCC CI", "Upper Z-DCC CI")
     names(cint_p) <- c("Lower p CI", "Upper p CI")
@@ -325,6 +362,10 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
 
 
   } else {
+
+    ###
+    # If CI is not desired
+    ###
 
     interval <- NULL
 
@@ -345,9 +386,10 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   }
 
 
+  ###
+  # Set names for objects in output
+  ###
 
-
-  #  # Set names for objects in output
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
   names(null.value) <- "difference between tasks"
@@ -365,7 +407,8 @@ UDT <- function (case_a, case_b, controls_a, controls_b,
   control.desc <- c(con_m_a, con_m_b, con_sd_a, con_sd_b, n)
 
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
   output <- list(statistic = tstat,
                  parameter = df,
                  p.value = pval,

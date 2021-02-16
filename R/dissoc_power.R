@@ -53,6 +53,10 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                       alternative = c("two.sided", "greater", "less"),
                       alpha = 0.05, spec = 0.005) {
 
+  ###
+  # Set up error messages
+  ###
+
   if (!is.null(sample_size) & !is.null(power)) stop("Must supply only one of sample size or desired power")
   if (is.null(sample_size) & is.null(power)) stop("Must supply either sample size or desired power")
   if (!is.null(power)) if (power > 1 | power < 0) stop("Desired power must be between 0 and 1")
@@ -63,6 +67,10 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   alternative <- match.arg(alternative)
 
   n = sample_size
+
+  ###
+  # Calculate analytic power depending on hypothesis
+  ###
 
   if (is.null(power)) {
 
@@ -112,6 +120,11 @@ UDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
     }
 
   }
+
+  ###
+  # Deploy search algorithm to find sample
+  # size given power
+  ###
 
   if (is.null(sample_size)) {
 
@@ -238,6 +251,10 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                        alternative = c("two.sided", "greater", "less"),
                        alpha = 0.05, nsim = 10000) {
 
+  ###
+  # Set up error messages
+  ###
+
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
   if (r_ab < -1 | r_ab > 1) stop("Correlation between task a and b must be between -1 and 1")
@@ -245,6 +262,11 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   alternative <- match.arg(alternative)
 
   n = sample_size
+
+  ###
+  # Create function that calculates p-value from
+  # simulated cases and samples
+  ###
 
   rsdt_p_sim <- function(case_a, case_b,mean_a, mean_b,
                          sd_a, sd_b, r_ab) {
@@ -268,6 +290,11 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   }
 
 
+  ###
+  # Simulate p-values nsim number of times
+  ###
+
+
   pval <- vector(length = nsim)
 
   for(i in 1:nsim) {
@@ -276,6 +303,10 @@ RSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                           sd_a, sd_b, r_ab)
 
   }
+
+  ###
+  # Calculate the percentage of which these p-values are less than alpha
+  ###
 
   power = sum(pval < alpha)/length(pval)
 
@@ -335,6 +366,10 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
                        alpha = 0.05, nsim = 1000, iter = 1000,
                        calibrated = TRUE) {
 
+  ###
+  # Set up error messages
+  ###
+
   if (!is.null(sample_size)) if (sample_size < 2) stop("Sample size must be greater than 1")
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
   if (r_ab < -1 | r_ab > 1) stop("Correlation between task a and b must be between -1 and 1")
@@ -342,6 +377,10 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
   alternative <- match.arg(alternative)
 
   n = sample_size
+
+  ###
+  # Define function for simulating case and controls based on the values given
+  ###
 
   bsdt_p_sim <- function() {
 
@@ -364,6 +403,9 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
     pval
   }
 
+  ###
+  # Simulate p-values nsim number of times
+  ###
 
   pval <- vector(length = nsim)
 
@@ -372,6 +414,10 @@ BSDT_power <- function(case_a, case_b, mean_a = 0, mean_b = 0,
     pval[i] <- bsdt_p_sim()
 
   }
+
+  ###
+  # Calculate the percentage of which these p-values are below alpha
+  ###
 
   power = sum(pval < alpha)/length(pval)
 
@@ -439,10 +485,18 @@ BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 
                           nsim = 1000, iter = 1000,
                           calibrated = TRUE) {
 
+  ###
+  # Set up error messages
+  ###
+
   if (alpha < 0 | alpha > 1) stop("Type I error rate must be between 0 and 1")
   if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
   if (sample_size < 2) stop("Sample size must be greater than 1")
   if (length(case_tasks) != 2) stop("case_tasks should be of length 2")
+
+  ###
+  # Extract needed statistics
+  ###
 
   alternative <- match.arg(alternative)
   n = sample_size
@@ -453,6 +507,10 @@ BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 
 
   Sigma <- diag(sum_stats[ , 2]) %*% cor_mat %*% diag(sum_stats[ , 2])
   mu <- sum_stats[ , 1]
+
+  ###
+  # Define function for simulating case and controls based on the values given
+  ###
 
   BSDT_cov_p_sim <- function() {
 
@@ -476,6 +534,9 @@ BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 
     pval
   }
 
+  ###
+  # Simulate p-values nsim number of times
+  ###
 
   pval <- vector(length = nsim)
 
@@ -484,6 +545,10 @@ BSDT_cov_power <- function(case_tasks, case_cov, control_tasks = matrix(c(0, 0, 
     pval[i] <- BSDT_cov_p_sim()
 
   }
+
+  ###
+  # Calculate the percentage of which these p-values are below alpha
+  ###
 
   power = sum(pval < alpha)/length(pval)
 

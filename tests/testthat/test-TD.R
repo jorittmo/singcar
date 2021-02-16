@@ -50,9 +50,9 @@ test_that("errors are occuring as they should", {
 
   expect_error(TD(rnorm(2), controls, na.rm = TRUE), "Case should only have 1 observation")
 
-  expect_error(TD(2, controls, na.rm = TRUE, conf_level = 2), "Confident level must be between 0 and 0.9999999")
+  expect_error(TD(2, controls, na.rm = TRUE, conf_level = 2), "Confidence level must be between 0 and < 1")
 
-  expect_error(TD(2, controls, na.rm = TRUE, conf_level = -2), "Confident level must be between 0 and 0.9999999")
+  expect_error(TD(2, controls, na.rm = TRUE, conf_level = -2), "Confidence level must be between 0 and < 1")
 
 })
 

@@ -72,6 +72,10 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
                 alternative = c("less", "greater", "two.sided"),
                 int_level = 0.95, iter = 10000, na.rm = FALSE) {
 
+  ###
+  # Set up of error and warning messages
+  ###
+
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(sd) == TRUE) {
     stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
@@ -85,6 +89,10 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
 
   if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
 
+  ###
+  # Extract relevant statistics and set up further errors
+  ###
+
   alternative <- match.arg(alternative)
 
   con_m <- mean(controls) # Mean of the control sample
@@ -95,21 +103,30 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   n <- length(controls)
   if (length(controls)<2 & is.null(sd) == FALSE & is.null(sample_size) == FALSE) n <- sample_size
 
-  df <- n - 1 # The degrees of freedom
+  df <- n - 1 # The degrees of freedom for chi2 simulation
   alpha <- 1 - int_level
 
-  ## BAYESIAN PROCESS AS EXPLAINED BY CRAWFORD AND GARTHWAITE (2007)##
-
+  ## PROCEDURE AS EXPLAINED BY CRAWFORD AND GARTHWAITE (2007)##
   # By their notation I will use theta for the unknown variance instead of sigma
 
+  ###
+  # Below follows the steps presented in "Bayesian test of deficit" section in vignette
+  ###
+
+  # Random draws of variance
   theta_hat <- ((n - 1)*con_sd^2) /  stats::rchisq(iter, df = df)
 
+  # Random draws of effects
   z <- stats::rnorm(iter)
 
   mu_hat <- con_m + (z * sqrt(theta_hat/n))
 
   z_ast <- (case - mu_hat)/sqrt(theta_hat)
 
+
+  ###
+  # Get p-value distribution
+  ###
 
   if (alternative == "less") {
 
@@ -125,8 +142,16 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
 
   }
 
+  ###
+  # Point estimate of effect
+  ###
+
   zcc <- (case - con_m)/con_sd
 
+
+  ###
+  # Get credible boundaries for effect and p estimate
+  ###
 
   zcc_int <- stats::quantile(z_ast, c(alpha/2, (1 - alpha/2)))
   names(zcc_int) <- c("Lower Z-CC CI", "Upper Z-CC CI")
@@ -136,6 +161,11 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   p_int <- stats::quantile(pval, c(alpha/2, (1 - alpha/2)))*100
   if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
+
+
+  ###
+  # Set estimates and names for print() output
+  ###
 
   estimate <- c(zcc, p_est*100)
   if (alternative == "two.sided") estimate <- c(zcc, (p_est/2)*100)
@@ -164,20 +194,29 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
 
   names(estimate) <- c(zcc.name, p.name)
 
+  ###
+  # Set name for the intervals stored in the output object
+  ###
 
   typ.int <- 100*int_level
   names(typ.int) <- "Interval level (%)"
   interval <- c(typ.int, zcc_int, p_int)
 
+  ###
+  # Set names for objects in output
+  ###
+
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
-  names(null.value) <- "difference between case and controls"
+  names(null.value) <- "diff. between case and controls"
   names(con_m) <- "Mean (controls)"
   names(con_sd) <- "SD (controls)"
   names(n) <- "Sample size"
 
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
+
   output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,

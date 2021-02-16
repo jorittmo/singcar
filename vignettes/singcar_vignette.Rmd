@@ -275,7 +275,7 @@ Z_{DCC}  = \frac{z^*_1 - z^*_2}{\sqrt{2-2\rho_{12}}}
 \label{eq:PJ}
 \end{equation}
 Where \(z_1^*\) and \(z_2^*\) are the standardised case scores on a task A and a task B
-and the subscript (DCC) indicates ``discrepancy-case-controls'' comparison. This quantity
+and the subscript (DCC) indicates "discrepancy-case-controls" comparison. This quantity
 was proposed by \citet{payneStatisticsInvestigationIndividual1957} as a significance test for discrepancies,
 but is of course not appropriate for such a purpose if small samples are used.
 This is due to the fact that we cannot use the \(Z\) distribution for estimating the
@@ -330,8 +330,8 @@ choose the positive root, the resultant statistic cannot be negative. Therefore,
 if it is required that the test statistic expresses the direction of a negative
 effect the correct sign would have to be imposed.
 
-The quantity in Equation \eqref{eq:RSDT} is referred to as the ``revised standardised
-difference test'' \citep[RSDT:][]{crawfordTestingSuspectedImpairments2005}. The name stems from it being
+The quantity in Equation \eqref{eq:RSDT} is referred to as the "revised standardised
+difference test" \citep[RSDT:][]{crawfordTestingSuspectedImpairments2005}. The name stems from it being
 preceded by a test similar to that of Equation \eqref{eq:UDT} but with standardised
 variates, developed by \citet{crawfordPayneJonesRevisited1998} and that of \citet{payneStatisticsInvestigationIndividual1957}.
 \citet{crawfordTestingSuspectedImpairments2005} show with Monte Carlo simulations that the RSDT is
@@ -385,7 +385,7 @@ of them to occur is contingent on the outcome of the preceding event. Monte
 Carlo methods are mathematical algorithms that solve numerical problems by
 repeated sampling from distributions. The idea is that one estimates the
 posterior by drawing a large number of random samples from the combination of
-the likelihood and prior, thus ``constructing'' it. The methods for drawing these
+the likelihood and prior, thus "constructing" it. The methods for drawing these
 samples differ depending on the type of distribution and problem at hand. But in
 general they are all building on algorithmic rules of drawing random numbers
 based on the likelihood and the prior, and observing the distribution after a
@@ -437,7 +437,7 @@ To estimate \(p\), the following steps are iterated:
   the estimate of \(\mu\) for this iteration.
 \item
   With estimates of \(\mu\) and \(\sigma\), \(p\) is calculated conditional
-  on these estimates being the ``correct'' \(\mu\) and \(\sigma\). Let
+  on these estimates being the "correct" \(\mu\) and \(\sigma\). Let
   \(z^*_{(i)}= \frac{y^* - \hat{\mu}_{(i)}}{\sqrt{\hat{\sigma}_{(i)}^2}}\) be the standardised
   case score then \(\hat{p}_{(i)} =\mathbb{P}[Z < z^*_{(i)}]\) or \(\hat{p}_{(i)} = 1-\mathbb{P}[Z < z^*_{(i)}]\)
   depending on alternative hypothesis, is the estimate of \(p\) for this
@@ -555,7 +555,7 @@ prior is given below:
 
 
 Bayesians might argue that good frequentist properties are not necessary when
-conducting Bayesian analyses. If so, one can use the ``standard theory'' prior
+conducting Bayesian analyses. If so, one can use the "standard theory" prior
 by generating a random observation from an inverse Wishart distribution on \(n\)
 degrees of freedom and scale matrix \(\pmb{S}\) and denote it
 \(\hat{\Sigma}_{(i)}\). With an estimate of \(\Sigma\) (regardless of the prior
@@ -1089,7 +1089,7 @@ the option of applying this test without standardising the variates by setting
 the argument \code{unstandardised} to \code{TRUE}. The output then converge to
 that of the frequentist UDT. Furthermore, one has the option of choosing
 a prior distribution. Setting the argument \code{calibrated} to
-\code{FALSE} specifies the use of the ``standard theory'' prior. If left
+\code{FALSE} specifies the use of the "standard theory" prior. If left
 to the default (\code{TRUE}) an accept-reject algorithm is deployed for each
 simulation of \(\Sigma\), as described in Section \ref{BSDT}. This default
 prior has been shown to have better frequentist properties for estimating \(\rho\)

@@ -83,6 +83,10 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
                 conf_int = TRUE, conf_level = 0.95,
                 conf_int_spec = 0.01,  na.rm = FALSE) {
 
+  ###
+  # Set up of error and warning messages
+  ###
+
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(sd) == TRUE) {
     stop("Not enough obs. Set sd and sample size for input of controls to be treated as mean")
@@ -94,8 +98,12 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
   if (na.rm == TRUE) controls <- controls[!is.na(controls)]
   if (sum(is.na(controls)) > 0) stop("Controls contains NA, set na.rm = TRUE to proceed")
 
-  if (conf_int == TRUE & (conf_level < 0 | conf_level > 0.9999999)) stop("Confident level must be between 0 and 0.9999999")
+  if (conf_int == TRUE & (conf_level < 0 | conf_level >= 1)) stop("Confidence level must be between 0 and < 1")
 
+
+  ###
+  # Extract relevant statistics
+  ###
 
   alternative <- match.arg(alternative)
 
@@ -113,7 +121,9 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
   tstat <- (case - con_m)/stderr # C&H's modified t
   df <- n - 1 # The degrees of freedom
 
+  ###
   # Get p-value depending on alternative hypothesis
+  ###
 
   if (alternative == "less") {
 
@@ -129,16 +139,24 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
 
   }
 
+  ###
+  # Set relevant estimates
+  ###
+
   estimate <- c(zcc, pval*100)
   if (alternative == "two.sided") estimate <- c(zcc, (pval/2)*100)
 
-  # Calculate the CIs with method described in Crawford and Garthwaite (2002) and Cumming and Finch (2001)
-
-  # Below is a search algorithm to find the non-centrality parameter of two non-central t-distributions
-  # which have their alpha/2 and 1-alpha/2 percentile at the std effect size * sqrt(n), respectively.
-  # These non-centrality paramters / sqrt(n) are then taken as the limits of the CIs.
+  ###
+  # Find the confidence boundaries
+  ###
 
   if (conf_int == T) {
+
+
+    # Below is a search algorithm to find the non-centrality parameter of two non-central t-distributions
+    # which have their alpha/2 and 1-alpha/2 percentile at the std effect size * sqrt(n), respectively.
+    # These non-centrality paramters / sqrt(n) are then taken as the limits of the CIs.
+    # Method described in Crawford and Garthwaite (2002).
 
     alph <- 1 - conf_level
 
@@ -180,10 +198,17 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
     ci_up_zcc <- ncp_up/sqrt(n)
     cint_zcc <- c(ci_lo_zcc, ci_up_zcc)
 
+    ###
+    # Set the name of the zcc estimate so that the CI is shown for print()
+    ###
+
     zcc.name <- paste0("Std. case score (Z-CC), ",
                        100*conf_level, "% CI [",
                        format(round(cint_zcc[1], 2), nsmall = 2),", ",
                        format(round(cint_zcc[2], 2), nsmall = 2),"]")
+    ###
+    # Get CIs for p-estimates, and set the names
+    ###
 
       if (alternative == "less") {
 
@@ -239,6 +264,10 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
       }
 
 
+    ###
+    # Set names for the CI stored in the output
+    ###
+
     names(cint_zcc) <- c("Lower Z-CC CI", "Upper Z-CC CI")
     names(cint_p) <- c("Lower p CI", "Upper p CI")
 
@@ -251,6 +280,10 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
 
 
   } else {
+
+    ###
+    # If CI is not desired
+    ###
 
     interval <- NULL
 
@@ -267,18 +300,23 @@ TD <- function (case, controls, sd = NULL, sample_size = NULL,
 
   }
 
+  ###
   # Set names for objects in output
+  ###
+
   names(tstat) <- "t"
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
-  names(null.value) <- "difference between case and controls"
+  names(null.value) <- "diff. between case and controls"
   names(con_m) <- "Mean (controls)"
   names(con_sd) <- "SD (controls)"
   names(n) <- "Sample size"
   names(stderr) <- "Std.err by C&H-method"
 
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
+
   output <- list(statistic = tstat, parameter = df, p.value = pval,
                  estimate = estimate, null.value = null.value,
                  interval = interval,

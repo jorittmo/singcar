@@ -72,7 +72,9 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
                   alternative = c("two.sided", "greater", "less"),
                   na.rm = FALSE) {
 
-  alternative <- match.arg(alternative)
+  ###
+  # Set up of error and warning messages
+  ###
 
   if (length(case_a) > 1 | length(case_b) > 1) stop("Case scores should be single value")
   if (length(controls_a) > 1 & length(controls_b) > 1) {
@@ -130,6 +132,12 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
     if (length(controls_a) != length(controls_b)) stop("Sample sizes must be equal")
   }
 
+  ###
+  # Extract relevant statistics and set up further errors
+  ###
+
+  alternative <- match.arg(alternative)
+
   con_m_a <- mean(controls_a) # Mean of the control sample on task A
   con_m_b <- mean(controls_b) # Mean of the control sample on task B
 
@@ -160,16 +168,20 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
 
   if (length(controls_a) > 1 & length(controls_b) > 1) r <- stats::cor(controls_a, controls_b)
 
-  df <- n - 1
+  df <- n - 1 # Degrees of freedom
+
+  ###
+  # Calculate standardised effect sizes
+  ###
 
   std_a <- (case_a - con_m_a)/con_sd_a
   std_b <- (case_b - con_m_b)/con_sd_b
 
-  zdcc <- (std_a - std_b) / sqrt(2 - 2*r) # Estimated effect size
+  zdcc <- (std_a - std_b) / sqrt(2 - 2*r)
 
-  # if (exact.method == T) {
-
-    # Exact probability - point estimate
+  ###
+  # Get approximate t-value, see Garthwaite & Crawford (2004)
+  ###
 
     a <- (1 + r)*(1 - r^2)
 
@@ -190,6 +202,10 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
       (-b + sqrt(b^2 - (4*a*c))) / (2*a)
     )
     names(tstat) <- "approx. abs. t"
+
+    ###
+    # Get p-value
+    ###
 
     if (alternative == "two.sided") {
       pval <- 2 * stats::pt(abs(tstat), df = df, lower.tail = FALSE)
@@ -224,8 +240,7 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
        p.name <- "Proportion below case (%)"
     }
 
-  # } else {
-  #
+
   #   # Method from which the above is derived
   #   # Not included as functionality for now.
   #
@@ -263,12 +278,14 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
   #   } else { # I.e. if alternative == "less"
   #     pval <- stats::pt(psi, df = df, lower.tail = TRUE)
   #   }
-  #
-  # }
+
 
   estimate <- c(std_a, std_b, zdcc, ifelse(alternative == "two.sided", (pval/2*100), pval*100))
 
+  ###
   # Set names for objects in output
+  ###
+
   names(estimate) <- c("Std. case score, task A (Z-CC)",
                        "Std. case score, task B (Z-CC)",
                        "Std. task discrepancy (Z-DCC)",
@@ -282,7 +299,9 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
                   "B: (", format(round(con_m_b, 2), nsmall = 2), ", ",format(round(con_sd_b, 2), nsmall = 2), ")")
   names(pval) <- NULL
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
+
   output <- list(statistic = tstat,
                  parameter = df,
                  p.value = pval,

@@ -93,7 +93,9 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                      int_level = 0.95, iter = 10000,
                      use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
-  alternative <- match.arg(alternative)
+  ###
+  # Set up of error and warning messages
+  ###
 
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
@@ -103,7 +105,18 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
 
+  ###
+  # Extract relevant statistics
+  ###
+
+  alternative <- match.arg(alternative)
+
   if (use_sumstats) {
+
+    ###
+    # If summary statistics are used as input this is a lazy way of
+    # generating corresponding data
+    ###
 
     sum_stats <- rbind(control_task, control_covar)
 
@@ -133,19 +146,20 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   df <- (n - m + k - 2)
 
-  ## DATA ESTIMATION ##
+  ###
+  # Data estimation
+  ###
 
+  X <- cbind(rep(1, n), control_covar) # Design matrix
+  Y <- control_task # Response matrix
 
-  X <- cbind(rep(1, n), control_covar)
-  Y <- control_task
+  B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y # Regression coefficients
 
-  B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
+  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast) # Now sums of squares
 
-  Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast) # Now sums of squares, to be real sigma: * (1/(n - m - 1))
-
-
-
-  ## PRIOR ##
+  ###
+  # Get parameter distributions as described in vignette
+  ###
 
   Sigma_hat <- c(CholWishart::rInvWishart(iter, df = (n - m + k - 2), Sigma_ast))
 
@@ -164,10 +178,11 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   mu_hat <- vector(length = iter)
   for (i in 1:iter) mu_hat[i] <- matrix(B_vec[i, ], ncol = (m+1), byrow = TRUE) %*% c(1, case_covar)
 
+  ###
+  # Get distributions for effect and p estimates
+  ###
 
   z_hat_ccc <- (case_task - mu_hat) / sqrt(Sigma_hat)
-
-  # TWO SIDED P-value
 
   if (alternative == "less") {
 
@@ -183,11 +198,15 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   }
 
-  mu_ast <- t(B_ast) %*% c(1, case_covar)
+  mu_ast <- t(B_ast) %*% c(1, case_covar) # Conditional means
 
   var_ast <- Sigma_ast/(n - 1)
 
   zccc <- (case_task - mu_ast) / sqrt(var_ast) # Calculate point estimate based on conditional sample means and sd
+
+  ###
+  # Get intervals for effect and p estimates
+  ###
 
   zccc_int <- stats::quantile(z_hat_ccc, c(alpha/2, (1 - alpha/2)))
   names(zccc_int) <- c("Lower Z-CCC CI", "Upper Z-CCC CI")
@@ -200,6 +219,10 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   estimate <- round(c(zccc, p_est*100), 6)
   if (alternative == "two.sided") estimate <- c(zccc, (p_est/2)*100)
+
+  ###
+  # Set names for estimates
+  ###
 
   zccc.name <- paste0("Std. case score (Z-CCC), ",
                      100*int_level, "% CI [",
@@ -226,6 +249,9 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   names(estimate) <- c(zccc.name, p.name)
 
+  ###
+  # Set names for each covariate
+  ###
 
   control_task <- matrix(control_task, ncol = 1, dimnames = list(NULL, "Task"))
   xname <- c()
@@ -234,9 +260,17 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
                           dimnames = list(NULL, xname))
   cor.mat <- stats::cor(cbind(control_task, control_covar))
 
+  ###
+  # Create object with descriptives
+  ###
+
   desc <- data.frame(Means = colMeans(cbind(control_task, control_covar)),
                      SD = apply(cbind(control_task, control_covar), 2, stats::sd),
                      Case_score = c(case_task, case_covar))
+
+  ###
+  # Set objects to use in the output object
+  ###
 
   typ.int <- 100*int_level
   names(typ.int) <- "Interval level (%)"
@@ -244,11 +278,13 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
 
   names(df) <- "df"
   null.value <- 0 # Null hypothesis: difference = 0
-  names(null.value) <- "difference between case and controls"
+  names(null.value) <- "diff. between case and controls"
 
 
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
+
   output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,

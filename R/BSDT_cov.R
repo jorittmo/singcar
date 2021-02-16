@@ -108,9 +108,9 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                       int_level = 0.95, calibrated = TRUE, iter = 10000,
                       use_sumstats = FALSE, cor_mat = NULL, sample_size = NULL) {
 
-  alternative <- match.arg(alternative)
-
-  # ERRORS BELOW
+  ###
+  # Set up of error and warning messages
+  ###
 
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
@@ -130,7 +130,16 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   if (is.data.frame(control_tasks)) control_tasks <- as.matrix(control_tasks)
   if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
 
+  ###
+  # Extract relevant statistics
+  ###
+
+  alternative <- match.arg(alternative)
+
   if (use_sumstats) {
+
+    # If summary statistics are used as input this is a lazy way of
+    # generating corresponding data
 
     sum_stats <- rbind(control_tasks, control_covar)
 
@@ -150,24 +159,31 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
   k <- length(case_tasks)
 
-  ## DATA ESTIMATION ##
+  ###
+  # Data estimation
+  ###
 
   m_ct <- colMeans(control_tasks)
   sd_ct <- apply(control_tasks, 2, stats::sd)
   r <- stats::cor(control_tasks)[1, 2]
 
-  X <- cbind(rep(1, n), control_covar)
-  Y <- control_tasks
+  X <- cbind(rep(1, n), control_covar) # Design matrix
+  Y <- control_tasks # Response matrix
 
-  B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y
+  B_ast <- solve(t(X) %*% X) %*% t(X) %*% Y # Regression coefficients
 
   Sigma_ast <- t(Y - X %*% B_ast) %*% (Y - X %*% B_ast)
 
+  ###
+  # Get parameter distributions of Sigma depending on prior chosen
+  ###
+
   if (calibrated == TRUE) {
 
-    ## PRIOR ##
-
-    ## ACCEPT/REJECT STEP Berger and Sun (2008)
+    ###
+    # Below follows the rejection sampling of Sigma
+    # for the "calibrated" prior detailed in the vignette
+    ###
 
     A_ast <- ((n - m - 2)*Sigma_ast) / (n - m - 1)
     df <- (n - m - 2)
@@ -193,15 +209,22 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
 
     }
 
-    Sigma_hat <- Sigma_hat_acc_save[ , , -1] # Remove the first matrix that is fild with NA
-    rm(Sigma_hat_acc_save, step_it, u, Sigma_hat_acc, rho_hat_pass) # Remove all variables not needed
+    Sigma_hat <- Sigma_hat_acc_save[ , , -1] # Remove the first matrix that is filled with NA
+    rm(Sigma_hat_acc_save, step_it, u, Sigma_hat_acc, rho_hat_pass) # Flush all variables not needed
 
 
   } else {
+
+    # If the "standard theory" prior is requested
+
     df <- (n - m + k - 2)
     Sigma_hat <- CholWishart::rInvWishart(iter, df = (n - m + k - 2), Sigma_ast)
 
   }
+
+  ###
+  # Get parameter distributions as described in vignette
+  ###
 
   B_ast_vec <- c(B_ast)
 
@@ -217,8 +240,11 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   mu_hat <- matrix(ncol = k, nrow = iter)
   for (i in 1:iter) mu_hat[i, ] <- matrix(B_vec[i, ], ncol = (m + 1), byrow = TRUE) %*% c(1, case_covar)
 
-  # Each row indicates the conditional expected values
-  # of the case on the tests. case_covar = values from the covariates
+  # Each row indicates the conditional case scores. case_covar = values from the covariates
+
+  ###
+  # Get conditional effect and p distributions
+  ###
 
   rho_hat <- Sigma_hat[1, 2, ] / sqrt(Sigma_hat[1, 1, ] * Sigma_hat[2, 2, ])
 
@@ -239,6 +265,10 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
     pval <- stats::pnorm(z_hat_dccc, lower.tail = TRUE)
   }
 
+  ###
+  # Get and name intervals
+  ###
+
   alpha <- 1 - int_level
 
   zdccc_int <- stats::quantile(z_hat_dccc, c(alpha/2, (1 - alpha/2)))
@@ -250,7 +280,9 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   if (alternative == "two.sided") p_int <- stats::quantile(pval/2, c(alpha/2, (1 - alpha/2)))*100
   names(p_int) <- c("Lower p CI", "Upper p CI")
 
-
+  ###
+  # Get the point estimates for the conditional effects
+  ###
 
   z.y1 <- (case_tasks[1] - m_ct[1]) / sd_ct[1]
   z.y2 <- (case_tasks[2] - m_ct[2]) / sd_ct[2]
@@ -265,6 +297,10 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   std.y2 <- (case_tasks[2] - mu_ast[2]) / sqrt(cov_ast[2, 2])
 
   zdccc <-  (std.y1 - std.y2) / sqrt(2 - 2*rho_ast)
+
+  ###
+  # Name and store estimates
+  ###
 
   prop <- ifelse(alternative == "two.sided", round((p_est/2*100), 2), p_est*100)
   estimate <- round(c(z.y1, z.y2, zdccc, prop), 6)
@@ -281,6 +317,8 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
     alt.p.name <- "Proportion below case (%), "
   }
 
+  # The below sets the intervals to be shown in the print() output
+
   p.name <- paste0(alt.p.name,
                    100*int_level, "% CI [",
                    format(round(p_int[1], 2), nsmall = 2),", ",
@@ -296,12 +334,18 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                        zdccc.name,
                        p.name)
 
-
+  ###
+  # Set names and type of intervals for output object
+  ###
 
   typ.int <- 100*int_level
   names(typ.int) <- "Credible (%)"
   interval <- c(typ.int, zdccc_int, p_int)
 
+
+  ###
+  # Set names for each covariate (and the variates of interest)
+  ###
 
   colnames(control_tasks) <- c("A", "B")
   xname <- c()
@@ -309,6 +353,10 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   control_covar <- matrix(control_covar, ncol = length(case_covar),
                           dimnames = list(NULL, xname))
   cor.mat <- stats::cor(cbind(control_tasks, control_covar))
+
+  ###
+  # Create object with descriptives
+  ###
 
   desc <- data.frame(Means = colMeans(cbind(control_tasks, control_covar)),
                      SD = apply(cbind(control_tasks, control_covar), 2, stats::sd),
@@ -324,7 +372,9 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
                   "Ctrl. (m, sd) A: (", format(round(m_ct[1], 2), nsmall = 2),",", format(round(sd_ct[1], 2), nsmall = 2) , "), ",
                   "B: (", format(round(m_ct[2], 2), nsmall = 2),",", format(round(sd_ct[2], 2), nsmall = 2) , ")")
 
-  # Build output to be able to set class as "htest" object. See documentation for "htest" class for more info
+  # Build output to be able to set class as "htest" object for S3 methods.
+  # See documentation for "htest" class for more info
+
   output <- list(parameter = df,
                  p.value = p_est,
                  estimate = estimate,
