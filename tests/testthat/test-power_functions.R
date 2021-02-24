@@ -228,13 +228,19 @@ test_that("TD_power and BTD_cov_power produce approx equal output", {
 
   set.seed(123456)
   expect_equal(TD_power(-2, sample_size = 15, alternative = "less"),
-               BTD_cov_power(-2, 0, sample_size = 15, alternative = "less", iter=50, nsim = 50), tolerance = 0.05)
+               BTD_cov_power(-2, 0, sample_size = 15, alternative = "less",
+                             cor_mat = diag(2),
+                             iter=50, nsim = 50), tolerance = 0.05)
 
   expect_equal(TD_power(-2, sample_size = 15, alternative = "two.sided"),
-               BTD_cov_power(-2, 0, sample_size = 15, alternative = "two.sided", iter=50, nsim = 50), tolerance = 0.05)
+               BTD_cov_power(-2, 0, sample_size = 15, alternative = "two.sided",
+                             cor_mat = diag(2),
+                             iter=50, nsim = 50), tolerance = 0.05)
 
   expect_equal(TD_power(-2, sample_size = 15, alternative = "greater"),
-               BTD_cov_power(-2, 0, sample_size = 15, alternative = "greater", iter=50, nsim = 50), tolerance = 0.05)
+               BTD_cov_power(-2, 0, sample_size = 15, alternative = "greater",
+                             cor_mat = diag(2),
+                             iter=50, nsim = 50), tolerance = 0.05)
 
 
 

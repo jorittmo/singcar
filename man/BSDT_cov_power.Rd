@@ -9,7 +9,7 @@ BSDT_cov_power(
   case_cov,
   control_tasks = matrix(c(0, 0, 1, 1), ncol = 2),
   control_covar = c(0, 1),
-  cor_mat = diag(3),
+  cor_mat = diag(3) + 0.3 - diag(c(0.3, 0.3, 0.3)),
   sample_size,
   alternative = c("two.sided", "greater", "less"),
   alpha = 0.05,
@@ -35,7 +35,7 @@ of covariates. Defaults to one covariate with mean 0 and sd = 1.}
 
 \item{cor_mat}{A correlation matrix containing the correlations of the tasks
 of interest and the coviariate(s). The first two variables are treated as
-the tasks of interest. Defaults to no correlation between any.}
+the tasks of interest. Defaults pairwise correlations between the variates of 0.3.}
 
 \item{sample_size}{Single value giving the size of the control sample for which you wish
 to calculate power.}
