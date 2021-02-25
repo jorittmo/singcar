@@ -20,3 +20,11 @@
 * `type = cairo` removed from vignette since Cairo-based devices are not always available.
 * Fixed bug that made power calculators for tests of deficits behave unexpectedly.
 * Exchanged URLs for DOI-links in documentation references.
+
+# singcar 0.1.3
+
+* Changed default correlation matrices for Bayesian power calculators.
+* Vignette now updated with extensive description of the methods used.
+* Edited print output.
+* Source code has been more rigorously commented. 
+

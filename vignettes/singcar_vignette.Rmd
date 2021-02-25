@@ -39,7 +39,6 @@ keywords:
   formatted: [single case comparisons, small samples, "\\proglang{R}"]
   plain:     [single case comparisons, small samples, R]
 bibliography: ref.bib
-csl: jss.csl
 preamble: >
   \usepackage{amsmath}
   \usepackage{amsfonts}
@@ -84,50 +83,49 @@ studies of uncommon human expertise, targeted quality checks in industries with
 limited production output, or animal studies where rearing a large experimental
 group might be infeasible.
 
-During the last 20 years methods have been developed for the purpose of
-estimating a case's deviancy compared to a control group, while controlling Type
-I errors, mainly by John Crawford and Paul Garthwaite [e.g.,
-@crawfordComparingIndividualTest1998; @crawfordComparingSingleCase2011;
-@crawfordComparisonSingleCase2007; @crawfordInvestigationSingleCase2002;
-@crawfordTestingSuspectedImpairments2005]. Their most popular methods focus on
-i) estimating abnormality of a case compared to a control sample on a single
-variate and ii) estimating abnormality of a case compared to a control sample on
-the \emph{discrepancy} between two variates.
-
 As it represents the canonical field for the application of these methods, the
-nomenclature of neuropsychology will here be adopted: an abnormally low score on
-a single variate will be referred to as a deficit, and an abnormally large
-discrepancy between two variates will be referred to as a dissociation. In a
-neuropsychological context, the ability to test for a dissociation is often
-considered to be of cardinal importance. This is because dissociations provide
-evidence for functional independence between two cognitive abilities. By
-charting dissociations, a cognitive architecture of the mind can be theorized
+nomenclature of neuropsychology will here be adopted. An abnormally low score on
+a single variate will be referred to as a \emph{deficit}, an important concept
+for clinical and basic neuropsychology alike. For the latter area another
+concept is also considered to be of cardinal importance: the ability to test for
+an abnormally large discrepancy between two variates. This is referred to as a
+\emph{dissociation}, which is taken to provide evidence for some degree of
+functional independence between two cognitive abilities. By charting
+dissociations, a cognitive architecture of the mind can be theorized
 [@shalliceNeuropsychologyMentalStructure1988].
 
-The methods devised by Crawford and colleagues have not yet been implemented in
-any standard statistical environment. By doing so in the package \pkg{singcar} for the \proglang{R}
-environment [@rcoreteamLanguageEnvironmentStatistical2020], our aim is to encourage and simplify their
-usage. Further, limiting Type II errors has not received as much attention as
-limiting Type I errors in single-case methodology [@mcintoshPowerCalculationsSinglecase2020]. By
-including novel tools for power calculations, our hope is to increase awareness
-of the inherently low power in this field as well as to aid in the planning and
-designing of experiments.
+During the last 20 years methods have been developed to estimate and test for
+both deficits and dissociations in the single case, while controlling the Type I
+error rate, mainly by John Crawford and Paul Garthwaite
+[e.g.,@crawfordComparingIndividualTest1998;
+@crawfordComparingSingleCase2011; @crawfordComparisonSingleCase2007;
+@crawfordInvestigationSingleCase2002; @crawfordTestingSuspectedImpairments2005].
+They are available as standalone computer programs, only taking summary data as
+input, at \url{https://homepages.abdn.ac.uk/j.crawford/pages/dept/psychom.htm}.
+But the majority of these methods have not yet been implemented in any standard
+statistical environment. By doing so in the package \pkg{singcar} for the
+\proglang{R} environment [@rcoreteamLanguageEnvironmentStatistical2020], our aim
+is to encourage and simplify their usage. Further, limiting Type II errors has
+not received as much attention as limiting Type I errors in single-case
+methodology [@mcintoshPowerCalculationsSinglecase2020]. By including novel tools
+for power calculations, our hope is to increase awareness of the inherently low
+power in this field as well as to aid in the planning and design of experiments.
 
-The \proglang{R} package \pkg{singcar} contains 7 functions to estimate a case's
-deviancy to a normal population estimated from a small sample, 3 with regards to
-a single variate and 4 with regards to the discrepancy between two variates.
+The \proglang{R} package \pkg{singcar} contains seven functions to estimate a case's
+abnormality compared to a normal population estimated from a small sample, three of them
+with regards to a single variate and four with regards to the discrepancy between two variates.
 Both frequentist and Bayesian methods are provided, all developed originally by
 Crawford and colleagues [@crawfordComparingIndividualTest1998;
 @crawfordComparingSingleCase2011; @crawfordComparisonSingleCase2007;
 @crawfordInvestigationSingleCase2002; @crawfordTestingSuspectedImpairments2005].
-Of special note for psychological research are the more-recently developed
-methods allowing the inclusion of covariates [@crawfordComparingSingleCase2011],
-using Bayesian regression modelling. These methods makes matching the control
+Of special note for psychological research are the
+methods allowing the inclusion of covariates [@crawfordComparingSingleCase2011]
+using Bayesian regression techniques (Section \@ref(cov)). These methods make matching the control
 sample to the case less cumbersome.
 
 In Section \@ref(section2) the implemented methods are described in detail and in
 Section \@ref(section3) the package is described and usage exemplified with a
-dataset from a recent single case study in neuropsychology.
+dataset from a recent neuropsychological single case study.
 
 
 # Comparing a single case to small samples {#section2}
@@ -138,7 +136,7 @@ In the neuropsychological application of the methods to be presented,
 the variates of interest will be scores obtained by participants on tasks
 assessing relevant cognitive functions. The variates will
 thus often be referred to as task scores. Historically, it was not uncommon for
-neuropsychological researchers to compare single cases against a control
+researchers to compare single cases against a control
 population estimated from a sample by evaluating the case score as a
 \(Z\) score from the estimated distribution. The \(p\) value associated with this
 \(Z\) score would then be treated as an estimate of the case's abnormality. A
@@ -149,15 +147,15 @@ between two standardised variates divided by the standard deviation of the
 difference.
 
 The \(Z\) score approach is of course problematic because it treats parameter estimations from
-a restricted control sample as if they were population parameters. This would possibly
-be justifiable with very large samples, but
+a restricted control sample as if they were population parameters. This could
+be appropriate with very large samples, but
 control samples in neuropsychology are often small (sometimes \textless{} 10), and it is
 well known that the sampling distribution of the sample variance is right skewed
 for small sample sizes. Hence, underestimation of variance would be more
-probable than overestimation, inflating obtained \(Z\) scores and thus, if used for
-hypothesis testing, Type I errors \citep{crawfordComparingIndividualTest1998}.
+probable than overestimation, inflating obtained \(Z\) scores and thus
+Type I errors if the Z scores were used for hypothesis testing \citep{crawfordComparingIndividualTest1998}.
 
-The package \pkg{singcar} implements a range of methods that have been devised to
+The following sections describe methods that have been devised to
 allow for the evaluation of the abnormality of a case against a restricted
 control sample, whilst retaining appropriate control over the Type I error rate.
 These methods include frequentist approaches (Section \ref{sec22}) and Bayesian
@@ -166,7 +164,7 @@ approaches (Section \ref{sec23}).
 
 ## Frequentist approaches {#sec22}
 
-An appropriate approach for comparing a single observation to the mean of a
+An appropriate method for comparing a single observation to the mean of a
 sample was proposed within the biological sciences by \citet{sokalBiometryPrinciplesPractice1981} (p.
 227). It was popularized within neuropsychology by \citet{crawfordComparingIndividualTest1998},
 where its common application was as a (one-tailed) test of deficit (TD) to
@@ -263,31 +261,34 @@ t_{n-1} = \frac{(y^*_1 - \overline{y}_1) - (y^* _2 - \overline{y}_2) }{ \sqrt{(s
 \label{eq:UDT}
 \end{equation}
 Construction of confidence intervals for abnormality estimates based on this
-unstandardised difference test (UDT) is done in
-an analogous way to that of the confidence intervals of TD \citep{crawfordTestingSuspectedImpairments2005}. However, the test
-is somewhat limited in its applicability. Far more common, at least in neuropsychology, is the need to
-assess discrepancies between differently-scaled variates, which require standardisation to be comparable.
+unstandardised difference test (UDT) is done in an analogous way to that of the
+confidence intervals of the TD \citep{crawfordTestingSuspectedImpairments2005}.
+However, the test is somewhat limited in its usefulness, because it is only
+applicable if the two variates are measured on equivalent scales. Far more
+common, at least in neuropsychology, is the need to assess discrepancies between
+differently-scaled variates, which require standardisation to be comparable.
 
 By standardising the variates (not taking sample size into account)
-we get an effect size measure similar to \(Z_{CC}\), Equation \eqref{eq:zcc} \citep{crawfordPointIntervalEstimates2010}:
+we get an effect size measure similar to \(Z_{CC}\), 
+Equation \eqref{eq:zcc} \citep{crawfordPointIntervalEstimates2010}:
 \begin{equation}
 Z_{DCC}  = \frac{z^*_1 - z^*_2}{\sqrt{2-2\rho_{12}}}
 \label{eq:PJ}
 \end{equation}
-Where \(z_1^*\) and \(z_2^*\) are the standardised case scores on a task A and a task B
-and the subscript (DCC) indicates "discrepancy-case-controls" comparison. This quantity
-was proposed by \citet{payneStatisticsInvestigationIndividual1957} as a significance test for discrepancies,
-but is of course not appropriate for such a purpose if small samples are used.
-This is due to the fact that we cannot use the \(Z\) distribution for estimating the
-abnormality of the discrepancy for the same reason we cannot use \(Z_{CC}\) to test for
-a deficit. But also because we cannot use use \(Z\) scores to represent the case's scores
-on each variate since the size of these will be inflated as well.
+Where \(z_1^*\) and \(z_2^*\) are the standardised case scores on some task A
+and some task B and the subscript (DCC) indicates "discrepancy-case-controls".
+This quantity was proposed by \citet{payneStatisticsInvestigationIndividual1957}
+as a significance test for discrepancies, but of course it is not appropriate
+for such a purpose if small samples are used: we cannot use the \(Z\)
+distribution for estimating the abnormality of the discrepancy for the same
+reason we cannot use \(Z_{CC}\) to test for a deficit.
+<!-- But also because we cannot use  \(Z\) scores to represent the case's scores -->
+<!-- on each variate since the size of these will be inflated as well. -->
 
 When the case scores on variates \(Y_1\) and \(Y_2\) are estimated from small
 samples and they need to be standardised, it means that instead of estimating
 the discrepancy between two normally distributed variates we need to estimate
 the discrepancy between two \(t\) distributed variates.
-
 Because linear combinations of correlated \(t\) distributed random variates are not
 themselves \(t\) distributed this problem is non-trivial. The distribution of such
 difference scores was examined by \citet{garthwaiteDistributionDifferenceTwo2004}. They used
@@ -308,8 +309,8 @@ asymptotically \(t\) distributed quantity. They found:
 
 Where \(\rho\) is the sample correlation between the tasks and \(c\) the critical
 two-tailed \(t\) value with \(n-1\) degrees of freedom. \citet{garthwaiteDistributionDifferenceTwo2004}
-demonstrate that \(\mathbb{P}[ \psi > c] \approx \mathbb{P}[t >c]\). To obtain a
-precise probability for \(\psi\) one solves for \(\psi = c\), which gives a quantity
+demonstrated that \(\mathbb{P}[ \psi > c] \approx \mathbb{P}[t >c]\). To obtain a
+precise probability for \(\psi\), one solves for \(\psi = c\), which gives a quantity
 not dependent on a pre-specified critical value.
 \(\psi = c\) is a quadratic equation in \(c^2\), choosing the positive root of which
 yields:
@@ -324,28 +325,32 @@ d & =  - 2\left[\frac{y^*_{1} - \overline{y}_1}{s_1}-\frac{y^*_2 -\overline{y}_2
 \label{eq:RSDT}
 \end{align}
 
-Where \(p = \mathbb{P}[t_{n-1}>c]\) is the estimate of abnormality and used for
+Where \(p = \mathbb{P}[t_{n-1}>c]\) is the estimate of abnormality, and is used for
 significance testing. It should be noted that because \(c\) is quadratic and we
-choose the positive root, the resultant statistic cannot be negative. Therefore,
-if it is required that the test statistic expresses the direction of a negative
-effect the correct sign would have to be imposed.
+choose the positive root, the resultant statistic cannot be negative. 
+If it is required that the test statistic expresses the direction of a negative
+effect the correct sign must be imposed.
 
-The quantity in Equation \eqref{eq:RSDT} is referred to as the "revised standardised
-difference test" \citep[RSDT:][]{crawfordTestingSuspectedImpairments2005}. The name stems from it being
-preceded by a test similar to that of Equation \eqref{eq:UDT} but with standardised
-variates, developed by \citet{crawfordPayneJonesRevisited1998} and that of \citet{payneStatisticsInvestigationIndividual1957}.
-\citet{crawfordTestingSuspectedImpairments2005} show with Monte Carlo simulations that the RSDT is
-superior to both their own previous test and \citet{payneStatisticsInvestigationIndividual1957}'s in
-controlling Type I errors.
+The quantity in Equation \eqref{eq:RSDT} is referred to as the "revised
+standardised difference test"
+\citep[RSDT:][]{crawfordTestingSuspectedImpairments2005}. The name stems from it
+being preceded by a test similar to that of the unstandardised difference test
+(Equation \eqref{eq:UDT}) but with standardised normal variates, developed by
+\citet{crawfordPayneJonesRevisited1998}.
+\citet{crawfordTestingSuspectedImpairments2005} show with Monte Carlo
+simulations that the RSDT is superior in controlling Type I errors compared to
+their earlier $t$ test and the $Z$ score method of
+\citet{payneStatisticsInvestigationIndividual1957}.
 
 Even for very small sample sizes of \(n=5\), RSDT was shown to barely exceed the
-specified 5\% error rate. However, if a case lacks significant discrepancy
-between the variates but exhibits extreme scores on both of them, the error rate
-of the RSDT increases steeply with the extremity of the scores.
-\citet{crawfordComparisonSingleCase2007} showed that the RSDT starts to lose control of the
-error for task scores being more extreme than two standard deviations away
-from the mean on both variates, without them exhibiting a discrepancy. For some
-parameter combinations error rates as large as 34\% was shown.
+specified 5\% error rate. However, if a case lacks a true discrepancy
+between the variates but exhibits extreme scores on both of them (in the same direction), the error rate
+of the RSDT increases steeply. \citet{crawfordComparisonSingleCase2007} 
+showed that the RSDT starts to lose control of the
+error for task scores being more extreme than two standard deviations away from
+the mean on both variates, without them exhibiting a discrepancy. For task
+scores at 8 standard deviations from the mean, the Type I error rate of the RSDT
+was inflated to nearly 35\%.
 
 Another major drawback of the RSDT is that it has proved difficult to construct
 confidence limits on the point estimate of abnormality due to \(\psi\) only being
@@ -355,55 +360,46 @@ looking into Bayesian methodology.
 
 ## Bayesian approaches {#sec23}
 
-In the frequentist framework, parameters
-are treated as fixed attributes of a population, estimations of which in a
-series of trials will converge to the true value. In the Bayesian
-framework, by contrast, parameters are treated as random variables with
-associated probability distributions. To estimate a parameter distribution, we
-can use any prior knowledge of that parameter to assign
-probabilities to possible values of the parameter, forming what is known as a
-prior distribution, or simply a prior. If no prior information is available
-we may want to use a non-informative prior, the most simple of which would assign
-equal probabilities to all possible parameter values (uniform prior). The prior is
-updated when new information is obtained to form what is called a posterior
-distribution. The posterior
-probability of a hypothesis (i.e., a specified value of the parameter) is
-calculated by using Bayes theorem. If we disregard the marginal probability of
-the data in Bayes theorem it can be rewritten as:
+In the frequentist framework, parameters are treated as fixed attributes of a
+population and their estimations are thought to converge to the true value
+across a series of trials. In the Bayesian framework, by contrast, parameters
+are treated as random variables with associated probability distributions. To
+estimate a parameter distribution, we can use any prior knowledge of that
+parameter to assign probabilities to possible values of the parameter, forming
+what is known as a prior distribution, or simply a prior. If no prior
+information is available we may want to use a non-informative prior, the most
+simple of which would assign equal probabilities to all possible parameter
+values. The prior is updated when new information is obtained to form what is
+called a posterior distribution. The posterior probability of a hypothesis
+(i.e., a specified value of the parameter) is calculated by using Bayes theorem.
+If we disregard the marginal probability of the data in Bayes theorem it can be
+rewritten as:
 \begin{equation*}
 posterior \ \propto \ likelihood \times prior
 \end{equation*}
 
 What this is saying is that the posterior density of a hypothesis is
 proportional (\(\propto\)) to the likelihood of the data under that hypothesis times the
-prior density of the hypothesis.
+prior probability of the hypothesis.
 
-In many cases, however, it is not feasible to calculate the posterior
-analytically. Instead one may use Markov Chain Monte Carlo (MCMC) methods. A
-Markov Chain describes a series of linked events where the probability for any
-of them to occur is contingent on the outcome of the preceding event. Monte
-Carlo methods are mathematical algorithms that solve numerical problems by
-repeated sampling from distributions. The idea is that one estimates the
-posterior by drawing a large number of random samples from the combination of
-the likelihood and prior, thus "constructing" it. The methods for drawing these
-samples differ depending on the type of distribution and problem at hand. But in
-general they are all building on algorithmic rules of drawing random numbers
-based on the likelihood and the prior, and observing the distribution after a
-large number of iterations.
-
-The peak of such a distribution is often taken as an estimation of the parameter of
-interest and when using non-informative priors this often corresponds to the
-maximum likelihood estimate of the parameter. Hence, using a non-informative
-prior often yields estimations with frequentist properties, a feature that is
-useful if hypothesis testing is desired.
+In many cases it is not feasible to calculate the posterior analytically and
+instead Monte Carlo methods are often used. These methods are
+mathematical algorithms that solve numerical problems by repeated sampling from
+distributions. The algorithms used differ depending on the problem at hand, but
+in general they are all building on rules of drawing random numbers based on the
+likelihood and the prior, and observing the distribution formed after a large
+number of iterations. The peak of such a distribution is often taken as an
+estimation of the parameter of interest and when using non-informative priors
+this often also corresponds to the maximum likelihood estimate. Hence, using a
+non-informative prior often yields estimations with frequentist properties, a
+feature that is useful if hypothesis testing is desired.
 
 This was a requirement when \citet{crawfordComparisonSingleCase2007} and
 \citet{crawfordComparingSingleCase2011} developed Bayesian versions of the tests
 described in Section \ref{sec22}, now implemented in \pkg{singcar}. The
-following sections describe the procedural details of these Bayesian methods.
-The steps presented here closely follow those outlined in the original papers
-with just a few slight changes of notation. The methods are all based on Monte
-Carlo simulations but Markov Chains are run for only a subset of the problems.
+following sections describe the procedural details of these methods which are
+all based on Monte Carlo simulations. The steps presented closely follow those
+outlined in the original papers with just a few slight changes of notation.
 
 
 ### The Bayesian test of deficit {#BTD}
@@ -416,13 +412,13 @@ Assume a sample of \(n\) controls on which we measure
 some value \(y\) that is normally distributed with unknown mean \(\mu\) and unknown
 variance \(\sigma^2\). Let \(\overline{y}\) and \(s^2\) denote the sample mean and
 sample variance respectively and \(y^*\) the case score.
-Because \(\mu\) and \(\sigma^2\) are unknown the prior distribution of \(\mu\) is
+Because \(\mu\) and \(\sigma^2\) are unknown, the prior distribution of \(\mu\) is
 conditioned on the prior distribution of \(\sigma^2\).
 A non-informative prior \(\mu | \sigma^2 \sim \mathcal{N}(0, \ \infty)\) is
 assumed. For the posterior we have that
 the marginal distribution of \(\frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{n-1}\) and
 the posterior distribution for
-\(\mu|\sigma^2 \sim \mathcal{N}(\overline{y}, \sigma^2/n)\).
+\(\mu|\sigma^2 \sim \mathcal{N}(\overline{y}, \sigma^2/n)\), see e.g., \citet{gelmanBayesianDataAnalysis2013} (p. 45 and 65).
 To estimate \(p\), the following steps are iterated:
 
 \begin{enumerate}
@@ -439,10 +435,10 @@ To estimate \(p\), the following steps are iterated:
   With estimates of \(\mu\) and \(\sigma\), \(p\) is calculated conditional
   on these estimates being the "correct" \(\mu\) and \(\sigma\). Let
   \(z^*_{(i)}= \frac{y^* - \hat{\mu}_{(i)}}{\sqrt{\hat{\sigma}_{(i)}^2}}\) be the standardised
-  case score then \(\hat{p}_{(i)} =\mathbb{P}[Z < z^*_{(i)}]\) or \(\hat{p}_{(i)} = 1-\mathbb{P}[Z < z^*_{(i)}]\)
+  case score then \(\hat{p}_{(i)} =\Phi\left(z^*_{(i)}\right)\) or \(\hat{p}_{(i)} = 1-\Phi\left(z^*_{(i)}\right)\)
   depending on alternative hypothesis, is the estimate of \(p\) for this
   iteration. That is the probability of drawing a
-  value less than \(z^*_{(i)}\) from a standard normal distribution.
+  value more extreme than \(z^*_{(i)}\) from a standard normal distribution.
 \end{enumerate}
 
 Repeating these steps a large number of times will yield a distribution
@@ -454,15 +450,15 @@ upper boundaries of the 95\% credible interval for \(p\). Similarly,
 the 25th smallest and 25th largest values of \(z^*_{(i)}\) would give the lower and
 upper boundaries of the 95\% credible interval for \(Z_{CC}\) the point
 estimate of which is that of Equation \eqref{eq:zcc}. \citet{crawfordComparisonSingleCase2007}
-show that this method yields converging results to that of the frequentist TD, Equation \eqref{eq:TD}.
+show that this method yields converging results to that of the frequentist test of deficit, Equation \eqref{eq:TD}.
 
 ### The Bayesian standardised difference test {#BSDT}
 
-The Bayesian standardised difference test (BSDT) follow a similar procedure to that of BTD, however, we now assume a
-sample of \(n\) controls from which we obtain values on the variates \(Y_1\)
-and \(Y_2\) following a bivariate normal distribution and representing task
-A and task B. Let \(\overline{y}_1\) and \(\overline{y}_2\) denote the sample means
-and
+The Bayesian standardised difference test (BSDT) follow a similar procedure to
+that of BTD. However, we now assume a sample of \(n\) controls from which we
+obtain values on the variates \(Y_1\) and \(Y_2\) following a bivariate normal
+distribution and representing task A and task B. Let \(\overline{y}_1\) and
+\(\overline{y}_2\) denote the sample means and
 \begin{equation*}
 \pmb{A}=\begin{bmatrix}
 s^2_{1} & s_{12} \\
@@ -486,33 +482,35 @@ dissociation tests we want to estimate the proportion \(p\) of the control
 population that would exhibit a greater difference \(Y_1-Y_2\) than the case's
 \(y_1^*-y_2^*\).
 
-The multivariate generalization of the \(\chi^2\)-distribution is the Wishart distribution.
-That is, a Wishart distribution of 1 dimension is a \(\chi^2\)-distribution on \(n\) degrees of
-freedom. The Wishart distribution is the conjugate prior of \(\Sigma^{-1}\) and the inverse
-Wishart distribution is the conjugate prior of \(\Sigma\). One can view the Wishart distribution
-parameterised with \(n\) degrees of freedom and some variance-covariance matrix as being a distribution
-of SSCP-matrices related to that variance-covariance matrix. Similarly, one can view the
-inverse Wishart distribution parameterised with the same degrees of freedom and a SSCP-matrix
-as being a distribution of variance-covariance matrices related to that SSCP-matrix.
+The multivariate generalization of the \(\chi^2\)-distribution is the Wishart
+distribution. That is, a Wishart distribution of 1 dimension is a
+\(\chi^2\)-distribution on \(n\) degrees of freedom. One can view the Wishart
+distribution parameterised with \(n\) degrees of freedom and some
+variance-covariance matrix as being a distribution of SSCP-matrices related to
+that variance-covariance matrix. Similarly, one can view the inverse Wishart
+distribution parameterised with the same degrees of freedom and a SSCP-matrix as
+being a distribution of variance-covariance matrices related to that
+SSCP-matrix.
 
-The joint prior for \(f(\pmb\mu, \Sigma^{-1})\) chosen in
-\citet{crawfordComparisonSingleCase2007} (note the inverse of \(\Sigma\)) was \(f(\pmb\mu, \Sigma^{-1}) \propto |\Sigma|\). The posterior marginal distribution of
-\(\Sigma^{-1}\) for this choice of prior is a Wishart distribution with \(n\)
-degrees of freedom and scale matrix \(\pmb{S}^{-1}\). To sample from the posterior
-of \(\Sigma\) we thus sample from an inverse Wishart distribution on \(n\) degrees
-of freedom and scale matrix \(\pmb{S}\). The conditional distribution of
-\(\pmb\mu|\Sigma\) is then a multivariate normal distribution with mean
-\([\overline{y}_1 \ \overline{y}_2]\) and variance \(\frac{1}{n}\Sigma\), \citep[see
-e.g.,][]{gelmanBayesianDataAnalysis2013}.
+The non-informative prior for \(f(\pmb\mu, \Sigma^{-1})\) chosen in
+\citet{crawfordComparisonSingleCase2007} was \(f(\pmb\mu, \Sigma^{-1}) \propto
+|\Sigma|\) in favour of the perhaps more commonly used \(f(\pmb\mu, \Sigma^{-1})
+\propto |\Sigma|^{(k+1)/2}\) ($k =$ number of variates) because, for unstandardised differences, it was shown
+to yield identical interval estimates to the frequentist UDT. The posterior
+marginal distribution of \(\Sigma^{-1}\) for this choice of prior is a Wishart
+distribution with \(n\) degrees of freedom and scale matrix \(\pmb{S}^{-1}\).
+The conditional distribution of \(\pmb\mu|\Sigma\) is then a multivariate normal
+distribution with mean \([\overline{y}_1 \ \overline{y}_2]\) and variance
+\(\Sigma/n\), see e.g., \citet{gelmanBayesianDataAnalysis2013} (p. 72-73).
+\citet{crawfordComparisonSingleCase2007} refer to this as the "standard theory"
+prior.
 
-\citet{crawfordComparisonSingleCase2007} refer to this as the "standard theory"\footnote{Independent
-Jeffrey's prior.} prior. Use of the standard theory prior produces good frequentist properties
-for \(\sigma_1\) and \(\sigma_2\), but \citet{bergerObjectivePriorsBivariate2008} have shown that the
-convergence to frequentist estimates is less good for \(\rho\)
-and discrepancy sizes \citep{crawfordComparingSingleCase2011}. \citet{bergerObjectivePriorsBivariate2008} instead recommend that
-\(f(\pmb\mu, \Sigma^{-1}) \propto \frac{1}{\sigma_1\sigma_2(1-\rho^2)}\)
-should be used as a general purpose prior.
-
+Using the standard theory prior produces good frequentist properties for
+\(\sigma_1\) and \(\sigma_2\), but \citet{bergerObjectivePriorsBivariate2008}
+have shown that the convergence to frequentist estimates is less good for
+\(\rho\) and differences in means ($\mu_1 - \mu_2$). Instead, they recommend
+that \(f(\pmb\mu, \Sigma^{-1}) \propto \frac{1}{\sigma_1\sigma_2(1-\rho^2)}\)
+should be used as a general purpose prior for bivariate normal data.
 To construct posteriors with this prior rejection sampling is used. Random
 observations are drawn from an inverse Wishart on \(n-1\)
 degrees of freedom and only a subset of the draws are accepted.
@@ -520,7 +518,7 @@ degrees of freedom and only a subset of the draws are accepted.
 credible intervals and, with simulations, showed that if the sample size was
 treated as \(n-1\) for estimations of \(\Sigma\), so that the intervals were
 somewhat conservative, the frequentist properties of their estimations were
-improved. \citet{crawfordComparingSingleCase2011} recommends this and refer to it as the
+improved. \citet{crawfordComparingSingleCase2011} recommend this and refer to it as the
 "calibrated" prior. The procedure for sampling from the posterior using this
 prior is given below:
 
@@ -573,7 +571,7 @@ of the control population expected to show a more extreme score than the case.
     \overline{y}_1 \\
     \overline{y}_2 \end{pmatrix}+ \pmb{T} \begin{pmatrix}
     z_{r1} \\
-    z_{r2} \end{pmatrix} \cdot \frac{1}{n}
+    z_{r2} \end{pmatrix} / \sqrt{n}
     \end{equation*}
     is the estimation of \(\pmb{\mu}\) for this iteration.
 
@@ -604,7 +602,7 @@ Repeating these
 steps a large number of times will yield a distribution of \(\hat{p}\), the
 mean of which is taken as the point estimate of \(p\) and used for hypothesis testing.
 Multiplied by 100 it gives the point estimate of the percentage of controls expected to exhibit
-a more extreme task difference than the case. If repeated e.g.~1000 times, the
+a more extreme task difference than the case. If repeated e.g., 1000 times, the
 25th smallest and 25th largest \(\hat{p}_i\) is the lower and upper boundaries of the 95\%
 credible interval for \(p\). Similarly,
 the 25th smallest and 25th largest values of \(z^*_{(i)}\) gives the lower and
@@ -614,7 +612,7 @@ estimate of which is that of Equation \eqref{eq:PJ}.
 ### Bayesian tests allowing for covariates {#cov}
 
 \citet{crawfordComparingSingleCase2011} extended the previously described Bayesian tests by
-developing Bayesian regression methods that allowed the case's abnormality to be assessed
+using Bayesian regression techniques that allowed the case's abnormality to be assessed
 in the presence of covariates. These tests thus allow you to compare
 the case's score on the task of interest conditioned on the results of the
 controls having the same score as the case on the covariate(s). If a case has 15
@@ -630,10 +628,10 @@ of interest can be achieved statistically. One degree of freedom is lost for
 each covariate included, so as a rule of thumb they should be included only if
 they have a sample correlation with the variate(s) of interest stronger than
 \(0.3\) \citep{crawfordComparingSingleCase2011}. Of course, the control sample should also ideally
-bracket the case on covariates of interest, in order to avoid extrapolating `out
-of sample'. As for the earlier tests, the assumption of the variates of interest
+bracket the case on the covariates, in order to avoid extrapolating "out
+of sample". As for the earlier tests, the assumption of the variates of interest
 are still that they follow a normal or bivariate normal distribution. However,
-no assumption is made about the distribution of the covariates.
+no assumptions are made about the distribution of the covariates.
 
 Suppose we have data from a sample of size \(n\), with scores on \(m\) covariates
 and \(k = 1, 2\) variates of interest, depending on whether we are testing for a
@@ -689,7 +687,7 @@ The data estimates of \(\boldsymbol{B}\) and \(\Sigma\) are then
 \boldsymbol{B}^* = (\boldsymbol{X}'\boldsymbol{X})^{-1}\boldsymbol{X}'\boldsymbol{Y} \ \text{and} \
 \Sigma^* = \frac{1}{n-m-1}(\boldsymbol{Y}-\boldsymbol{X}\boldsymbol{B}^*)'(\boldsymbol{Y}-\boldsymbol{X}\boldsymbol{B}^*)
 \]
-For the "standard theory"" prior the posterior of \(\Sigma\) is an inverse
+For the "standard theory" prior the posterior of \(\Sigma\) is an inverse
 Wishart distribution with \(df = n - m\) when \(k=2\) and \(df=n-m-1\) when \(k
 = 1\) \citep{crawfordComparingSingleCase2011,
 tiaoBayesianEstimationMultivariate1964} and scale matrix \((n-m-1)\Sigma^*\).
@@ -718,7 +716,7 @@ Then this vector is the data estimate for
 \(\boldsymbol{B}_{\text{vec}}=(\boldsymbol{\beta}'_1, ...,\boldsymbol{\beta}'_k)'\).
 Take the kronecker product \(\boldsymbol{\hat\Sigma}_{(i)} \otimes (\boldsymbol{X'X})^{-1}\) and
 denote this \(\boldsymbol{\Lambda}_{(i)}\). Then the posterior of \(\boldsymbol{B}_{\text{vec}}|\boldsymbol{\hat\Sigma}_{(i)}\)
-is a \(k\)-variate normal distribution with mean vector \(\boldsymbol{B}^*_{\text{vec}}\)
+is a multivariate normal distribution with mean vector \(\boldsymbol{B}^*_{\text{vec}}\)
 and variance-covariance matrix \(\boldsymbol{\Lambda}_{(i)}\). Draw a random value
 from this distribution such that
 \(\hat{\boldsymbol{B}}^*_{\text{vec(i)}} =(\hat{\boldsymbol{\beta}}'_{1(i)}, ...,\hat{\boldsymbol{\beta}}'_{k(i)})'\)
@@ -738,9 +736,9 @@ estimations derived above. Depending on whether we are testing for a
 deficit or a discrepancy (i.e., whether \(k=1\) or \(k=2\)) the calculations
 of the effect sizes differ. \citet{crawfordComparingSingleCase2011} call these effect
 sizes \(Z_{CCC}\) and \(Z_{DCCC}\) for a deficit and a discrepancy respectively.
-They are similar to \(Z_{CC}\) \eqref{eq:zcc} and \(Z_{DCC}\) \eqref{eq:PJ}, however,
+They are similar to \(Z_{CC}\) (Equation \eqref{eq:zcc}) and \(Z_{DCC}\) (Equation \eqref{eq:PJ}), however,
 the extra \(C\) in the subscript indicates that they are conditional on
-covariates. Denote \(y^*_1\) and \(y^*_2\) as the case's scores on two variates
+covariates. Denote \(y^*_1\) and \(y^*_2\) as the case's scores on the two variates
 of interest. Given that we want to estimate deficiency of a case on \(Y_1\), we
 calculate
 \begin{equation}
@@ -760,7 +758,7 @@ standard deviations obtained from \(\hat{\Sigma}_{(i)}\) in Equation \eqref{eq:s
 The conditional correlation between \(Y_1\) and \(Y_2\) in the denominator is given by
 \[\hat{\rho}_{12(i)} = \frac{\hat{s}_{12(i)}}{\sqrt{\hat{s}^2_{1(i)}\hat{s}^2_{2(i)}}}\]
 
-We then find the tail area under the standard normal density that is less or greater than
+We then find the tail area under the standard normal distribution that is less or greater than
 \(\hat{Z}_{CCC(i)}\) or \(\hat{Z}_{DCCC(i)}\) depending on the problem at hand and the alternative
 hypothesis specified. Denote the value obtained \(\hat{p}_{(i)}\) which then
 is an estimate of \(p\). If testing for a deficit we would have:
@@ -772,7 +770,7 @@ Iterating these steps a large number of times will yield a distribution of
 \(\hat{p}\), the mean of which is taken as the point estimate of \(p\). This
 estimate is used for significance testing and if multiplied by 100 it will
 give an estimate of the percentage of controls expected to exhibit a more
-extreme score than the case. If repeated e.g.~1000 times, the
+extreme score than the case. If repeated e.g., 1000 times, the
 25th smallest and 25th largest \(\hat{p}_{(i)}\) is the lower and upper boundaries of
 the 95\% credible interval for \(p\).
 
@@ -782,7 +780,7 @@ and correlation calculated directly from the control sample.
 The \(1-\alpha\) credible intervals for these
 effect sizes are given by the \(\alpha/2\) and \(1-\alpha/2\) quantiles
 of the sampled distribution of \(Z_{CCC}\) or \(Z_{DCCC}\). That is, just as
-for \(p\), if repeated e.g.~1000 times, the
+for \(p\), if repeated e.g., 1000 times, the
 25th smallest and 25th largest value of \(\hat{Z}_{CCC(i)}\) or \(\hat{Z}_{DCCC(i)}\)
 is the lower and upper boundaries of
 the 95\% credible interval for \(Z_{CCC}\) or \(Z_{DCCC}\).
@@ -791,29 +789,6 @@ the 95\% credible interval for \(Z_{CCC}\) or \(Z_{DCCC}\).
 # The \pkg{singcar} package {short-title="The singcar package" #section3}
 
 ## Functions for testing abnormality
-
-<!-- The main functions of \pkg{singcar} are: -->
-
-<!-- Name | Function | Source | Reference  -->
-<!-- ---------------|----------|-------|-------- -->
-<!-- Test of deficit |\code{TD()} | @crawford_comparing_1998 | Equation \@ref(eq:TD) -->
-<!-- Bayesian test of deficit | \code{BTD()} | @crawford_comparison_2007 | Section \@ref(BTD) -->
-<!-- Bayesian test of deficit with covariates | \code{BTD_cov()} | @crawford_comparing_2011 | Section \@ref(cov)  -->
-<!-- Unstandardised difference test | \code{UDT()} | @crawford_testing_2005 | Equation \@ref(eq:UDT) -->
-<!-- Revised standardised difference test | \code{RSDT()} | @crawford_testing_2005 | Equation \@ref(eq:RSDT) -->
-<!-- Bayesian standardised difference test | \code{BSDT()}| @crawford_comparison_2007 | Section \@ref(BSDT) -->
-<!-- Bayesian standardised difference test with covariates | \code{BSDT_cov()}|  @crawford_comparing_2011 | Section \@ref(cov)  -->
-
-<!-- To facilitate meta-analyses of studies using case-control comparisons -->
-<!-- all of the above functions can take both summary statistics as -->
-<!-- input as well as raw data. In any case, begin by installing and loading -->
-<!-- the package: -->
-
-<!-- ```{r astar, eval=FALSE} -->
-<!-- install.packages("singcar") -->
-<!-- library("singcar") -->
-<!-- ``` -->
-
 
 The main functions in the package are presented in Table \@ref(tab:funtab).
 
@@ -909,14 +884,16 @@ Section \ref{cov}\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \captionsetup{width=0.95\textwidth}
-\caption{Main functions for significance testing of abnormality when using small control samples.}
+\caption{Main functions for significance testing of abnormality when using small control samples 
+and principal relevant reference in prior literature.}
 \label{tab:funtab}
 \end{longtable}
 
-To facilitate meta-analyses of studies using case-control comparisons
-all of the above functions can take both summary statistics as
-input as well as raw data. In any case, begin by installing and loading
-the package:
+To facilitate meta-analyses of studies using case-control comparisons,
+all functions in Table \@ref(tab:funtab) can take both summary statistics as
+input as well as raw data. The output will be a list set to class \code{"htest"},
+for which the generic function \code{print} have a method. To use the package,
+begin by installing and loading it:
 
 ```{r loadpack, eval=FALSE}
 install.packages("singcar")
@@ -935,7 +912,7 @@ The illusion implies that sensory cues about object size affect the perception
 of weight. It has been suggested that patient DF does not experience this
 illusion in the same way as the healthy population when only visual cues about
 object size are available \citep{dijkermanVisuomotorPerformancePatient2004a}. In contrast, when kinaesthetic (tactile) cues are
-provided it is suggested that the DF's experience of the illusion is unaffected
+provided it is suggested that DF's experience of the illusion is unaffected
 by her brain damage. In other words, patient DF was expected to have a deficit
 in the visual size-weight illusion and exhibit an abnormally large discrepancy
 (dissociation) between visual and kinaesthetic size-weight illusions. The
@@ -999,20 +976,20 @@ If the control sample for a study is not appropriately matched to the case on
 variables such as, for example, age or education level it is appropriate to use tests
 that account for this by allowing for the inclusion of covariates. Including
 theoretically sound covariates is often a good idea. \citet{crawfordComparingSingleCase2011}
-recommends however to only include a covariate if it correlates \(>0.3\) with
+recommends however to only include a covariate if it correlates \(\geq 0.3\) with
 the variate of interest, because of the loss of degrees of freedom.
 
 The function \code{BTD_cov()} allows for the inclusion of covariates and therefore to
 assess the patient on the task of interest by essentially comparing him/her to
 the controls with the same score on the covariate. Even though the correlation
-between age and visual size-weight illusion is \(<0.3\) it is included here as
+between age and visual size-weight illusion is \(< 0.3\) it is included here as
 a coviariate for demonstrative purposes. Start again by extracting the
 scores on the covariate for the patient and for the control participants.
 ```{r covariate}
 PAT_age <- size_weight_illusion[1, "YRS"] 
 CON_age <- size_weight_illusion[-1, "YRS"]
 ```
-Since \code{BTD_cov} is somewhat computationally intense, the number of
+Since \code{BTD_cov()} is somewhat computationally intense, the number of
 iterations has been reduced in the example compared to \code{BTD()}. For actual analysis the number
 of iterations should be based on required precision. It should be noted that
 there is no restriction on the number of covariates used as long as \(n > m+1\). If more than one
@@ -1048,7 +1025,7 @@ function to use is the unstandardised difference test, Equation \eqref{eq:UDT}.
 This test is in \pkg{singcar} called by the function \code{UDT()}. However, one
 should use this only if the variates are known to come from equivalent distributions.
 Otherwise, tests that can evaluate standardised scores
-without inflating effect sizes should be used. In the frequentist framework the
+without inflating Type I errors should be used. In the frequentist framework the
 appropriate test for this is the RSDT, Equation \eqref{eq:RSDT}. In this example we wish
 to estimate and test the abnormality of the discrepancy between visual
 and kinaesthetic size-weight illusion in patient DF. That is, we want to compare the difference
@@ -1081,20 +1058,22 @@ RSDT(case_a = PAT_VSWI,
      na.rm = FALSE)
 ```
 
-The Bayesian analogue of this test is also appropriate to use and is in fact
-recommended over the RSDT \citet{crawfordComparisonSingleCase2007}, as described in Section \ref{BSDT}.
-The syntax of the two functions is
-similar, but the BSDT comes with more optional arguments. For example, one has
-the option of applying this test without standardising the variates by setting
-the argument \code{unstandardised} to \code{TRUE}. The output then converge to
-that of the frequentist UDT. Furthermore, one has the option of choosing
-a prior distribution. Setting the argument \code{calibrated} to
-\code{FALSE} specifies the use of the "standard theory" prior. If left
-to the default (\code{TRUE}) an accept-reject algorithm is deployed for each
-simulation of \(\Sigma\), as described in Section \ref{BSDT}. This default
-prior has been shown to have better frequentist properties for estimating \(\rho\)
-and differences between means in a bivariate normal distributions
-\citep{bergerObjectivePriorsBivariate2008} and is therefore the default and recommended choice.
+The Bayesian analogue of this test is recommended over the RSDT
+ because it keeps a better control
+over Type I errors when the case exhibits extreme deficits on both variates but
+no discrepancy between them \citep{crawfordComparisonSingleCase2007}.
+The syntax of the two functions is similar, but the \code{BSDT()} comes with more
+optional arguments. For example, one has the option of applying this test
+without standardising the variates by setting the argument \code{unstandardised}
+to \code{TRUE}. The output then converges to that of the frequentist UDT.
+Furthermore, one can choose between priors. Setting the
+argument \code{calibrated} to \code{FALSE} specifies the use of the "standard
+theory" prior. If left to the default (\code{TRUE}) an accept-reject algorithm
+is deployed for each simulation of \(\Sigma\), as described in Section
+\ref{BSDT}. This default prior has been shown to have better frequentist
+properties for estimating \(\rho\) and differences between means in a bivariate
+normal distributions \citep{bergerObjectivePriorsBivariate2008} and is therefore
+the default and recommended choice.
 ```{r BSDT}
 BSDT(case_a = PAT_VSWI,
      case_b = PAT_KSWI,
@@ -1115,7 +1094,7 @@ BSDT(case_a = PAT_VSWI,
 If analysing discrepancies between variates in the presence of covariates the syntax is slightly
 different, requiring that one specifies the case's scores on the variates of
 interest as a vector and the control scores as a data frame or matrix.
-One has the option to choose
+One has the option to choose between the "calibrated" and "standard theory"
 prior, just as for \code{BSDT()}, where \code{calibrated = TRUE} is the
 recommended and default behaviour. If using summary statistics
 \code{use_sumstats} must be set to \code{TRUE} and the summary input should be
@@ -1143,10 +1122,9 @@ BSDT_cov(case_tasks = c(PAT_VSWI, PAT_KSWI),
 A further capacity of \pkg{singcar} is that it can be used to calculate
 statistical power of the tests. The notion of power when comparing cases to
 control samples have been somewhat overlooked for this class of statistical tests.
-In recent work by the authors \citep{mcintoshPowerCalculationsSinglecase2020}, we argued that,
+In recent work \citep{mcintoshPowerCalculationsSinglecase2020}, we argued that,
 even though power is inherently limited in this paradigm, a priori calculations are
 still useful for study design and interpretation in neuropsychological and other applications.
-
 Calculating power for the test of deficit is similar to calculating power for
 any \(t\) test and can be done analytically.
 \begin{equation} power = 1 - \beta =
@@ -1155,26 +1133,27 @@ T_{n-1}\left(t_{\alpha, \ n-1} \Bigg\rvert \frac{x^* - \overline{x}}{\sigma
 \end{equation}
 Where \(T_{n-1}(.\rvert \theta)\) is the cumulative distribution function for the
 non-central \(t\) distribution with \(n-1\) degrees of freedom and non-centrality
-parameter \(\frac{y^* - \overline{y}}{\sigma \sqrt{\frac{n+1}{n}}}\) {[}i.e., TD, Equation
-\eqref{eq:TD}{]} and \(t_{\alpha, \ n-1}\) is the \(\alpha\) quantile of the \emph{central}
+parameter \(\frac{y^* - \overline{y}}{\sigma \sqrt{\frac{n+1}{n}}}\) (i.e., TD, Equation
+\eqref{eq:TD}) and \(t_{\alpha, \ n-1}\) is the \(\alpha\) quantile of the \emph{central}
 \(t\) distribution on \(n-1\) degrees of freedom (note that this is for a one-sided
 test). For the unstandardised difference test power is calculated in an
 analogous way by putting Equation \eqref{eq:UDT} as the non-centrality parameter. Deriving
 power for the other functions in an analytic manner is however not possible (the
 RSDT is only approximately \(t\) distributed) and a Monte Carlo approach has been
 used for these tests. To call any power calculator in the package one simply
-use the function names with \code{_power} added as a suffix.
+uses the function names with \code{_power} added as a suffix.
 
 So, for example, to calculate power for the test of deficit we call \code{TD_power()}.
-Expected case score and either sample size or desired power must
+The expected case score and either sample size or desired power must
 be supplied. The mean and standard deviation of the control sample
 can also be specified with the arguments \code{mean} and \code{sd}.
 If not, they take the default values of 0 and 1 respectively so
 that the case score is interpreted as distance from the mean
-in standard deviations. An \(\alpha\)-level of the conventional
+in standard deviations. A conventional \(\alpha\)-level of
 \(0.05\) is assumed if nothing else is supplied. The alternative
-hypothesis can also be specified to the argument \code{alternative}, for a one-tailed test
-specify \code{"less"} (default) or \code{"greater"}, for a two-tailed \code{"two.sided"}.
+hypothesis can also be specified by the argument \code{alternative}:
+specify \code{"less"} (default) or \code{"greater"} for a one-tailed test, specify 
+\code{"two.sided"} for a two-tailed test.
 ```{r TD-power}
 TD_power(case = 70,
          mean = 100,
@@ -1187,13 +1166,13 @@ TD_power(case = 70,
 ```
 
 \code{TD_power()} can also be used to calculate required sample size for a
-desired level of power. If we for example specify a desired power level of 0.6,
+desired level of power. For example, if we specify a desired power level of 0.6,
 leave \code{sample_size} to its default and let the rest of the arguments
 be as in the previous example, we see from the output of the function that
-power will not increase more than 0.5\% for any additional patient after a sample
+power will not increase more than 0.5\% for any additional participant after a sample
 size of 15. That is, the algorithm stops searching
 when this level of specificity has been reached and we are nearing the
-asymptotic maximum power for this effect size. We can increase this specificity
+asymptotic maximum power for this effect size. We can increase the specificity
 by lowering the \code{spec} argument.
 ```{r TDpowersize}
 TD_power(case = 70,
@@ -1210,7 +1189,7 @@ Power calculators for the Bayesian tests of deficit cannot calculate
 required sample size. This is because they rely on simulation methods
 to estimate approximate power and deploying a search algorithm to find the required sample
 size for a given level of power would be computationally too intense. The syntax
-is, however, relatively similar to that of \code{TD_power()}. For \code{BTD_power()}
+is otherwise relatively similar to that of \code{TD_power()}. For \code{BTD_power()}
 we have the two extra arguments \code{nsim} and \code{iter}, indicating the number
 of simulations used in the power function and by \code{BTD()}, respectively.
 ```{r BTDpower}
@@ -1231,8 +1210,10 @@ The covariates can be specified similarly or as an \(m \times 2\) matrix where t
 column gives the means of each covariate and the second column gives the standard
 deviations. The correlation matrix of the variates must be given as well. In the example
 below, power is evaluated for a test taking two covariates into account, both with a mean
-of 0 and a standard deviation of 1. The correlation matrix is specified as a \(3\times 3\)
-identity matrix. This function is computationally intense and hence, the number
+of 0 and a standard deviation of 1. The correlation is specified as a \(3\times 3\)
+matrix with pairwise correlations of $0.3$. The default settings include only one
+covariate having a $0.3$ correlation with the variate of interest.
+This function is computationally intense and hence, the number
 of simulations has, for the example below, been decreased.
 ```{r BTDcovpower}
 covars <- matrix(c(0, 1,
@@ -1241,7 +1222,7 @@ BTD_cov_power(case = -2,
               case_cov = c(0.2, -0.6),
               control_task = c(0, 1),
               control_covar = covars,
-              cor_mat = diag(3),
+              cor_mat = diag(3) + 0.3 - diag(c(0.3, 0.3, 0.3)),
               sample_size = 15,
               alternative = "less",
               alpha = 0.05,
@@ -1254,7 +1235,7 @@ variates as well as sample size. The means and standard deviations of the
 control sample can also be specified. If unspecified, they take on the default values of
 0 and 1 respectively, so that the expected case scores are interpreted as
 distances from the means in standard deviations. \code{RSDT_power()},
-\code{BSDT_power()} and \code{UDT_power()} additionally requires an estimate of
+\code{BSDT_power()} and \code{UDT_power()} additionally require an estimate of
 the sample correlation between the variates of interest, \code{r_ab}. If this is
 not specified a correlation of 0.5 is assumed by default. For
 \code{BSDT_cov_power()} the correlation matrix between the variates of interest
@@ -1306,10 +1287,10 @@ BSDT_cov_power(case_tasks = c(70, 55),
 
 # Summary
 
-The \pkg{singcar} package for \proglang{R} has in this paper been outlined and
+The \pkg{singcar} package for \proglang{R} has been outlined and
 its main functionalities described. The package consists of methods for
 estimating abnormality of a single case when compared to a population estimated
-by a small sample. Methods for estimating abnormality for a single variate are
+by a small sample. Methods for estimating abnormality on a single variate have been
 described as well as methods for estimating abnormality of the difference
 between two variates. Historically, the use of these tests has mainly been
 within the field of neuropsychology, but their potential applicability is far
@@ -1317,15 +1298,16 @@ wider, extending to other areas of psychology and perhaps even to completely new
 fields.
 
 In neuropsychology the methods developed by John Crawford and Paul Garthwaite
-are frequently used, especially the test of deficit, Equation \eqref{eq:TD}, and the revised
-standardised difference test, Equation \eqref{eq:RSDT}. However, the more
-flexible methods allowing for the inclusion of covariates have not gained as
-much traction. It is hoped that by providing them in a documented package for a
-popular language such as \proglang{R}, these methods will receive further spread.
+are frequently used, especially the test of deficit, Equation \eqref{eq:TD}, and
+the revised standardised difference test, Equation \eqref{eq:RSDT}. However, the
+Bayesian standardised difference test, which outperforms the RSDT regarding
+control of Type I errors, has not gained as much traction. Neither have the more
+flexible Bayesian methods allowing for the inclusion of covariates.
+It is hoped that by providing them in a documented package for a
+popular language such as \proglang{R}, they will receive further uptake.
 
-The methods described has been developed for keeping transparent control over
-Type I errors but to emphasise the importance of Type II errors in the paradigm
-of case-control comparisons, power calculators have been implemented in the
+The methods described have been developed for keeping transparent control over
+Type I errors, but power calculators have been implemented in the
 package as well. Consideration of power can assist researchers in study design
 and in setting realistic expectations for what these types of statistical
 hypothesis tests can achieve \citep{mcintoshPowerCalculationsSinglecase2020}.
