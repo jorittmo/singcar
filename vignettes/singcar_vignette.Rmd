@@ -1,10 +1,7 @@
 ---
-documentclass: jss
-classoption: nojss
 author:
   - name: Jonathan Ö. Rittmo
     affiliation: University of Edinburgh
-    # use this syntax to add text on several lines
     address: |
       | Human Cognitive Neuroscience
       | Psychology
@@ -17,9 +14,7 @@ author:
     email: r.d.mcintosh@ed.ac.uk
 title:
   formatted: "The \\proglang{R} package \\pkg{singcar}: Comparing Single Cases to Small Samples"
-  # If you use tex in the formatted title, also supply version without
   plain:     "The R package singcar: Comparing Single Cases to Small Samples"
-  # For running headers, if needed
   short:     "\\pkg{singcar}: Comparing Single Cases to Small Samples"
 abstract: >
     Comparison of single cases to populations estimated from a sample has many
@@ -35,7 +30,6 @@ abstract: >
     This paper describes some of the main methods and presents a package in which
     they are implemented.
 keywords:
-  # at least one keyword must be supplied
   formatted: [single case comparisons, small samples, "\\proglang{R}"]
   plain:     [single case comparisons, small samples, R]
 bibliography: ref.bib
@@ -52,6 +46,8 @@ preamble: >
 output:
   bookdown::pdf_book:
     base_format: rticles::jss_article
+documentclass: jss
+classoption: nojss
 vignette: >
   %\VignetteIndexEntry{The R package singcar: Comparing Single Cases to Small Samples}
   %\VignetteEngine{knitr::rmarkdown}
