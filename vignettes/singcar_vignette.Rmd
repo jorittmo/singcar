@@ -1,5 +1,5 @@
 ---
-author:
+author: 
   - name: Jonathan Ö. Rittmo
     affiliation: University of Edinburgh
     address: |
@@ -12,7 +12,7 @@ author:
       | Human Cognitive Neuroscience
       | Psychology
     email: r.d.mcintosh@ed.ac.uk
-title:
+title: 
   formatted: "The \\proglang{R} package \\pkg{singcar}: Comparing Single Cases to Small Samples"
   plain:     "The R package singcar: Comparing Single Cases to Small Samples"
   short:     "\\pkg{singcar}: Comparing Single Cases to Small Samples"
@@ -29,10 +29,11 @@ abstract: >
     case is compared to a sample, without losing control of the Type I error rate.
     This paper describes some of the main methods and presents a package in which
     they are implemented.
-keywords:
+keywords: 
   formatted: [single case comparisons, small samples, "\\proglang{R}"]
   plain:     [single case comparisons, small samples, R]
 bibliography: ref.bib
+csl: biomed-central.csl
 preamble: >
   \usepackage{amsmath}
   \usepackage{amsfonts}
@@ -44,13 +45,15 @@ preamble: >
   \renewcommand{\eqref}{\Cref}
   \Crefformat{equation}{#2#1#3}
 output:
-  bookdown::pdf_book:
-    base_format: rticles::jss_article
+    bookdown::pdf_book:
+      base_format: rticles::jss_article
 documentclass: jss
 classoption: nojss
+# if (packageVersion("rticles") < 0.5 || rmarkdown::pandoc_version() >= 2)
+#   rticles::jss_article else rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{The R package singcar: Comparing Single Cases to Small Samples}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
