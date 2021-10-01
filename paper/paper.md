@@ -16,7 +16,7 @@ authors:
 affiliations:
  - name: Human Cognitive Neuroscience, Psychology, University of Edinburgh, UK
    index: 1
-date: 29 September 2021
+date: 01 October 2021
 bibliography: paper.bib
 
 ---
@@ -58,7 +58,7 @@ assess the patient score on some variate Y, for which we do not know the
 population parameters, these must be estimated from a sample. Thus, the
 single-case of interest is compared to a control sample. There are many other
 areas where the application of such methods could also be useful, for example
-studies of uncommon human expertise. 
+studies of uncommon human expertise.
 
 As it represents the canonical field for the application of these methods, the
 nomenclature of neuropsychology is adopted. An abnormally low score on
@@ -93,16 +93,17 @@ Further advantages of `singcar` include an API that has more modifiable test
 parameters. It is also possible to automate these tests if multiple analyses need to
 be run for the purposes of data analysis or simulation studies. 
 The development of Crawford and Garthwaite's methods has been focused around limiting Type I
-errors, but to emphasise the importance of limiting Type II errors we also
-provide power calculators for each test function. Our hope in doing so is to
-increase awareness of power considerations for this methodology as well as to
-aid in the planning and design of experiments
-[@mcintoshPowerCalculationsSinglecase2020]. 
+errors, but to emphasise the importance of considering Type II errors we also provide power
+calculators for each test function. Our hope in doing so is to increase awareness of power
+for this methodology as well as to aid in the planning and design of experiments 
+[@mcintoshPowerCalculationsSinglecase2020].
 
-Note that the `R` package `singlecase` [@matthieusinglecase2008] contains
-overlapping functionality as `singcar` but has not been maintained or developed
-since 2008 and miss core functionality such as tests allowing for the inclusion
-of covariates.
+Note that the `R` package `singlecase` [@matthieusinglecase2008] contains some overlapping
+functionality with `singcar`, but it has not been maintained since 2008 and lacks
+core functionality such as tests allowing for the inclusion of covariates, and
+power calculators. A recent study by @mitchell2020peripheral investigating 
+peripheral reaching in Alzheimer’s disease and mild cognitive impairment exemplifies
+the uses of these novel functionalities in `singcar`. 
 
 # Functionality
 
@@ -119,6 +120,5 @@ inclusion of covariates [@crawfordComparingSingleCase2011] using Bayesian
 regression techniques. These methods make matching the control sample to the
 case less cumbersome. For rationale as well as mathematical and contextual
 background of the methods consult the package vignette.
-
 
 # References
