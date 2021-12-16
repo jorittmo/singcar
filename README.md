@@ -47,6 +47,16 @@ install_github("jorittmo/singcar")
 library("singcar")
 ```
 
+## Issues
+
+Please report any bugs, issues or feature requests in the 
+[issue tracker](https://github.com/jorittmo/singcar/issues).
+
+## Contributions 
+
+Contributions are highly appreciated and 
+[contribution guidelines](CONTRIBUTING.md) prior to submitting a pull request.
+
 ## Example
 
 The package comes with the dataset `size_weight_illusion`, a neuropsychological
