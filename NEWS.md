@@ -28,3 +28,8 @@
 * Edited print output.
 * Source code has been more rigorously commented. 
 
+# singcar 0.1.4
+
+* Added paper for Journal of Open Source Software
+* Added contribution guidelines and Code of Conduct
+
