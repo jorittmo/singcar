@@ -1,0 +1,18 @@
+citHeader("To cite singcar in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "singcar: Comparing single cases to small samples in R",
+  author   = "Jonathan Ö. Rittmo and Robert D. McIntosh",
+  publisher = "The Open Journal",
+  journal  = "Journal of Open Source Software",
+  year     = "2021",
+  volume   = "6",
+  number   = "68",
+  pages    = "3887",
+  doi      = "10.21105/joss.03887",
+  url      = "https://doi.org/10.21105/joss.03887",
+  textVersion = paste(
+  "Rittmo, J, Ö., McIntosh, R, D. (2021). singcar: Comparing single cases to small samples in R. Journal of Open Source Software, 6(68), 3887, https://doi.org/10.21105/joss.03887"
+  )
+)
