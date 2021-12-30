@@ -29,6 +29,11 @@ from a normative sample (i.e. a control group). It should be noted that these
 statistical methods could also be applied as a general method of outlier
 detection in small samples. 
 
+To cite this package you can use:
+
+* Rittmo, J, Ö., McIntosh, R, D. (2021). singcar: Comparing single cases to small samples in R. Journal of Open Source Software, 6(68), 3887, https://doi.org/10.21105/joss.03887
+
+
 ## Installation
 
 `singcar` is now available on CRAN! To get this stable version run:
