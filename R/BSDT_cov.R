@@ -112,6 +112,9 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
   # Set up of error and warning messages
   ###
 
+  case_tasks <- as.numeric(unlist(case_tasks))
+  case_covar <- as.numeric(unlist(case_covar))
+
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_tasks) != 2) stop("case_task should have length 2")
@@ -127,8 +130,8 @@ BSDT_cov <- function (case_tasks, case_covar, control_tasks, control_covar,
     rm(cov_obs)
   }
 
-  if (is.data.frame(control_tasks)) control_tasks <- as.matrix(control_tasks)
-  if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
+  if (!is.matrix(control_tasks)) control_tasks <- as.matrix(control_tasks)
+  if (!is.matrix(control_covar)) control_covar <- as.matrix(control_covar)
 
   ###
   # Extract relevant statistics

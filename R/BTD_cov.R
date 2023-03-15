@@ -97,13 +97,18 @@ BTD_cov <- function (case_task, case_covar, control_task, control_covar,
   # Set up of error and warning messages
   ###
 
+  case_task <- as.numeric(unlist(case_task))
+  case_covar <- as.numeric(unlist(case_covar))
+
+  control_task <- as.numeric(unlist(control_task))
+
   if (use_sumstats & (is.null(cor_mat) | is.null(sample_size))) stop("Please supply both correlation matrix and sample size")
   if (int_level < 0 | int_level > 1) stop("Interval level must be between 0 and 1")
   if (length(case_task) != 1) stop("case_task should be single value")
   if (!is.null(cor_mat)) if (sum(eigen(cor_mat)$values > 0) < length(diag(cor_mat))) stop("cor_mat is not positive definite")
   if (!is.null(cor_mat) | !is.null(sample_size)) if (use_sumstats == FALSE) stop("If input is summary data, set use_sumstats = TRUE")
 
-  if (is.data.frame(control_covar)) control_covar <- as.matrix(control_covar)
+  if (!is.matrix(control_covar) & !is.vector(control_covar)) control_covar <- as.matrix(control_covar)
 
   ###
   # Extract relevant statistics

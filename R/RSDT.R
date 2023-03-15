@@ -75,6 +75,11 @@ RSDT <- function (case_a, case_b, controls_a, controls_b,
   ###
   # Set up of error and warning messages
   ###
+  case_a <- as.numeric(unlist(case_a))
+  controls_a <- as.numeric(unlist(controls_a))
+
+  case_b <- as.numeric(unlist(case_b))
+  controls_b <- as.numeric(unlist(controls_b))
 
   if (length(case_a) > 1 | length(case_b) > 1) stop("Case scores should be single value")
   if (length(controls_a) > 1 & length(controls_b) > 1) {

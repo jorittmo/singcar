@@ -76,6 +76,9 @@ BTD <- function (case, controls, sd = NULL, sample_size = NULL,
   # Set up of error and warning messages
   ###
 
+  case <- as.numeric(unlist(case))
+  controls <- as.numeric(unlist(controls))
+
   if (length(case)>1) stop("Case should only have 1 observation")
   if (length(controls)<2 & is.null(sd) == TRUE) {
     stop("Not enough obs. Set sd and n for input of controls to be treated as mean")
