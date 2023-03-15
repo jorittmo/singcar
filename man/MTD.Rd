@@ -42,8 +42,20 @@ A list with class \code{"htest"} containing the following components:
   used}
 }
 \description{
-Multivariate Test of deficit
+Testing for abnormality in the distance between a a vector of observations
+for a single case and a vector of population means. Please see vignette
+for further details.
 }
 \examples{
+
+caseA <- size_weight_illusion[1, "V_SWI"]
+contA <- size_weight_illusion[-1, "V_SWI"]
+caseB <- size_weight_illusion[1, "K_SWI"]
+contB <- size_weight_illusion[-1, "K_SWI"]
+
+MTD(case = c(caseA, caseB), controls = cbind(contA, contB),
+  conf_level = 0.95, method = c("pd", "pchi", "pf", "pmd"),
+  mahalanobis_dist = NULL, k = NULL, n = NULL)
+
 
 }

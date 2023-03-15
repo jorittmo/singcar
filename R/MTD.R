@@ -1,5 +1,9 @@
 #' Multivariate Test of deficit
 #'
+#' Testing for abnormality in the distance between a a vector of observations
+#' for a single case and a vector of population means. Please see vignette
+#' for further details.
+#'
 #' @param case Vector of case scores
 #' @param controls Matrix or data frame with scores from the control sample, each column representing a variable
 #' @param conf_level Level of confidence for the confidence intervals
@@ -22,6 +26,16 @@
 #'
 #' @examples
 #'
+#' caseA <- size_weight_illusion[1, "V_SWI"]
+#' contA <- size_weight_illusion[-1, "V_SWI"]
+#' caseB <- size_weight_illusion[1, "K_SWI"]
+#' contB <- size_weight_illusion[-1, "K_SWI"]
+#'
+#' MTD(case = c(caseA, caseB), controls = cbind(contA, contB),
+#'   conf_level = 0.95, method = c("pd", "pchi", "pf", "pmd"),
+#'   mahalanobis_dist = NULL, k = NULL, n = NULL)
+#'
+#'
 MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf", "pmd"),
                 mahalanobis_dist = NULL, k = NULL, n = NULL) {
 
@@ -33,7 +47,7 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
   if (!is.null(case)){
     xbar <- colMeans(controls)
-    S <- solve(cov(controls))
+    S <- solve(stats::cov(controls))
     k <- length(case)
     n <- nrow(controls)
 
@@ -69,11 +83,11 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
 
 
-    c <- integrate(post, 0, sqrt(lamhat)/2)$value +
-      integrate(post, sqrt(lamhat)*0.5, sqrt(lamhat))$value +
-      integrate(post, sqrt(lamhat), sqrt(lamhat)*1.5)$value +
-      integrate(post, sqrt(lamhat)*1.5, sqrt(lamhat)*2)$value +
-      integrate(post, sqrt(lamhat)*2, Inf)$value
+    c <- stats::integrate(post, 0, sqrt(lamhat)/2)$value +
+      stats::integrate(post, sqrt(lamhat)*0.5, sqrt(lamhat))$value +
+      stats::integrate(post, sqrt(lamhat), sqrt(lamhat)*1.5)$value +
+      stats::integrate(post, sqrt(lamhat)*1.5, sqrt(lamhat)*2)$value +
+      stats::integrate(post, sqrt(lamhat)*2, Inf)$value
 
     post_norm <- function(lam) {
       post(lam)/c
@@ -82,18 +96,18 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
 
     postquant <- function(lim, quantile) {
-      abs(integrate(post_norm, 0, lim)$value - quantile)
+      abs(stats::integrate(post_norm, 0, lim)$value - quantile)
     }
     postquant <- Vectorize(postquant)
 
-    lammed <- nlminb(delta_hat, postquant, quantile = 0.5, lower = 0)$par
-    lamu <- nlminb(delta_hat, postquant, quantile = (1+conf_level)/2, lower = 0)$par
-    laml <- nlminb(delta_hat, postquant, quantile = (1-conf_level)/2, lower = 0)$par
+    lammed <- stats::nlminb(delta_hat, postquant, quantile = 0.5, lower = 0)$par
+    lamu <- stats::nlminb(delta_hat, postquant, quantile = (1+conf_level)/2, lower = 0)$par
+    laml <- stats::nlminb(delta_hat, postquant, quantile = (1-conf_level)/2, lower = 0)$par
 
 
-    pmd <- (1 - pchisq(lammed, df = nu1))*100
-    pmdl <- (1 - pchisq(lamu, df = nu1))*100
-    pmdu <- (1 - pchisq(laml, df = nu1))*100
+    pmd <- (1 - stats::pchisq(lammed, df = nu1))*100
+    pmdl <- (1 - stats::pchisq(lamu, df = nu1))*100
+    pmdu <- (1 - stats::pchisq(laml, df = nu1))*100
 
     p_int <- c(pmdl, pmdu)
     dist_int <- c(sqrt(laml), sqrt(lamu))
@@ -125,18 +139,18 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
 
     fquant <- function(nlam, qu) {
-      abs(pf(F0, nu1, nu2, ncp = nlam) - qu)
+      abs(stats::pf(F0, nu1, nu2, ncp = nlam) - qu)
     }
     fquant <- Vectorize(fquant)
 
-    lammed <- nlminb(F0, fquant, qu = 0.5, lower = 0)$par/n
-    laml <- nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
-    lamu <- nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
+    lammed <- stats::nlminb(F0, fquant, qu = 0.5, lower = 0)$par/n
+    laml <- stats::nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
+    lamu <- stats::nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
 
 
-    pd <- (1 - pchisq(lammed, nu1))*100
-    pl <- (1 - pchisq(lamu, nu1))*100
-    pu <- (1 - pchisq(laml, nu1))*100
+    pd <- (1 - stats::pchisq(lammed, nu1))*100
+    pl <- (1 - stats::pchisq(lamu, nu1))*100
+    pu <- (1 - stats::pchisq(laml, nu1))*100
 
     p_int <- c(pl, pu)
     dist_int <- c(sqrt(laml), sqrt(lamu))
@@ -165,19 +179,19 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
   if (method == "pchi") {
 
     q <- (n/(n-1))*lamhat
-    pchi <- pchisq(q, df = nu1, lower.tail = FALSE)*100
+    pchi <- stats::pchisq(q, df = nu1, lower.tail = FALSE)*100
 
     F0 <- (n*nu2)/((n-1)*nu1)*lamhat
     fquant <- function(nlam, qu) {
-      abs(pf(F0, nu1, nu2, ncp = nlam) - qu)
+      abs(stats::pf(F0, nu1, nu2, ncp = nlam) - qu)
     }
     fquant <- Vectorize(fquant)
 
-    laml <- nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
-    lamu <- nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
+    laml <- stats::nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
+    lamu <- stats::nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
 
-    pl <- (1 - pchisq(lamu, nu1))*100
-    pu <- (1 - pchisq(laml, nu1))*100
+    pl <- (1 - stats::pchisq(lamu, nu1))*100
+    pu <- (1 - stats::pchisq(laml, nu1))*100
 
     p_int <- c(pl, pu)
     dist_int <- c(sqrt(laml), sqrt(lamu))
@@ -206,19 +220,19 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
     T2 <- (n/(n+1))*lamhat
     q <- (nu2/((n-1)*nu1))*T2
-    pF <- pf(q, nu1, nu2, lower.tail = FALSE)*100
+    pF <- stats::pf(q, nu1, nu2, lower.tail = FALSE)*100
 
     F0 <- (n*nu2)/((n-1)*nu1)*lamhat
     fquant <- function(nlam, qu) {
-      abs(pf(F0, nu1, nu2, ncp = nlam) - qu)
+      abs(stats::pf(F0, nu1, nu2, ncp = nlam) - qu)
     }
     fquant <- Vectorize(fquant)
 
-    laml <- nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
-    lamu <- nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
+    laml <- stats::nlminb(F0, fquant, qu = (1+conf_level)/2, lower = 0)$par/n
+    lamu <- stats::nlminb(F0, fquant, qu = (1-conf_level)/2, lower = 0)$par/n
 
-    pl <- (1 - pchisq(lamu, nu1))*100
-    pu <- (1 - pchisq(laml, nu1))*100
+    pl <- (1 - stats::pchisq(lamu, nu1))*100
+    pu <- (1 - stats::pchisq(laml, nu1))*100
 
     p_int <- c(pl, pu)
     dist_int <- c(sqrt(laml), sqrt(lamu))
@@ -244,7 +258,7 @@ MTD <- function(case, controls, conf_level = 0.95, method = c("pd", "pchi", "pf"
 
   T2 <- (n/(n+1))*lamhat
   q <- (nu2/((n-1)*nu1))*T2
-  p.val <- pf(q, nu1, nu2, lower.tail = FALSE)
+  p.val <- stats::pf(q, nu1, nu2, lower.tail = FALSE)
   names(T2) <- "Hotelling's T^2"
 
   typ.int <- 100*conf_level
