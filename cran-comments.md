@@ -2,16 +2,14 @@
 This is a resubmission. In this version I have:
 
 * Updated the vignette with extensive description of the methods used.
-* Changed default correlation matrices for Bayesian power calculators.
-* Slightly edited print output.
-* Commented source code more rigorously. 
+* Added the function MTD that offers multivariate hypothesis testing of abnormality
+* Fixed issue regarding functions not being able to take certain formats as input.
 
 ## Test environments
-- local Windows 10 R installation, R 4.0.4
-- ubuntu 16.04 (on travis-ci), R 4.0.4
-- R-hub windows-x86_64-devel (r-devel)
-- R-hub ubuntu-gcc-release (r-release)
-- R-hub fedora-clang-devel (r-devel)
+- local Windows 10 R installation, R 4.2.2
+- ubuntu 16.04 (on travis-ci), R 4.2.2
+- R-hub Windows Server 2022, R-devel, 64 bit
+- R-hub macOS 10.13.6 High Sierra, R-release, brew
 
 ## R CMD check results
 0 errors | 0 warnings | 0 notes 

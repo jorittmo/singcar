@@ -32,4 +32,7 @@
 
 * Added paper for Journal of Open Source Software
 * Added contribution guidelines and Code of Conduct
+* Updated the vignette with extensive description of the methods used.
+* Added the function MTD that offers multivariate hypothesis testing of abnormality
+* Fixed issue regarding functions not being able to take certain formats as input.
 
