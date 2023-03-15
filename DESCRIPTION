@@ -1,6 +1,10 @@
 Package: singcar
 Title: Comparing Single Cases to Small Samples
+<<<<<<< HEAD
 Version: 0.1.4
+=======
+Version: 0.1.3.9000
+>>>>>>> multivariateTD
 Authors@R: 
     c(person(given = "Jonathan",
              family = "Rittmo",
