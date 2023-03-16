@@ -1,9 +1,11 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Updated the vignette with extensive description of the methods used.
-* Added the function MTD that offers multivariate hypothesis testing of abnormality
-* Fixed issue regarding functions not being able to take certain formats as input.
+* Fixed the issue regarding:
+```
+Package CITATION file contains call(s) to old-style citEntry().  Please
+  use bibentry() instead.
+```
 
 ## Test environments
 - local Windows 10 R installation, R 4.2.2
